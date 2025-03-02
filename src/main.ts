@@ -9,9 +9,31 @@ import { createPinia } from 'pinia'
 import { useClick } from '@/utils/hooks/useClick'
 import bus, { EVENT_KEY } from '@/utils/bus'
 
+// import { CreateUserRequestSchema,UserService } from "@/api/static_codegen/user_pb";
+// import { create } from '@bufbuild/protobuf'
+// import { createClient } from "@connectrpc/connect";
+// import { createGrpcWebTransport  } from "@connectrpc/connect-web";
+
+// const transport = createGrpcWebTransport ({
+//   baseUrl: "http://127.0.0.1:8081",
+// });
+
+// // Here we make the client itself, combining the service
+// // definition with the transport.
+// const client = createClient(UserService, transport);
+
+// // 测试代码
+
+// var request = create( CreateUserRequestSchema)
+// request.name = 'test';
+
+// const response= await client.createUser(request)
+// console.log(response);
+
+console.log('main.ts')
 window.isMoved = false
-window.isMuted = true
-window.showMutedNotice = true
+window.isMuted = false
+window.showMutedNotice = false
 HTMLElement.prototype.addEventListener = new Proxy(HTMLElement.prototype.addEventListener, {
   apply(target, ctx, args) {
     const eventName = args[0]
@@ -46,10 +68,12 @@ app.use(VueLazyload, {
 })
 app.use(pinia)
 app.use(router)
+
 app.mount('#app')
 app.directive('click', vClick)
 
 //放到最后才可以使用pinia
+
 startMock()
 setTimeout(() => {
   bus.emit(EVENT_KEY.HIDE_MUTED_NOTICE)

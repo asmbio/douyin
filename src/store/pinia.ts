@@ -23,6 +23,7 @@ export const useBaseStore = defineStore('base', {
         user_age: '',
         signature: '',
         unique_id: '',
+        uid: '',
         province: '',
         city: '',
         gender: '',
@@ -51,7 +52,8 @@ export const useBaseStore = defineStore('base', {
         ]
       },
       friends: resource.users,
-      message: ''
+      message: '',
+      islogin: false
     }
   },
   getters: {
@@ -63,10 +65,12 @@ export const useBaseStore = defineStore('base', {
     async init() {
       const r = await panel()
       if (r.success) {
+        console.log('r.data', r.data)
         this.userinfo = Object.assign(this.userinfo, r.data)
       }
       const r2 = await friends()
       if (r2.success) {
+        console.log('r2.data', r2.data)
         this.users = r2.data
       }
     },

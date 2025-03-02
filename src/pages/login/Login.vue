@@ -78,11 +78,12 @@ import Loading from '../../components/Loading.vue'
 import { onMounted, reactive } from 'vue'
 import { useNav } from '@/utils/hooks/useNav'
 import { _no, _sleep } from '@/utils'
+import { useBaseStore } from '@/store/pinia'
 
 defineOptions({
   name: 'login'
 })
-
+const useStore = useBaseStore()
 const nav = useNav()
 const data = reactive({
   isAgree: false,
@@ -108,6 +109,8 @@ async function getPhone() {
 function login() {
   if (data.isAgree) {
     data.loading.login = true
+    useStore.islogin = true
+    nav('/home')
   } else {
     if (!data.showAnim && !data.showTooltip) {
       data.showAnim = true

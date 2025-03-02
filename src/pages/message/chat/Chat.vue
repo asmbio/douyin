@@ -4,8 +4,14 @@
       <div class="header">
         <div class="left">
           <dy-back @click="router.back"></dy-back>
-          <div class="badge">12</div>
-          <span>zzzz</span>
+          <img
+            :src="_checkImgUrl(store.userinfo.avatar_168x168.url_list[0])"
+            alt=""
+            style="border-radius: 50%"
+          />
+          <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{
+            store.userinfo.nickname
+          }}</span>
         </div>
         <div class="right">
           <img
@@ -30,25 +36,57 @@
           v-for="(item, index) in data.messages"
         ></ChatMessage>
       </div>
+      <!-- 在message-wrapper下方添加录音界面 -->
+      <div class="recording-indicator" v-if="data.mediaRecorder">
+        <div class="recording-animation">
+          <div class="mic-icon"></div>
+          <div class="wave"></div>
+        </div>
+        <div class="recording-time">
+          {{ formatTime(data.recordingTime) }}
+        </div>
+        <div class="recording-hint">松开结束录音</div>
+      </div>
       <div class="footer">
         <div class="toolbar" v-if="!data.recording">
           <img src="../../../assets/img/icon/message/camera.png" alt="" class="camera" />
           <input
-            @click="data.typing = true"
+            v-model="data.messageInput"
+            @click="handleInputClick"
             @blur="data.typing = false"
+            @keyup.enter.exact="handleSend"
             type="text"
             placeholder="发送信息..."
           />
+
           <img @click="handleClick" src="../../../assets/img/icon/message/voice-white.png" alt="" />
           <img src="../../../assets/img/icon/message/emoji-white.png" alt="" />
+
           <img
+            v-if="!data.messageInput"
             @click="data.showOption = !data.showOption"
             src="../../../assets/img/icon/message/add-white.png"
             alt=""
           />
+          <img
+            v-else
+            @click="handleSend"
+            src="../../../assets/img/icon/message/chat/fasong.png"
+            alt="发送"
+            class="send-btn"
+          />
         </div>
         <div class="record" v-else>
-          <span>按住 说话</span>
+          <div
+            style="padding: 0"
+            v-on:touchstart="handleStartRecording"
+            v-on:touchend="handleStopRecording"
+            v-on:mousedown="handleStartRecording"
+            v-on:mouseup="handleStopRecording"
+          >
+            <span>按住 说话</span>
+          </div>
+
           <img
             @click="data.recording = false"
             src="../../../assets/img/icon/message/keyboard.png"
@@ -194,6 +232,9 @@ import { _checkImgUrl, _no, _sleep } from '@/utils'
 import { useRouter } from 'vue-router'
 import { useNav } from '@/utils/hooks/useNav'
 import bus, { EVENT_KEY } from '@/utils/bus'
+import { mapState } from 'pinia'
+// 在现有import后添加：
+import { onBeforeUnmount } from 'vue'
 
 let CALL_STATE = {
   REJECT: 0,
@@ -249,7 +290,7 @@ const data = reactive({
       time: '2021-01-02 21:21',
       user: {
         id: '2739632844317827',
-        avatar: '../../assets/img/icon/head-image.jpg'
+        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
       }
     },
 
@@ -260,16 +301,16 @@ const data = reactive({
       time: '2021-01-02 21:21',
       user: {
         id: '2739632844317827',
-        avatar: '../../assets/img/icon/head-image.jpg'
+        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
       },
       loved: [
         {
           id: 2,
-          avatar: '../../assets/img/icon/head-image.jpg'
+          avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
         },
         {
           id: 2,
-          avatar: '../../assets/img/icon/head-image.jpg'
+          avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
         }
       ]
     },
@@ -280,7 +321,7 @@ const data = reactive({
       time: '2021-01-02 21:21',
       user: {
         id: 1,
-        avatar: '../../assets/img/icon/head-image.jpg'
+        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
       }
     },
     {
@@ -290,7 +331,7 @@ const data = reactive({
       time: '2021-01-02 21:21',
       user: {
         id: '2739632844317827',
-        avatar: '../../assets/img/icon/head-image.jpg'
+        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
       },
       readState: READ_STATE.ARRIVED
     },
@@ -301,7 +342,7 @@ const data = reactive({
       time: '2021-01-02 21:21',
       user: {
         id: '2739632844317827',
-        avatar: '../../assets/img/icon/head-image.jpg'
+        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
       }
     },
     {
@@ -311,7 +352,7 @@ const data = reactive({
       time: '2021-01-02 21:21',
       user: {
         id: '2739632844317827',
-        avatar: '../../assets/img/icon/head-image.jpg'
+        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
       }
     },
     {
@@ -321,7 +362,7 @@ const data = reactive({
       time: '2021-01-02 21:21',
       user: {
         id: '2739632844317827',
-        avatar: '../../assets/img/icon/head-image.jpg'
+        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
       }
     },
     {
@@ -331,7 +372,7 @@ const data = reactive({
       time: '2021-01-02 21:21',
       user: {
         id: '2739632844317827',
-        avatar: '../../assets/img/icon/head-image.jpg'
+        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
       }
     },
     {
@@ -341,7 +382,7 @@ const data = reactive({
       time: '2021-01-02 21:21',
       user: {
         id: '2739632844317827',
-        avatar: '../../assets/img/icon/head-image.jpg'
+        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
       }
     },
     {
@@ -351,7 +392,7 @@ const data = reactive({
       time: '2021-01-02 21:21',
       user: {
         id: '2739632844317827',
-        avatar: '../../assets/img/icon/head-image.jpg'
+        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
       }
     },
     {
@@ -364,7 +405,7 @@ const data = reactive({
       time: '2021-01-02 21:21',
       user: {
         id: '1',
-        avatar: '../../assets/img/icon/head-image.jpg'
+        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
       }
     },
     {
@@ -377,7 +418,7 @@ const data = reactive({
       time: '2021-01-02 21:21',
       user: {
         id: '2739632844317827',
-        avatar: '../../assets/img/icon/head-image.jpg'
+        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
       }
     },
     {
@@ -386,7 +427,7 @@ const data = reactive({
       time: '2021-01-02 21:21',
       user: {
         id: '2739632844317827',
-        avatar: '../../assets/img/icon/head-image.jpg'
+        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
       }
     },
     {
@@ -395,7 +436,7 @@ const data = reactive({
       time: '2021-01-02 21:21',
       user: {
         id: '2739632844317827',
-        avatar: '../../assets/img/icon/head-image.jpg'
+        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
       }
     },
     {
@@ -404,7 +445,7 @@ const data = reactive({
       time: '2021-01-02 21:21',
       user: {
         id: '1',
-        avatar: '../../assets/img/icon/head-image.jpg'
+        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
       }
     },
     {
@@ -413,7 +454,7 @@ const data = reactive({
       time: '2021-01-02 21:21',
       user: {
         id: '2739632844317827',
-        avatar: '../../assets/img/icon/head-image.jpg'
+        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
       }
     },
     {
@@ -430,7 +471,7 @@ const data = reactive({
       time: '2021-01-02 21:21',
       user: {
         id: '1',
-        avatar: '../../../assets/img/icon/head-image.jpg'
+        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
       }
     },
     {
@@ -442,7 +483,7 @@ const data = reactive({
       time: '2021-01-02 21:21',
       user: {
         id: '2739632844317827',
-        avatar: '../../../assets/img/icon/head-image.jpg'
+        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
       }
     },
     {
@@ -457,7 +498,7 @@ const data = reactive({
       time: '2021-01-02 21:21',
       user: {
         id: '2739632844317827',
-        avatar: '../../assets/img/icon/head-image.jpg'
+        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
       }
     },
     {
@@ -472,7 +513,7 @@ const data = reactive({
       time: '2021-01-02 21:21',
       user: {
         id: 1,
-        avatar: '../../assets/img/icon/head-image.jpg'
+        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
       }
     }
   ],
@@ -484,25 +525,184 @@ const data = reactive({
   showOption: false,
   isShowOpenRedPacket: false,
   tooltipTop: -1,
-  tooltipTopLocation: ''
+  tooltipTopLocation: '',
+
+  messageInput: '', // 新增输入绑定字段
+  keyboardHeight: 0, // 记录键盘高度
+
+  audioBlob: null, // 存储录音文件
+  recordingTime: 0, // 录音时长记录
+  mediaRecorder: null, // MediaRecorder实例
+
+  audioChunks: [] as Blob[], // 存储录音数据块
+  recordingTimer: null // 录音计时器
 })
 
+// 在现有代码后添加返回键处理：
+const handleKeyDown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape') {
+    router.back()
+  }
+}
+
+// 处理Android物理返回键
+const handlePopState = () => {
+  router.back()
+}
 onMounted(() => {
   msgWrapper.value
     .querySelectorAll('img')
     .forEach((item) => item.addEventListener('load', scrollBottom))
   scrollBottom()
+
+  // 新增键盘事件监听
+  window.addEventListener('keydown', handleKeyDown)
+  window.addEventListener('popstate', handlePopState)
 })
 
-onUnmounted(() => {
-  msgWrapper.value
-    .querySelectorAll('img')
-    .forEach((item) => item.removeEventListener('load', scrollBottom))
+onBeforeUnmount(() => {
+  if (msgWrapper.value) {
+    msgWrapper.value
+      .querySelectorAll('img')
+      .forEach((item) => item.removeEventListener('load', scrollBottom))
+  }
+  if (window.visualViewport) {
+    window.visualViewport.removeEventListener('resize', adjustLayout)
+  }
+  // 移除事件监听
+  window.removeEventListener('keydown', handleKeyDown)
+  window.removeEventListener('popstate', handlePopState)
 })
+onUnmounted(() => {})
 
 const isExpand = computed(() => {
   return data.showOption
 })
+// 修改后的handleStartRecording
+async function handleStartRecording() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    data.mediaRecorder = new MediaRecorder(stream)
+    data.audioChunks = []
+
+    data.mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) {
+        data.audioChunks.push(e.data)
+      }
+    }
+
+    data.mediaRecorder.onstop = async () => {
+      // 创建最终Blob
+      const audioBlob = new Blob(data.audioChunks, { type: 'audio/wav' })
+      console.log('audioBlob', audioBlob)
+      // 生成对象URL并存储
+      data.audioBlob = URL.createObjectURL(audioBlob)
+      console.log('audioBlob', data.audioBlob)
+      // 创建消息对象
+      const newMsg = {
+        type: MESSAGE_TYPE.AUDIO,
+        state: AUDIO_STATE.NORMAL,
+        data: {
+          duration: data.recordingTime,
+          src: data.audioBlob
+        },
+        time: new Date().toLocaleTimeString(),
+        user: {
+          id: store.userinfo.uid,
+          avatar: store.userinfo.avatar_168x168.url_list[0]
+        }
+      }
+
+      // 添加消息
+      if (data.recordingTime >= 1) {
+        data.messages.push(newMsg)
+        nextTick(scrollBottom)
+      } else {
+        alert('录音时间太短')
+      }
+
+      // 清理资源
+      data.audioChunks = []
+      data.recordingTime = 0
+      stream.getTracks().forEach((track) => track.stop())
+    }
+
+    data.mediaRecorder.start()
+    data.recordingTime = 0
+    data.recordingTimer = setInterval(() => {
+      data.recordingTime++
+    }, 1000)
+  } catch (error) {
+    console.error('录音失败:', error)
+  }
+}
+
+// 修改后的handleStopRecording
+function handleStopRecording() {
+  console.log('stop')
+  if (data.mediaRecorder) {
+    data.mediaRecorder.stop()
+    clearInterval(data.recordingTimer)
+    data.mediaRecorder.stream.getTracks().forEach((track) => track.stop())
+    data.mediaRecorder = null
+  }
+}
+
+// 添加时间格式化方法
+function formatTime(seconds: number) {
+  const mins = Math.floor(seconds / 60)
+  const secs = seconds % 60
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+}
+
+// 处理输入框点击
+function handleInputClick() {
+  data.typing = true
+  // 移动端需要处理键盘弹出时的布局
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', adjustLayout)
+  }
+}
+
+// 调整布局适应键盘
+function adjustLayout() {
+  const viewport = window.visualViewport
+  if (viewport) {
+    data.keyboardHeight = window.innerHeight - viewport.height
+    msgWrapper.value.style.height = `calc(var(--vh, 1vh) * 100 - ${125 + data.keyboardHeight}rem)`
+  }
+}
+
+// 处理发送
+function handleSend() {
+  if (!data.messageInput.trim()) return
+
+  // 创建新消息对象
+  const newMsg = {
+    type: MESSAGE_TYPE.TEXT,
+    data: data.messageInput,
+    time: new Date().toLocaleTimeString(),
+    user: {
+      id: store.userinfo.uid, // 当前用户ID
+      avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
+    }
+  }
+
+  // 添加到消息列表
+  data.messages.push(newMsg)
+
+  // 清空输入
+  data.messageInput = ''
+  data.typing = false
+
+  // 滚动到底部
+  nextTick(() => {
+    scrollBottom()
+    // 还原布局
+    msgWrapper.value.style.height = ''
+    data.keyboardHeight = 0
+  })
+}
 
 function handleClick() {
   data.recording = true
@@ -538,14 +738,15 @@ async function clickItem(e) {
 
 function showTooltip(e) {
   console.log(e)
-  let wrapper = null
-  e.path.map((v) => {
-    if (v && v.classList) {
-      if (v.classList.value === 'chat-wrapper') {
-        wrapper = v
-      }
-    }
-  })
+  let wrapper = e.target
+
+  // e.path.map((v) => {
+  //   if (v && v.classList) {
+  //     if (v.classList.value === 'chat-wrapper') {
+  //       wrapper = v
+  //     }
+  //   }
+  // })
   if (wrapper) {
     // console.log(wrapper.getBoundingClientRect())
     if (wrapper.getBoundingClientRect().y - 61 > 70) {
@@ -561,6 +762,71 @@ function showTooltip(e) {
 </script>
 
 <style>
+.recording-indicator {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.8);
+  padding: 20rem;
+  border-radius: 10rem;
+  text-align: center;
+
+  .recording-animation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10rem;
+
+    .mic-icon {
+      width: 30rem;
+      height: 30rem;
+      background: url('../../../assets/img/icon/microphone.png') no-repeat center;
+      background-size: contain;
+    }
+
+    .wave {
+      width: 100rem;
+      height: 30rem;
+      background: linear-gradient(90deg, #fff 50%, transparent 50%);
+      animation: wave 1s infinite linear;
+    }
+  }
+
+  .recording-time {
+    color: #fff;
+    font-size: 16rem;
+    margin-bottom: 10rem;
+  }
+
+  .recording-hint {
+    color: #ccc;
+    font-size: 12rem;
+  }
+}
+
+@keyframes wave {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 40rem 0;
+  }
+}
+/* 添加发送按钮样式 */
+.send-btn {
+  width: 24rem;
+  margin-left: 15rem;
+  transition: 0.3s;
+  &:active {
+    transform: scale(0.9);
+  }
+}
+
+/* 调整消息容器高度 */
+.message-wrapper {
+  transition: height 0.3s ease;
+}
 .scale-enter-active,
 .scale-leave-active {
   transition: transform 0.2s ease;

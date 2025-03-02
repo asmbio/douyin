@@ -15,13 +15,15 @@ try {navigator.control.longpressMenu(false);} catch (e) {} //关闭长按弹出�
 * */
 import routes from './router/routes'
 import Call from './components/Call.vue'
-import { useBaseStore } from '@/store/pinia.js'
+
 import { onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import BaseMask from '@/components/BaseMask.vue'
 import { BASE_URL } from '@/config'
-
+import { useNav } from '@/utils/hooks/useNav'
+import { useBaseStore } from '@/store/pinia.js'
+const nav = useNav()
 const store = useBaseStore()
 const route = useRoute()
 const transitionName = ref('go')
@@ -61,10 +63,17 @@ function resetVhAndPx() {
 
 onMounted(() => {
   store.init()
+  //判断是否登录
+  //  if (store.islogin === false ) {
+  //   //window.location.pathname = '/login'
+  //     nav('/login')
+  //   }else{
+  //     nav('/home')
+  //   }
   resetVhAndPx()
   // 监听resize事件 视图大小发生变化就重新计算1vh的值
   window.addEventListener('resize', () => {
-    location.href = BASE_URL + '/'
+    location.href = BASE_URL + '/home'
     resetVhAndPx()
   })
 })

@@ -53,7 +53,7 @@ export default {
     tab(index) {
       switch (index) {
         case 1:
-          this.$nav('/')
+          this.$nav('/home')
           break
         case 2:
           this.$nav('/shop')

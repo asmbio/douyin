@@ -8,7 +8,7 @@
       {{ message.time }}
     </div>
     <template v-else>
-      <img v-if="!isMe" src="../../../assets/img/icon/avatar/3.png" alt="" class="avatar" />
+      <img v-if="!isMe" :src="message.user.avatar" alt="" class="avatar" />
       <div class="chat-wrapper" @click="$emit('itemClick', message)">
         <div class="chat-text" v-if="message.type === MESSAGE_TYPE.TEXT">
           {{ message.data }}
@@ -29,17 +29,38 @@
           <img src="../../../assets/img/icon/play-white.png" class="pause" />
         </div>
 
-        <div class="audio" v-if="message.type === MESSAGE_TYPE.AUDIO">
+        <div
+          class="audio"
+          v-if="message.type === MESSAGE_TYPE.AUDIO"
+          @click.stop="toggleAudioPlayback"
+        >
           <template v-if="isMe">
-            <div class="duration">{{ message.data.duration }}'</div>
-            <img src="../../../assets/img/icon/message/chat/rss2.png" alt="" class="audio-icon" />
+            <div class="duration">{{ formattedDuration }}</div>
+
+            <img
+              src="../../../assets/img/icon/message/chat/rss2.png"
+              alt="Audio"
+              class="audio-icon"
+              :class="{ playing: isAudioPlaying }"
+            />
           </template>
           <template v-else>
-            <img src="../../../assets/img/icon/message/chat/rss.png" alt="" class="audio-icon" />
-            <div class="duration">{{ message.data.duration }}'</div>
+            <img
+              src="../../../assets/img/icon/message/chat/rss.png"
+              alt="Audio"
+              class="audio-icon"
+              :class="{ playing: isAudioPlaying }"
+            />
+            <div class="duration">{{ formattedDuration }}</div>
           </template>
+          <audio
+            ref="audioPlayer"
+            :src="validAudioSrc"
+            @ended="handleAudioEnd"
+            @timeupdate="handleTimeUpdate"
+            style="display: none"
+          ></audio>
         </div>
-
         <div
           class="call"
           v-if="
@@ -99,7 +120,7 @@
           />
         </div>
       </div>
-      <img v-if="isMe" src="../../../assets/img/icon/avatar/2.png" alt="" class="avatar" />
+      <img v-if="isMe" :src="message.user.avatar" alt="" class="avatar" />
     </template>
   </div>
 </template>
@@ -107,7 +128,7 @@
 <script>
 import { mapState } from 'pinia'
 import { useBaseStore } from '@/store/pinia'
-
+//
 let CALL_STATE = {
   REJECT: 0,
   RESOLVE: 1,
@@ -157,6 +178,8 @@ export default {
   },
   data() {
     return {
+      isAudioPlaying: false,
+      currentDuration: 0,
       MESSAGE_TYPE,
       CALL_STATE,
       RED_PACKET_MODE
@@ -164,18 +187,101 @@ export default {
   },
   computed: {
     ...mapState(useBaseStore, ['userinfo']),
+    formattedDuration() {
+      // 将秒转换为 mm:ss 格式
+      const duration = this.currentDuration || this.message.data.duration
+      const minutes = Math.floor(duration / 60)
+      const seconds = Math.floor(duration % 60)
+      return `${minutes}:${seconds.toString().padStart(2, '0')}`
+    },
+    validAudioSrc() {
+      // // 确保音频路径有效性
+      // if (this.message.data.src.startsWith('http') || this.message.data.src.startsWith('/')) {
+      //   return this.message.data.src;
+      // }
+      // return require(`@/assets/${this.message.data.src}`);
+      return this.message.data.src
+    },
     isMe() {
       return this.userinfo.uid === this.message.user.id
     }
   },
   created() {},
-  methods: {}
+  methods: {
+    toggleAudioPlayback() {
+      const audio = this.$refs.audioPlayer
+      if (!audio) return
+
+      if (audio.paused) {
+        audio
+          .play()
+          .then(() => {
+            this.isAudioPlaying = true
+          })
+          .catch((error) => {
+            console.error('音频播放失败:', error)
+            this.isAudioPlaying = false
+          })
+      } else {
+        audio.pause()
+        this.isAudioPlaying = false
+      }
+    },
+    handleAudioEnd() {
+      this.isAudioPlaying = false
+      this.currentDuration = 0
+      this.$refs.audioPlayer.currentTime = 0
+    },
+    handleTimeUpdate() {
+      this.currentDuration = Math.floor(this.$refs.audioPlayer.currentTime)
+    }
+  }
 }
 </script>
 
 <style scoped lang="less">
 @import '../../../assets/less/index';
+.audio {
+  // cursor: pointer;
+  // display: flex;
+  // align-items: center;
+  // gap: 8px;
+  // padding: 8px 12px;
+  // background: #f0f0f0;
+  // border-radius: 16px;
+  // transition: background-color 0.3s;
 
+  // &:hover {
+  //   background-color: #e0e0e0;
+  // }
+
+  .audio-icon {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s;
+
+    &.playing {
+      animation: pulse 1s infinite;
+    }
+  }
+
+  // .duration {
+  //   font-size: 12px;
+  //   color: #666;
+  // }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
 .ChatMessage {
   padding: 0 10rem;
   margin-bottom: 20rem;

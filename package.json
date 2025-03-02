@@ -23,6 +23,14 @@
     "commit": "git-cz"
   },
   "dependencies": {
+    "@bufbuild/buf": "^1.50.0",
+    "@bufbuild/protobuf": "^2.2.3",
+    "@bufbuild/protoc-gen-es": "^2.2.3",
+    "@capacitor/android": "^7.0.1",
+    "@capacitor/core": "^7.0.1",
+    "@capacitor/ios": "^7.0.1",
+    "@connectrpc/connect": "^2.0.1",
+    "@connectrpc/connect-web": "^2.0.1",
     "@jambonn/vue-lazyload": "1.0.9",
     "axios": "^1.6.8",
     "axios-mock-adapter": "^1.22.0",
@@ -34,6 +42,7 @@
     "vue-router": "4.3.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "^7.0.1",
     "@commitlint/cli": "^19.2.1",
     "@commitlint/config-conventional": "^19.1.0",
     "@iconify/vue": "^4.1.1",
