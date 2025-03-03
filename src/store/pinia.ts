@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { friends, panel } from '@/api/user'
 import enums from '@/utils/enums'
 import resource from '@/assets/data/resource'
+import { PlatformAdapter } from '@/utils/platform'
 
 export const useBaseStore = defineStore('base', {
   state: () => {
@@ -57,12 +58,16 @@ export const useBaseStore = defineStore('base', {
     }
   },
   getters: {
-    selectFriends() {
-      return this.friends.all.filter((v) => v.select)
+    selectFriends: (state) => {
+      return state.friends.all.filter((v) => v.select)
     }
   },
   actions: {
     async init() {
+      // 使用示例
+      const platformAdapter = new PlatformAdapter()
+      // 获取当前平台
+      console.log('Current platform:', platformAdapter.platform)
       const r = await panel()
       if (r.success) {
         console.log('r.data', r.data)

@@ -1,0 +1,7 @@
+# extraResources:
+#   - from: "electron/bin/${os}"
+#     to: "extra"
+#     filter:
+#       - "**/*"
+
+      

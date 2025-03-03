@@ -62,7 +62,7 @@ function resetVhAndPx() {
 }
 
 onMounted(() => {
-  store.init()
+  //store.init()
   //判断是否登录
   //  if (store.islogin === false ) {
   //   //window.location.pathname = '/login'
@@ -73,7 +73,7 @@ onMounted(() => {
   resetVhAndPx()
   // 监听resize事件 视图大小发生变化就重新计算1vh的值
   window.addEventListener('resize', () => {
-    location.href = BASE_URL + '/home'
+    //  location.href = BASE_URL + '/home'
     resetVhAndPx()
   })
 })

@@ -1,10 +1,30 @@
 import Mogu from '@/definitions'
+
+// electron-preload/preload.ts
+
+// export default {
+//   methods: {
+//     async startApp() {
+//       try {
+//         const result = await ipcRenderer.invoke('start-app', '--my-argument')
+//         this.$message.success(result)
+//       } catch (err) {
+//         this.$message.error(err.message)
+//       }
+//     },
+//     async checkStatus() {
+//       const isRunning = await ipcRenderer.invoke('check-app-status')
+//       this.$message.info(isRunning ? '应用正在运行' : '应用未运行')
+//     }
+//   }
+// }
 // platform.enum.ts
 export enum Platform {
-  Windows = 'windows',
-  Mac = 'mac',
-  Linux = 'linux',
+  // Windows = 'windows',
+  // Mac = 'mac',
+  // Linux = 'linux',
   Mobile = 'mobile',
+  Desktop = 'desktop',
   Unknown = 'unknown'
 }
 
@@ -12,13 +32,12 @@ export enum Platform {
 export class PlatformDetector {
   static detect(): Platform {
     const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : ''
-
+    console.log(userAgent)
     const rules: [RegExp, Platform][] = [
-      [/windows phone/i, Platform.Mobile],
-      [/windows/i, Platform.Windows],
-      [/macintosh/i, Platform.Mac],
-      [/linux/i, Platform.Linux],
-      [/android|webos|iphone|ipad/i, Platform.Mobile]
+      [/android|webos|iphone|ipad|Mobile|windows phone/i, Platform.Mobile],
+      [/windows|macintosh|linux/i, Platform.Desktop]
+      // [/macintosh/i, Platform.Mac],
+      // [/linux/i, Platform.Linux],
     ]
 
     for (const [regex, platform] of rules) {
@@ -37,44 +56,60 @@ export class PlatformDetector {
 
 // platform-action-handler.ts
 type PlatformActionMap = {
-  [key in Platform]: () => void
+  [key in Platform]: (pwd: string) => void
 }
 
 export class PlatformActionHandler {
   private static actions: PlatformActionMap = {
-    [Platform.Windows]: () => {
-      console.log('Executing Windows specific action')
-      // Windows 原生 API 调用
-    },
-    [Platform.Mac]: () => {
-      console.log('Executing macOS specific action')
-      // macOS 原生 API 调用
-    },
-    [Platform.Linux]: () => {
+    // [Platform.Windows]: () => {
+    //   console.log('Executing Windows specific action')
+    //   // Windows 原生 API 调用
+    // },
+    // [Platform.Mac]: () => {
+    //   console.log('Executing macOS specific action')
+    //   // macOS 原生 API 调用
+    // },
+    [Platform.Desktop]: (pwd: string) => {
       console.log('Executing Linux specific action')
-    },
-    [Platform.Mobile]: () => {
-      console.log('Executing mobile specific action')
-      if (typeof navigator !== 'undefined' && navigator.vibrate) {
-        navigator.vibrate(200)
-      }
-
-      Mogu.start({ pwd: '123456' })
+      window.ipcRenderer
+        .invoke('start-app', pwd)
         .then((result) => {
           console.log('Success:', result.value)
         })
         .catch((error) => {
-          console.error('Error:', error.message)
           alert(error.message)
         })
     },
-    [Platform.Unknown]: () => {
+    [Platform.Mobile]: (pwd: string) => {
+      console.log('Executing mobile specific action')
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate(200)
+        Mogu.start({ pwd: '123456' })
+          .then((result) => {
+            console.log('Success:', result.value)
+          })
+          .catch((error) => {
+            console.error('Error:', error.message)
+            alert(error.message)
+          })
+      } else {
+        window.ipcRenderer
+          .invoke('start-app', pwd)
+          .then((result) => {
+            console.log('Success:', result.value)
+          })
+          .catch((error) => {
+            alert(error.message)
+          })
+      }
+    },
+    [Platform.Unknown]: (pwd: string) => {
       console.log('Default action for unknown platform')
     }
   }
 
-  static execute(platform: Platform): void {
-    this.actions[platform]?.()
+  static execute(platform: Platform, pwd: string): void {
+    this.actions[platform]?.(pwd)
   }
 }
 
@@ -91,7 +126,7 @@ export class PlatformAdapter {
     this.resizeHandler = this.handleResize.bind(this)
 
     if (typeof window !== 'undefined') {
-      window.addEventListener('resize', this.resizeHandler)
+      //  window.addEventListener('resize', this.resizeHandler)
     }
   }
 
@@ -103,8 +138,8 @@ export class PlatformAdapter {
     return PlatformDetector.isMobile(this.currentPlatform)
   }
 
-  public executePlatformAction(): void {
-    PlatformActionHandler.execute(this.currentPlatform)
+  public executePlatformAction(pwd: string): void {
+    PlatformActionHandler.execute(this.currentPlatform, pwd)
   }
 
   public subscribe(callback: PlatformChangeCallback): void {

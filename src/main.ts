@@ -1,13 +1,14 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import './assets/less/index.less'
-import { startMock } from '@/mock'
+//import { startMock } from '@/mock'
 import router from './router'
 import mixin from './utils/mixin'
 import VueLazyload from '@jambonn/vue-lazyload'
 import { createPinia } from 'pinia'
 import { useClick } from '@/utils/hooks/useClick'
 import bus, { EVENT_KEY } from '@/utils/bus'
+import { useBaseStore } from '@/store/pinia.js'
 
 // import { CreateUserRequestSchema,UserService } from "@/api/static_codegen/user_pb";
 // import { create } from '@bufbuild/protobuf'
@@ -31,6 +32,7 @@ import bus, { EVENT_KEY } from '@/utils/bus'
 // console.log(response);
 
 console.log('main.ts')
+
 window.isMoved = false
 window.isMuted = false
 window.showMutedNotice = false
@@ -58,6 +60,7 @@ HTMLElement.prototype.addEventListener = new Proxy(HTMLElement.prototype.addEven
 
 const vClick = useClick()
 const pinia = createPinia()
+
 const app = createApp(App)
 app.mixin(mixin)
 const loadImage = new URL('./assets/img/icon/img-loading.png', import.meta.url).href
@@ -70,11 +73,14 @@ app.use(pinia)
 app.use(router)
 
 app.mount('#app')
+console.log("app.mount('#app')")
 app.directive('click', vClick)
 
 //放到最后才可以使用pinia
+//const store = useBaseStore()
+//store.init()
 
-startMock()
+//startMock()
 setTimeout(() => {
   bus.emit(EVENT_KEY.HIDE_MUTED_NOTICE)
   window.showMutedNotice = false

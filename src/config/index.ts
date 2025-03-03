@@ -6,13 +6,16 @@ export default {
 const BASE_URL_MAP = {
   DEV: '',
   PROD: '',
+  ELECTRON: '',
   // GP_PAGES: '/dist',
   GP_PAGES: '',
   GITEE_PAGES: '/douyin',
   UNI: 'https://dy.ttentau.top'
 }
 
-export const IS_SUB_DOMAIN = ['GITEE_PAGES', 'GP_PAGES'].includes(import.meta.env.VITE_ENV)
+export const IS_SUB_DOMAIN = ['GITEE_PAGES', 'GP_PAGES', 'ELECTRON'].includes(
+  import.meta.env.VITE_ENV
+)
 export const IS_GITEE_PAGES = ['GITEE_PAGES'].includes(import.meta.env.VITE_ENV)
 export const BASE_URL = BASE_URL_MAP[import.meta.env.VITE_ENV]
 export const IMG_URL = BASE_URL + '/images/'

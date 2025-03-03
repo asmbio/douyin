@@ -6,6 +6,10 @@ import { Plugin as importToCDN } from 'vite-plugin-cdn-import'
 import { fileURLToPath, URL } from 'node:url'
 import { getLastCommit } from 'git-last-commit'
 import VueMacros from 'unplugin-vue-macros/vite'
+import * as path from 'path'
+import electron from 'vite-plugin-electron'
+import electronRenderer from 'vite-plugin-electron-renderer'
+//import polyfillExports  from "vite-plugin-electron-renderer";
 
 const lifecycle = process.env.npm_lifecycle_event
 
@@ -31,6 +35,22 @@ export default defineConfig((): Promise<UserConfig> => {
             //   exclude: [/node_modules/, /jQuery\.js/]
             // }
           }),
+          electron([
+            {
+              entry: 'electron/main.ts' // 主进程文件
+            },
+            {
+              entry: 'electron/preload.ts',
+              onstart({ reload }) {
+                // Notify the Renderer process to reload the page when the Preload scripts build is complete,
+                // instead of restarting the entire Electron App.
+                reload()
+              }
+            }
+          ]),
+          electronRenderer(),
+          //polyfillExports(),
+
           // Vue(),
           // VueJsx(),
           lifecycle === 'report' ? (visualizer({ open: false }) as any as PluginOption) : null,
@@ -155,7 +175,9 @@ export default defineConfig((): Promise<UserConfig> => {
               assetFileNames: 'assets/[name]-[hash].[ext]' // 资源文件像 字体，图片等
             }
           },
-          assetsInlineLimit: 2048
+
+          assetsInlineLimit: 2048,
+          emptyOutDir: false
         },
         define: {
           LATEST_COMMIT_HASH: JSON.stringify(
