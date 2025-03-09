@@ -1,5 +1,13 @@
 import Mogu from '@/definitions'
 
+declare global {
+  interface Window {
+    electronAPI: {
+      startApp: (pwd: string) => Promise<{ value: string }>
+    }
+  }
+}
+
 // electron-preload/preload.ts
 
 // export default {
@@ -70,9 +78,9 @@ export class PlatformActionHandler {
     //   // macOS 原生 API 调用
     // },
     [Platform.Desktop]: (pwd: string) => {
-      console.log('Executing Linux specific action')
-      window.ipcRenderer
-        .invoke('start-app', pwd)
+      console.log('Executing desktop specific action')
+      window.electronAPI
+        .startApp(pwd)
         .then((result) => {
           console.log('Success:', result.value)
         })
@@ -93,8 +101,8 @@ export class PlatformActionHandler {
             alert(error.message)
           })
       } else {
-        window.ipcRenderer
-          .invoke('start-app', pwd)
+        window.electronAPI
+          .startApp(pwd)
           .then((result) => {
             console.log('Success:', result.value)
           })

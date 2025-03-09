@@ -3,6 +3,7 @@
     <Loading v-if="state.loading" style="position: absolute" />
     <!--    <video :src="item.video + '?v=123'"-->
     <video
+      @ended="videoEnded"
       :poster="poster"
       ref="videoEl"
       :muted="state.isMuted"
@@ -88,7 +89,7 @@ import ItemToolbar from './ItemToolbar.vue'
 import ItemDesc from './ItemDesc.vue'
 import bus, { EVENT_KEY } from '../../utils/bus'
 import { SlideItemPlayStatus } from '@/utils/const_var'
-import { computed, onMounted, onUnmounted, provide, reactive } from 'vue'
+import { computed, onBeforeUnmount, onMounted, onUnmounted, provide, reactive } from 'vue'
 import { Icon } from '@iconify/vue'
 import { _css } from '@/utils/dom'
 
@@ -171,7 +172,8 @@ let state = reactive({
     width: 0
   },
   videoScreenHeight: 0,
-  commentVisible: false
+  commentVisible: false,
+  hasEnded: false // 新增状态
 })
 const poster = $computed(() => {
   return _checkImgUrl(props.item.video.poster ?? props.item.video.cover.url_list[0])
@@ -200,15 +202,23 @@ onMounted(() => {
   state.width = document.body.clientWidth
   videoEl.currentTime = 0
   let fun = (e) => {
+    // console.log(e.target.currentTime)
+
     state.currentTime = Math.ceil(e.target.currentTime)
     state.playX = (state.currentTime - 1) * state.step
+    //  console.log(state.currentTime,state.playX)
   }
+
   videoEl.addEventListener('loadedmetadata', () => {
     state.videoScreenHeight = videoEl.videoHeight / (videoEl.videoWidth / state.width)
     state.duration = videoEl.duration
     state.progressBarRect = progressEl.getBoundingClientRect()
     state.step = state.progressBarRect.width / Math.floor(state.duration)
     videoEl.addEventListener('timeupdate', fun)
+    // videoEl.addEventListener('ended', (e) => {
+    //   state.hasEnded=true
+    //   console.log('ended')
+    // })
   })
 
   let eventTester = (e, t: string) => {
@@ -267,7 +277,16 @@ onMounted(() => {
 
   bus.on(EVENT_KEY.REMOVE_MUTED, removeMuted)
 })
-
+onBeforeUnmount(() => {
+  // 更新观看时间
+  // 发送播放数据
+  console.log('awemeId: %s,%s,%s ', props.item.aweme_id, state.hasEnded, state.currentTime)
+  // bus.emit(EVENT_KEY.VIDEO_PLAYBACK_DATA, {
+  //   hasEnded: state.hasEnded,
+  //   currentTime: state.currentTime,
+  //   awemeId: props.item.aweme_id // 可选：传递视频ID用于关联
+  // })
+})
 onUnmounted(() => {
   // console.log('unmounted')
   bus.off(EVENT_KEY.SINGLE_CLICK_BROADCAST, click)
@@ -279,7 +298,10 @@ onUnmounted(() => {
   bus.off(EVENT_KEY.CLOSE_SUB_TYPE, onCloseSubType)
   bus.off(EVENT_KEY.REMOVE_MUTED, removeMuted)
 })
-
+function videoEnded() {
+  console.log('视频播放完毕')
+  // 执行其他操作...
+}
 function removeMuted() {
   state.isMuted = false
 }

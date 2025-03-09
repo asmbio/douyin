@@ -94,6 +94,7 @@ async function getData(refresh = false) {
     if (refresh) {
       state.list = []
     }
+    console.log(res.data.list)
     state.list = state.list.concat(res.data.list)
   }
 }

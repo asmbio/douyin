@@ -11,7 +11,7 @@
     <div class="userinfo">
       <div class="change-avatar">
         <div class="avatar-ctn" @click="showAvatarDialog">
-          <img class="avatar" :src="_checkImgUrl(store.userinfo.cover_url[0].url_list[0])" alt="" />
+          <img class="avatar" :src="_checkImgUrl(store.userinfo.coverUrl[0]?.urlList[0])" alt="" />
           <img class="change" src="../../../assets/img/icon/me/camera-light.png" alt="" />
         </div>
         <span>点击更换头像</span>
@@ -19,7 +19,7 @@
       <div class="row" @click="nav('/me/edit-userinfo-item', { type: 1 })">
         <div class="left">名字</div>
         <div class="right">
-          <span>{{ isEmpty(store.userinfo.nickname) }}</span>
+          <span>{{ isEmpty(store.userinfo.displayname) }}</span>
           <dy-back scale=".8" direction="right"></dy-back>
         </div>
       </div>
@@ -47,7 +47,7 @@
       <div class="row" @click="showBirthdayDialog">
         <div class="left">生日</div>
         <div class="right">
-          <span>{{ isEmpty(store.userinfo.user_age) }}</span>
+          <span>{{ isEmpty(store.userinfo.userAge) }}</span>
           <div v-show="false" id="trigger1"></div>
           <dy-back scale=".8" direction="right"></dy-back>
         </div>
@@ -152,7 +152,7 @@ function showAvatarDialog() {
       case 2:
         return _no()
       case 3:
-        data.previewImg = _checkImgUrl(store.userinfo.cover_url[0].url_list[0])
+        data.previewImg = _checkImgUrl(store.userinfo.coverUrl[0].urlList[0])
         break
     }
   })
@@ -224,7 +224,7 @@ function showBirthdayDialog() {
 
   .resource {
     width: 100%;
-    max-height: %;
+    max-height: 100%;
   }
 
   .download {

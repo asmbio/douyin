@@ -1,35 +1,21 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import './assets/less/index.less'
-//import { startMock } from '@/mock'
+import { startMock } from '@/mock'
 import router from './router'
 import mixin from './utils/mixin'
 import VueLazyload from '@jambonn/vue-lazyload'
 import { createPinia } from 'pinia'
 import { useClick } from '@/utils/hooks/useClick'
 import bus, { EVENT_KEY } from '@/utils/bus'
-import { useBaseStore } from '@/store/pinia.js'
+import { PlatformAdapter } from './utils/platform'
+import { useBaseStore } from './store/pinia'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
-// import { CreateUserRequestSchema,UserService } from "@/api/static_codegen/user_pb";
-// import { create } from '@bufbuild/protobuf'
-// import { createClient } from "@connectrpc/connect";
-// import { createGrpcWebTransport  } from "@connectrpc/connect-web";
-
-// const transport = createGrpcWebTransport ({
-//   baseUrl: "http://127.0.0.1:8081",
-// });
-
-// // Here we make the client itself, combining the service
-// // definition with the transport.
-// const client = createClient(UserService, transport);
-
-// // 测试代码
-
-// var request = create( CreateUserRequestSchema)
-// request.name = 'test';
-
-// const response= await client.createUser(request)
-// console.log(response);
+const platformAdapter = new PlatformAdapter()
+// 获取当前平台
+console.log('Current platform:', platformAdapter.platform)
+//platformAdapter.executePlatformAction(data.password)
 
 console.log('main.ts')
 
@@ -60,6 +46,7 @@ HTMLElement.prototype.addEventListener = new Proxy(HTMLElement.prototype.addEven
 
 const vClick = useClick()
 const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
 
 const app = createApp(App)
 app.mixin(mixin)
@@ -71,16 +58,18 @@ app.use(VueLazyload, {
 })
 app.use(pinia)
 app.use(router)
+const store = useBaseStore()
 
 app.mount('#app')
 console.log("app.mount('#app')")
+
 app.directive('click', vClick)
 
 //放到最后才可以使用pinia
 //const store = useBaseStore()
 //store.init()
 
-//startMock()
+startMock()
 setTimeout(() => {
   bus.emit(EVENT_KEY.HIDE_MUTED_NOTICE)
   window.showMutedNotice = false

@@ -1,8 +1,10 @@
 import { defineStore } from 'pinia'
-import { friends, panel } from '@/api/user'
-import enums from '@/utils/enums'
+
 import resource from '@/assets/data/resource'
-import { PlatformAdapter } from '@/utils/platform'
+
+import { _sleep } from '@/utils'
+import { UserInfoSchema, type UserInfo, type Userinfolist } from '@/api/gen/userinfo_pb'
+import { getPanel } from '@/api/moguservice'
 
 export const useBaseStore = defineStore('base', {
   state: () => {
@@ -18,44 +20,14 @@ export const useBaseStore = defineStore('base', {
       loading: false,
       routeData: null,
       users: [],
-      userinfo: {
-        nickname: '',
-        desc: '',
-        user_age: '',
-        signature: '',
-        unique_id: '',
-        uid: '',
-        province: '',
-        city: '',
-        gender: '',
-        school: {
-          name: '',
-          department: null,
-          joinTime: null,
-          education: null,
-          displayType: enums.DISPLAY_TYPE.ALL
-        },
-        avatar_168x168: {
-          url_list: []
-        },
-        avatar_300x300: {
-          url_list: []
-        },
-        cover_url: [
-          {
-            url_list: []
-          }
-        ],
-        white_cover_url: [
-          {
-            url_list: []
-          }
-        ]
-      },
+      userinfo: {} as UserInfo, // Initialized with an empty object
       friends: resource.users,
       message: '',
       islogin: false
     }
+  },
+  persist: {
+    storage: sessionStorage
   },
   getters: {
     selectFriends: (state) => {
@@ -64,20 +36,35 @@ export const useBaseStore = defineStore('base', {
   },
   actions: {
     async init() {
-      // 使用示例
-      const platformAdapter = new PlatformAdapter()
-      // 获取当前平台
-      console.log('Current platform:', platformAdapter.platform)
-      const r = await panel()
-      if (r.success) {
-        console.log('r.data', r.data)
-        this.userinfo = Object.assign(this.userinfo, r.data)
+      let success = false
+      while (!success) {
+        try {
+          const r = await getPanel()
+          //   console.log('r.data', r);
+          this.userinfo = r
+          //   console.log('userinfo', this.userinfo);
+          // const r2 = await getContacts('', 20, CONTACT_TAG.FRIEND);
+          // console.log('r2.data', r2.userList);
+          // this.users = r2.userList;
+          // console.log('users', this.users);
+          success = true
+        } catch (err) {
+          await _sleep(1000)
+          console.error(err)
+        }
       }
-      const r2 = await friends()
-      if (r2.success) {
-        console.log('r2.data', r2.data)
-        this.users = r2.data
-      }
+      // 捕获刷新信号并保存状态到 sessionStorage
+
+      return true
+    },
+    setsession() {
+      console.log('setsession')
+      sessionStorage.setItem('piniaState', JSON.stringify(this.$state))
+    },
+    loadsession() {
+      const lstate = JSON.parse(sessionStorage.getItem('piniaState'))
+      console.log('loadsession', lstate)
+      Object.assign(this.$state, lstate)
     },
     setUserinfo(val) {
       this.userinfo = val

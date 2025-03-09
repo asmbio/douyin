@@ -30,11 +30,7 @@
     <div class="footer">
       <div class="comment">
         <div class="left">
-          <img
-            :src="_checkImgUrl(baseStore.userinfo.avatar_168x168.url_list[0])"
-            class="avatar"
-            alt=""
-          />
+          <img :src="_getavater(baseStore.userinfo)" class="avatar" alt="" />
           <span>善语结善缘，恶言伤人心</span>
         </div>
         <div class="right">
@@ -116,7 +112,7 @@ import ConfirmDialog from '../../components/dialog/ConfirmDialog.vue'
 import FollowSetting2 from '@/pages/home/components/FollowSetting2.vue'
 import ShareToFriend from '@/pages/home/components/ShareToFriend.vue'
 import { DefaultUser } from '@/utils/const_var'
-import { _checkImgUrl, slideItemRender } from '@/utils'
+import { _checkImgUrl, slideItemRender, _getavater } from '@/utils'
 import { useBaseStore } from '@/store/pinia'
 import SlideVerticalInfinite from '@/components/slide/SlideVerticalInfinite.vue'
 import { useRouter } from 'vue-router'

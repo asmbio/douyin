@@ -1,0 +1,492 @@
+syntax = "proto3";
+
+package protos;
+
+option go_package = "douyinapi/protos/out";
+
+
+// // 用户服务
+// service UserService {
+//   // 基础信息
+//   rpc GetUserInfo(UserInfoRequest) returns (User) {}
+//   rpc UpdateUserInfo(UpdateUserRequest) returns (User) {}
+  
+//   // 社交关系
+//   rpc GetUserFriends(FriendsRequest) returns (UserList) {}
+//   rpc FollowUser(FollowRequest) returns (RelationStatus) {}
+//   rpc UnfollowUser(FollowRequest) returns (RelationStatus) {}
+  
+//   // 内容管理
+//   rpc GetUserCollect(CollectRequest) returns (UserCollectResponse) {}
+//   rpc GetUserVideoList(VideoListRequest) returns (VideoListResponse) {}
+//   rpc GetUserLikedVideos(VideoListRequest) returns (VideoListResponse) {}
+  
+//   // 消息系统
+//   rpc GetMessages(MessageRequest) returns (MessageList) {}
+//   rpc SendMessage(NewMessage) returns (MessageStatus) {}
+// }
+
+// // 视频服务
+// service VideoService {
+//   // 视频获取
+//   rpc GetRecommendedVideos(VideoRequest) returns (VideoListResponse) {}
+//   rpc GetFollowingVideos(VideoRequest) returns (VideoListResponse) {}
+//   rpc GetPrivateVideos(VideoRequest) returns (VideoListResponse) {}
+//   rpc GetHistoryVideos(HistoryRequest) returns (VideoListResponse) {}
+  
+//   // 互动功能
+//   rpc GetVideoComments(CommentRequest) returns (CommentList) {}
+//   rpc PostComment(NewComment) returns (Comment) {}
+//   rpc LikeVideo(LikeRequest) returns (LikeStatus) {}
+  
+//   // 内容操作
+//   rpc PublishVideo(stream VideoUpload) returns (PublishStatus) {}
+//   rpc DeleteVideo(DeleteRequest) returns (OperationStatus) {}
+//   rpc ReportVideo(ReportRequest) returns (OperationStatus) {}
+  
+//   // 扩展功能
+//   rpc SearchVideos(SearchRequest) returns (VideoListResponse) {}
+//   rpc GetVideoStream(StreamRequest) returns (stream VideoChunk) {}
+// }
+
+message VideoList{
+  repeated Video all =1;
+}
+message Video {
+  string aweme_id = 1;
+  string desc = 2;
+  int64 create_time = 3;
+  string share_url = 4;
+  int64 duration = 5;
+  bool prevent_download = 6;
+  
+  // 关联实体
+  Music music = 7;
+  VideoInfo video = 8;
+  Statistics statistics = 9;
+  VideoStatus status = 10;
+  Author author = 11;
+  
+  // 扩展内容
+  repeated TextExtra text_extra = 12;
+  RiskInfo risk_infos = 13;
+}
+
+// ========== 嵌套结构 ==========
+
+message Music {
+  int64 id = 1;
+  string title = 2;
+  string author = 3;
+  int32 duration = 4;
+  MediaInfo cover_medium = 5;
+  MediaInfo cover_thumb = 6;
+  MediaInfo play_url = 7;
+}
+
+message VideoInfo {
+  PlayAddr play_addr = 1;
+  MediaInfo cover = 2;
+  string poster = 3;
+  int32 height = 4;
+  int32 width = 5;
+  string ratio = 6;
+}
+
+message Author {
+  string uid = 1;
+  string displayname = 2;
+  string signature = 3;
+  string ip_location = 4;
+  int64 follower_count = 5;
+  AvatarInfo avatar_168x168 = 6;
+  AvatarInfo avatar_300x300 = 7;
+}
+
+// ========== 通用结构 ==========
+
+message MediaInfo {
+  string uri = 1;
+  repeated string url_list = 2;
+  int32 width = 3;
+  int32 height = 4;
+}
+
+message PlayAddr {
+  string uri = 1;
+  repeated string url_list = 2;
+  string url_key = 3;
+  int32 data_size = 4;
+}
+
+message AvatarInfo {
+  string uri = 1;
+  repeated string url_list = 2;
+  int32 width = 3;
+  int32 height = 4;
+}
+
+// ========== 新增结构 ==========
+
+message Statistics {
+  int64 admire_count = 1;
+  int64 comment_count = 2;
+  int64 digg_count = 3;
+  int64 collect_count = 4;
+  int64 play_count = 5;
+  int64 share_count = 6;
+}
+
+message VideoStatus {
+  int32 listen_video_status = 1;
+  bool is_delete = 2;
+  bool allow_share = 3;
+  bool is_prohibited = 4;
+  bool in_reviewing = 5;
+  int32 part_see = 6;
+  int32 private_status = 7;
+  ReviewResult review_result = 8;
+}
+
+message ReviewResult {
+  int32 review_status = 1;
+}
+
+message RiskInfo {
+  bool vote = 1;
+  bool warn = 2;
+  bool risk_sink = 3;
+  int32 type = 4;
+  string content = 5;
+}
+
+message TextExtra {
+  int32 start = 1;
+  int32 end = 2;
+  int32 type = 3;
+  string hashtag_name = 4;
+  string hashtag_id = 5;
+  bool is_commerce = 6;
+  int32 caption_start = 7;
+  int32 caption_end = 8;
+}
+
+// ========== 枚举类型 ==========
+
+enum RelateType {
+  REQUEST_FOLLOW = 0;
+  FOLLOW_ME = 1;
+  FOLLOW_HE = 2;
+  FOLLOW_EACH_OTHER = 3;
+}
+
+enum VisibilityLevel {
+  PUBLIC = 0;
+  PRIVATE = 1;
+  FRIENDS_ONLY = 2;
+}
+
+
+message VideoUpload {
+  oneof upload_type {
+    bytes chunk_data = 1;
+    VideoMetadata metadata = 2;
+  }
+}
+
+message VideoMetadata {
+  string title = 1;
+  string desc = 2;
+  string cover_uri = 3;
+  VisibilityLevel visibility = 4;
+  repeated string hashtags = 5;
+}
+
+message OperationStatus {
+  bool success = 1;
+  string error_code = 2;
+  string message = 3;
+  int64 timestamp = 4;
+}
+
+// ========== 流式传输 ==========
+
+message VideoChunk {
+  bytes data = 1;
+  int32 chunk_number = 2;
+  bool is_last = 3;
+}
+
+// ========== 其他结构 ==========
+
+message Pagination {
+  int32 page = 1;
+  int32 page_size = 2;
+  string sort_by = 3;
+}
+
+
+
+// {
+//   "aweme_id": "6727250369396608264",
+//   "desc": "一想到你我就。。。#芒种 #原创国风计划",
+//   "create_time": 1566310036,
+//   "music": {
+//       "id": 6726069569057803000,
+//       "title": "用户创作的原声",
+//       "author": "Dd5233_",
+//       "cover_medium": {
+//           "uri": "720x720/aweme-avatar/tos-cn-avt-0015_d3040e2fef654a95f4df19a0b6c3841f",
+//           "url_list": [
+//               "https://p3-pc.douyinpic.com/aweme/720x720/aweme-avatar/tos-cn-avt-0015_d3040e2fef654a95f4df19a0b6c3841f.jpeg?from=116350172"
+//           ],
+//           "width": 720,
+//           "height": 720
+//       },
+//       "cover_thumb": {
+//           "uri": "100x100/aweme-avatar/tos-cn-avt-0015_d3040e2fef654a95f4df19a0b6c3841f",
+//           "url_list": [
+//               "https://p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-avt-0015_d3040e2fef654a95f4df19a0b6c3841f.jpeg?from=116350172"
+//           ],
+//           "width": 720,
+//           "height": 720
+//       },
+//       "play_url": {
+//           "uri": "https://sf3-cdn-tos.douyinstatic.com/obj/ies-music/6726069569057803021.m4a",
+//           "url_list": [
+//               "https://sf3-cdn-tos.douyinstatic.com/obj/ies-music/6726069569057803021.m4a",
+//               "https://sf5-hl-cdn-tos.douyinstatic.com/obj/ies-music/6726069569057803021.m4a"
+//           ],
+//           "width": 720,
+//           "height": 720,
+//           "url_key": "6726069569057803021"
+//       },
+//       "duration": 7,
+//       "user_count": 0,
+//       "owner_id": "107998862767",
+//       "owner_nickname": "Dd5233_",
+//       "is_original": false
+//   },
+//   "video": {
+//       "play_addr": {
+//           "uri": "v0200f9e0000bldvt42gd9fqp49ecpag",
+//           "url_list": [
+//               "https://www.douyin.com/aweme/v1/play/?video_id=v0200f9e0000bldvt42gd9fqp49ecpag&line=0&file_id=f87d7ac5d5a24b19b3f33f1b31ba02e7&sign=c872722944d05b0ccd56ac9f5fb8a51b&is_play_url=1&source=PackSourceEnum_PUBLISH"
+//           ],
+//           "width": 1080,
+//           "height": 1920,
+//           "url_key": "v0200f9e0000bldvt42gd9fqp49ecpag_h264_1080p_2640316",
+//           "data_size": 2395427,
+//           "file_hash": "c872722944d05b0ccd56ac9f5fb8a51b",
+//           "file_cs": "c:0-8749-5a66|d:0-1197712-9106,1197713-2395426-e0b2|a:v0200f9e0000bldvt42gd9fqp49ecpag"
+//       },
+//       "cover": {
+//           "uri": "tos-cn-p-0015/e468ce3333034b1db0c987b00f2b5af3",
+//           "url_list": [
+//               "od74MFuaQhZyh-PZyPN1S.png"
+//           ],
+//           "width": 720,
+//           "height": 720
+//       },
+//       "poster": "out9.jpg",
+//       "height": 1280,
+//       "width": 720,
+//       "ratio": "1080p",
+//       "use_static_cover": false,
+//       "duration": 7258
+//   },
+//   "share_url": "https://www.iesdouyin.com/share/video/6727250369396608264/?region=CN&mid=6726069569057803021&u_code=13kgm680k&did=MS4wLjABAAAAiOgYyZm8XbWZMr5o3OvhR-TEOuNygb_hQOwkie-VXJpDYaR4vZfpiIGBfAWKCFHB&iid=MS4wLjABAAAANwkJuWIRFOzg5uCpDRpMj4OX-QryoDgn-yYlXQnRwQQ&with_sec_did=1&titleType=title&share_sign=Ap.RTkMGnFHEOhBESgtUfw7mmOS5plOMI.3o4FkvWRY-&share_version=170400&ts=1710492054&from_aid=6383&from_ssr=1",
+//   "statistics": {
+//       "admire_count": 0,
+//       "comment_count": 94706,
+//       "digg_count": 4403895,
+//       "collect_count": 147324,
+//       "play_count": 0,
+//       "share_count": 169502
+//   },
+//   "status": {
+//       "listen_video_status": 0,
+//       "is_delete": false,
+//       "allow_share": true,
+//       "is_prohibited": false,
+//       "in_reviewing": false,
+//       "part_see": 0,
+//       "private_status": 0,
+//       "review_result": {
+//           "review_status": 0
+//       }
+//   },
+//   "text_extra": [
+//       {
+//           "start": 9,
+//           "end": 12,
+//           "type": 1,
+//           "hashtag_name": "芒种",
+//           "hashtag_id": "1602062059634691",
+//           "is_commerce": false,
+//           "caption_start": 0,
+//           "caption_end": 0
+//       },
+//       {
+//           "start": 13,
+//           "end": 20,
+//           "type": 1,
+//           "hashtag_name": "原创国风计划",
+//           "hashtag_id": "1612584995920910",
+//           "is_commerce": false,
+//           "caption_start": 0,
+//           "caption_end": 0
+//       }
+//   ],
+//   "is_top": 1,
+//   "share_info": {
+//       "share_url": "https://www.iesdouyin.com/share/video/6727250369396608264/?region=CN&mid=6726069569057803021&u_code=13kgm680k&did=MS4wLjABAAAAiOgYyZm8XbWZMr5o3OvhR-TEOuNygb_hQOwkie-VXJpDYaR4vZfpiIGBfAWKCFHB&iid=MS4wLjABAAAANwkJuWIRFOzg5uCpDRpMj4OX-QryoDgn-yYlXQnRwQQ&with_sec_did=1&titleType=title&share_sign=Ap.RTkMGnFHEOhBESgtUfw7mmOS5plOMI.3o4FkvWRY-&share_version=170400&ts=1710492054&from_aid=6383&from_ssr=1",
+//       "share_link_desc": "6.99 05/09 G@v.SY Lws:/ 一想到你我就。。。# 芒种 # 原创国风计划  %s 复制此链接，打开Dou音搜索，直接观看视频！"
+//   },
+//   "duration": 7258,
+//   "image_infos": null,
+//   "risk_infos": {
+//       "vote": false,
+//       "warn": false,
+//       "risk_sink": false,
+//       "type": 0,
+//       "content": ""
+//   },
+//   "position": null,
+//   "author_user_id": 60043717321,
+//   "prevent_download": false,
+//   "long_video": null,
+//   "aweme_control": {
+//       "can_forward": true,
+//       "can_share": true,
+//       "can_comment": true,
+//       "can_show_comment": true
+//   },
+//   "images": null,
+//   "suggest_words": {
+//       "suggest_words": [
+//           {
+//               "words": [
+//                   {
+//                       "word": "芒种鞠婧祎",
+//                       "word_id": "6749107705027237127",
+//                       "info": "{\"qrec_for_search\":\"{\\\"video_ecom\\\":\\\"1\\\"}\"}"
+//                   }
+//               ],
+//               "scene": "detail_inbox_rex",
+//               "icon_url": "",
+//               "hint_text": "",
+//               "extra_info": "{}"
+//           }
+//       ]
+//   },
+//   "author": {
+//       "avatar_168x168": {
+//           "height": 720,
+//           "uri": "aweme-avatar/mosaic-legacy_310e3000a130132511b54",
+//           "url_list": [
+//               "https://p3-pc.douyinpic.com/img/aweme-avatar/mosaic-legacy_310e3000a130132511b54~c5_168x168.jpeg?from=2956013662"
+//           ],
+//           "width": 720
+//       },
+//       "avatar_300x300": {
+//           "height": 720,
+//           "uri": "aweme-avatar/mosaic-legacy_310e3000a130132511b54",
+//           "url_list": [
+//               "https://p3-pc.douyinpic.com/img/aweme-avatar/mosaic-legacy_310e3000a130132511b54~c5_300x300.jpeg?from=2956013662"
+//           ],
+//           "width": 720
+//       },
+//       "aweme_count": 304,
+//       "birthday_hide_level": 0,
+//       "can_show_group_card": 1,
+//       "city": "",
+//       "commerce_info": {
+//           "challenge_list": [],
+//           "head_image_list": null,
+//           "offline_info_list": [],
+//           "smart_phone_list": null,
+//           "task_list": null
+//       },
+//       "commerce_user_info": {
+//           "ad_revenue_rits": null,
+//           "has_ads_entry": true,
+//           "show_star_atlas_cooperation": false,
+//           "star_atlas": 1
+//       },
+//       "commerce_user_level": 0,
+//       "country": "",
+//       "cover_colour": "#03997706",
+//       "cover_url": [
+//           {
+//               "uri": "douyin-user-image-file/c029dcead6fbf261d15b1ab7de43bf2f",
+//               "url_list": [
+//                   "2eFwyUS9yN8r7wJCXHUvb.png"
+//               ]
+//           },
+//           {
+//               "uri": "c8510002be9a3a61aad2",
+//               "url_list": [
+//                   "0yrHnPaNjbwpkaPNo7s4x.png"
+//               ]
+//           }
+//       ],
+//       "district": "",
+//       "favoriting_count": 0,
+//       "follow_status": 0,
+//       "follower_count": 24783790,
+//       "follower_request_status": 0,
+//       "follower_status": 0,
+//       "following_count": 52,
+//       "forward_count": 2,
+//       "gender": 0,
+//       "ip_location": "IP属地：云南",
+//       "max_follower_count": 27200114,
+//       "mplatform_followers_count": 24783790,
+//       "nickname": "小橙子",
+//       "province": "",
+//       "public_collects_count": 0,
+//       "share_info": {
+//           "bool_persist": 1,
+//           "share_desc": "长按复制此条消息，打开抖音搜索，查看TA的更多作品。",
+//           "share_image_url": {
+//               "uri": "tos-cn-p-0015/oceLdA0zALBI8CoyKiCfhU69IBlNq4RsbgzSAu",
+//               "url_list": [
+//                   "qnOWDz5lUek2B1I5MPHa-.png"
+//               ]
+//           },
+//           "share_qrcode_url": {
+//               "uri": "216a0023aa35c71d4381",
+//               "url_list": [
+//                   "https://p11.douyinpic.com/obj/216a0023aa35c71d4381",
+//                   "https://p3.douyinpic.com/obj/216a0023aa35c71d4381",
+//                   "https://p6.douyinpic.com/obj/216a0023aa35c71d4381"
+//               ]
+//           },
+//           "share_title": "快来加入抖音，让你发现最有趣的我！",
+//           "share_url": "www.iesdouyin.com/share/user/MS4wLjABAAAAI-lEgbXAy9AcrRR_ujh1DfyWRuh1ZjxLdzmjMD948KY?from_aid=6383&u_code=13kgm680k&did=MS4wLjABAAAAiOgYyZm8XbWZMr5o3OvhR-TEOuNygb_hQOwkie-VXJpDYaR4vZfpiIGBfAWKCFHB&iid=MS4wLjABAAAANwkJuWIRFOzg5uCpDRpMj4OX-QryoDgn-yYlXQnRwQQ&with_sec_did=1&sec_uid=MS4wLjABAAAAI-lEgbXAy9AcrRR_ujh1DfyWRuh1ZjxLdzmjMD948KY&from_ssr=1",
+//           "share_weibo_desc": "长按复制此条消息，打开抖音搜索，查看TA的更多作品。"
+//       },
+//       "short_id": "13632088",
+//       "signature": "承蒙厚爱 万分感激🙏🏻\n视频均为自己创作 未签约 不直播\n工作v❤ orangelaby",
+//       "total_favorited": 575707796,
+//       "uid": "60043717321",
+//       "unique_id": "",
+//       "user_age": -1,
+//       "white_cover_url": [
+//           {
+//               "uri": "douyin-user-image-file/c029dcead6fbf261d15b1ab7de43bf2f",
+//               "url_list": [
+//                   "ejF34o5i413UeROTNoYFI.png"
+//               ]
+//           },
+//           {
+//               "uri": "318f1000413827e122102",
+//               "url_list": [
+//                   "x9tjnPkC-OscQ480dZZAR.png"
+//               ]
+//           }
+//       ]
+//   },
+//   "type": "recommend-video"
+// }

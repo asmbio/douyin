@@ -1,11 +1,11 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  startApp: (arg: string) => ipcRenderer.invoke('start-app', arg),
-  checkAppStatus: () => ipcRenderer.invoke('check-app-status'),
-  onAppExit: (callback: () => void) => {
-    ipcRenderer.on('app-exited', () => callback())
-  }
+  startApp: (arg: string) => ipcRenderer.invoke('start-app', arg)
+  // checkAppStatus: () => ipcRenderer.invoke('check-app-status'),
+  // onAppExit: (callback: () => void) => {
+  //   ipcRenderer.on('app-exited', () => callback())
+  // }
 })
 
 // 安全配置 (在创建 BrowserWindow 时设置)

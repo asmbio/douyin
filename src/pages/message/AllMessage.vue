@@ -62,11 +62,7 @@
                 <div class="time">01-11</div>
               </div>
             </div>
-            <img
-              v-lazy="_checkImgUrl(store.userinfo.cover_url[0].url_list[0])"
-              alt=""
-              class="poster"
-            />
+            <img v-lazy="_checkImgUrl(_getcover(store.userinfo))" alt="" class="poster" />
           </div>
         </div>
       </div>
@@ -76,7 +72,7 @@
 <script setup lang="ts">
 import Scroll from '@/components/Scroll.vue'
 import { useBaseStore } from '@/store/pinia'
-import { _checkImgUrl } from '@/utils'
+import { _checkImgUrl, _getcover } from '@/utils'
 
 import { computed, reactive } from 'vue'
 import { useNav } from '@/utils/hooks/useNav.js'

@@ -20,7 +20,7 @@
           <div
             class="option"
             :key="i"
-            v-for="(item, i) in store.friends.all"
+            v-for="(item, i) in store.friends"
             @click.stop="toggleCall(item)"
           >
             <img

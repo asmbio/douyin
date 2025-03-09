@@ -9,10 +9,18 @@
     <div v-else class="content">
       <div class="desc">
         <div class="title">登录看朋友内容</div>
-        <div class="phone-number">138****8000</div>
-        <div class="sub-title">认证服务由中国移动提供</div>
+        <div class="phone-number" v-if="data.uid">{{ data.uid }}</div>
+        <div class="phone-number" v-else>未注册</div>
+        <div class="sub-title">输入密码后自动生成随机密钥</div>
       </div>
-
+      <LoginInput
+        autofocus
+        class="mt1r"
+        type="password"
+        v-model="data.password"
+        placeholder="请输入密码"
+        style="margin-bottom: 10rem"
+      />
       <dy-button
         type="primary"
         :loading="data.loading.login"
@@ -22,16 +30,14 @@
       >
         {{ data.loading.login ? '登录中' : '一键登录' }}
       </dy-button>
-      <dy-button :active="false" type="white" @click="nav('/login/other')"
-        >其他手机号码登录
-      </dy-button>
+      <dy-button :active="false" type="white">其他手机号码登录 </dy-button>
 
       <div class="protocol" :class="data.showAnim ? 'anim-bounce' : ''">
         <Tooltip style="top: -100%; left: -10rem" v-model="data.showTooltip" />
-        <div class="left">
+        <!-- <div class="left">
           <Check v-model="data.isAgree" />
-        </div>
-        <div class="right">
+        </div> -->
+        <!-- <div class="right">
           我已阅读并同意
           <span class="link" @click="nav('/service-protocol', { type: '“抖音”用户服务协议' })"
             >用户协议</span
@@ -47,7 +53,7 @@
             >
             ，同时登录并使用抖音火山版（原“火山小视频”）和抖音
           </div>
-        </div>
+        </div> -->
       </div>
 
       <div class="other-login">
@@ -79,17 +85,26 @@ import { onMounted, reactive } from 'vue'
 import { useNav } from '@/utils/hooks/useNav'
 import { _no, _sleep } from '@/utils'
 import { useBaseStore } from '@/store/pinia'
+import LoginInput from './components/LoginInput.vue'
+import { PlatformAdapter } from '@/utils/platform'
+import { getDftAddr, startCore } from '@/api/moguservice'
 
 defineOptions({
   name: 'login'
 })
-const useStore = useBaseStore()
+
 const nav = useNav()
+const useStore = useBaseStore()
+if (useStore.islogin) {
+  nav('/home')
+}
 const data = reactive({
-  isAgree: false,
+  isAgree: true,
   isOtherLogin: false,
   showAnim: false,
   showTooltip: false,
+  uid: '',
+  password: '',
   loading: {
     login: false,
     getPhone: false
@@ -102,15 +117,29 @@ onMounted(() => {
 
 async function getPhone() {
   data.loading.getPhone = true
-  await _sleep(1000)
+  const addr = await getDftAddr()
+  data.uid = addr.Value
   data.loading.getPhone = false
 }
 
-function login() {
+async function login() {
+  if (useStore.islogin) {
+    nav('/home')
+  }
   if (data.isAgree) {
     data.loading.login = true
-    useStore.islogin = true
-    nav('/home')
+
+    try {
+      const started = await startCore(data.password)
+      const result = await useStore.init()
+      console.log('useStore init result:', result)
+      useStore.islogin = true
+      nav('/home')
+    } catch (error) {
+      console.error('Initialization failed:', error)
+    } finally {
+      data.loading.login = false
+    }
   } else {
     if (!data.showAnim && !data.showTooltip) {
       data.showAnim = true

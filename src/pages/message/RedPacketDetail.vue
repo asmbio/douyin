@@ -7,7 +7,7 @@
     </BaseHeader>
     <div class="content">
       <div class="wrapper">
-        <img :src="_checkImgUrl(store.userinfo.cover_url[0].url_list[0])" alt="" class="avatar" />
+        <img :src="_checkImgUrl(_getcover(store.userinfo))" alt="" class="avatar" />
         <span class="belong">{{ store.userinfo.nickname }}的红包</span>
         <div class="password">大吉大利</div>
         <span class="money">0.01元</span>
@@ -20,7 +20,7 @@
 </template>
 <script setup lang="ts">
 import { useBaseStore } from '@/store/pinia'
-import { _checkImgUrl, _no } from '@/utils'
+import { _checkImgUrl, _getcover, _no } from '@/utils'
 
 defineOptions({
   name: 'RedPacketDetail'

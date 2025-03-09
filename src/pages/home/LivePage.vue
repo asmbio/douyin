@@ -23,7 +23,7 @@
       <div class="top">
         <div class="left">
           <div class="liver">
-            <img class="avatar" :src="_checkImgUrl(userinfo.avatar_168x168.url_list[0])" alt="" />
+            <img class="avatar" :src="_checkImgUrl(_getavater(userinfo))" alt="" />
             <div class="desc">
               <div class="desc-wrapper">
                 <div class="name">{{ userinfo.nickname }}</div>
@@ -117,7 +117,7 @@ import Dom from '../../utils/dom'
 import { nextTick } from 'vue'
 import { mapState } from 'pinia'
 import { useBaseStore } from '@/store/pinia'
-import { _checkImgUrl, _sleep, random } from '@/utils'
+import { _checkImgUrl, _getavater, _sleep, random } from '@/utils'
 import Mock from 'mockjs'
 
 export default {

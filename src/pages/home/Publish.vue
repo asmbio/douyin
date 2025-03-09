@@ -3,18 +3,18 @@
     <video id="video" autoplay style="width: 100%; height: calc(100% - 60rem)"></video>
     <div class="footer">
       <SlideHorizontal style="height: 60rem" v-model:index="activeIndex">
-        <SlideItem style="width: 20vw"></SlideItem>
-        <SlideItem style="width: 20vw"></SlideItem>
-        <SlideItem style="width: 25vw" @click="activeIndex = 0">
+        <SlideItem style="width: 100rem"></SlideItem>
+        <SlideItem style="width: 100rem"></SlideItem>
+        <SlideItem style="width: 125rem" @click="activeIndex = 0">
           <span :class="activeIndex + 2 === 2 ? 'active' : ''">分段拍</span>
         </SlideItem>
-        <SlideItem style="width: 20vw" @click="activeIndex = 1">
+        <SlideItem style="width: 100rem" @click="activeIndex = 1">
           <span :class="activeIndex + 2 === 3 ? 'active' : ''">快拍</span>
         </SlideItem>
-        <SlideItem style="width: 20vw" @click="activeIndex = 2">
+        <SlideItem style="width: 100rem" @click="handleAlbumClick">
           <span :class="activeIndex + 2 === 4 ? 'active' : ''">影集</span>
         </SlideItem>
-        <SlideItem style="width: 20vw" @click="activeIndex = 3">
+        <SlideItem style="width: 100rem" @click="activeIndex = 3">
           <span :class="activeIndex + 2 === 5 ? 'active' : ''">开直播</span>
         </SlideItem>
       </SlideHorizontal>
@@ -49,8 +49,10 @@
   </div>
 </template>
 <script setup lang="ts">
+import { IpfsFileSchema, Media_Video_MixedSchema } from '@/api/gen/video2_pb'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { create } from '@bufbuild/protobuf'
 
 defineOptions({
   name: 'Publish'
@@ -97,6 +99,60 @@ function getMedia() {
   }
 }
 
+// 新增响应式数据
+
+// 影集点击处理函数
+const handleAlbumClick = () => {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.multiple = false
+  input.accept = 'video/*'
+  input.onchange = (e: Event) => {
+    console.log('onchange')
+    const files = (e.target as HTMLInputElement).files
+    var videofmt = create(Media_Video_MixedSchema)
+    if (files && files.length > 0) {
+      const promises = Array.from(files).map((file) => {
+        return new Promise<void>((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = (e1) => {
+            try {
+              const dataURL = e1.target.result
+              console.log('filereader onload', e1)
+              // 修复文件名处理
+              const ext = file.name.includes('.') ? file.name.split('.').pop() : ''
+              const ipfsfile = create(IpfsFileSchema, {
+                Iscid: false,
+                Filename: `1${ext ? `.${ext}` : ''}`,
+                Content: dataURL as string
+              })
+              videofmt.Medias.push(ipfsfile)
+              console.log('resolve')
+              resolve()
+            } catch (error) {
+              console.log(error)
+              reject(error) // 捕获同步错误
+            }
+          }
+          reader.onerror = (error) => reject(error)
+          reader.readAsDataURL(file)
+        })
+      })
+
+      Promise.all(promises)
+        .then(() => {
+          sessionStorage.setItem('tempmedia', JSON.stringify(videofmt))
+          console.log('setitem', videofmt)
+          router.push({ path: '/publish/confirm' })
+        })
+        .catch((error) => {
+          console.error('Error processing files:', error)
+          // 可选：通知用户具体哪个文件出错
+        })
+    }
+  }
+  input.click()
+}
 onMounted(() => {
   videoEl.value = document.getElementById('video')
   getMedia()

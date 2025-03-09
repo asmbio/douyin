@@ -18,11 +18,7 @@
           <div class="header">
             <div class="wrapper">
               <img src="../../assets/img/icon/message/display2.webp" alt="" class="icon1" />
-              <img
-                :src="_checkImgUrl(store.userinfo.cover_url[0].url_list[0])"
-                alt=""
-                class="icon2"
-              />
+              <img :src="_checkImgUrl(_getcover(store.userinfo))" alt="" class="icon2" />
               <img src="../../assets/img/icon/message/display1.webp" alt="" class="icon3" />
             </div>
           </div>
@@ -93,7 +89,7 @@ import FromBottomDialog from '@/components/dialog/FromBottomDialog.vue'
 import Switches from './components/swtich/switches.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import { useBaseStore } from '@/store/pinia'
-import { _checkImgUrl, _notice, cloneDeep } from '@/utils'
+import { _checkImgUrl, _getcover, _notice, cloneDeep } from '@/utils'
 
 import { onMounted, reactive, watch } from 'vue'
 import { useRouter } from 'vue-router'

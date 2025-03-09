@@ -8,6 +8,7 @@ import NoticeDialog from '../components/dialog/NoticeDialog.vue'
 import { ArchiveReader, libarchiveWasm } from 'libarchive-wasm'
 import SlideUser from '@/components/slide/SlideUser.vue'
 import BaseVideo from '@/components/slide/BaseVideo.vue'
+import type { UserInfo } from '@/api/gen/userinfo_pb'
 
 export function _storageSet(key, value) {
   localStorage.setItem(key, JSON.stringify(value))
@@ -119,6 +120,19 @@ export function _time(time) {
   return str
 }
 
+export function _getavater(userinfo: UserInfo) {
+  return userinfo.avatar168x168?.urlList && userinfo.avatar168x168?.urlList.length > 0
+    ? userinfo.avatar168x168.urlList[0]
+    : 'images/default/cover.png'
+}
+export function _getcover(userinfo: UserInfo) {
+  return userinfo.coverUrl &&
+    userinfo.coverUrl.length > 0 &&
+    userinfo.coverUrl[0].urlList &&
+    userinfo.coverUrl[0].urlList.length > 0
+    ? userinfo.coverUrl[0].urlList[0]
+    : 'images/default/cover.png'
+}
 export function _checkImgUrl(url) {
   // console.log(url)
   if (!url) return

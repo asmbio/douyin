@@ -18,7 +18,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/home/MusicRankList.vue')
   },
   { path: '/home/live', component: () => import('@/pages/home/LivePage.vue') },
-
+  {
+    path: '/publish/confirm',
+    component: () => import('@/pages/home/PublishConfirm.vue'),
+    meta: { requiresAuth: true }
+  },
   { path: '/shop', component: () => import('@/pages/shop/Shop.vue') },
   {
     path: '/shop/detail',

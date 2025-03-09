@@ -29,7 +29,7 @@
               <div class="content">
                 <img :src="_checkImgUrl(item.avatar)" alt="" class="head-image" />
                 <div class="comment-container">
-                  <div class="name">{{ item.nickname }}</div>
+                  <div class="name">{{ item.displayname }}</div>
                   <div class="detail" :class="item.user_buried && 'gray'">
                     {{ item.user_buried ? '该评论已折叠' : item.content }}
                   </div>

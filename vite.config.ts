@@ -120,7 +120,8 @@ export default defineConfig((): Promise<UserConfig> => {
         ],
         resolve: {
           alias: {
-            '@': fileURLToPath(new URL('./src', import.meta.url))
+            '@': fileURLToPath(new URL('./src', import.meta.url)),
+            '@electron': fileURLToPath(new URL('./electron', import.meta.url))
           },
           extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue']
         },

@@ -16,7 +16,7 @@ try {navigator.control.longpressMenu(false);} catch (e) {} //关闭长按弹出�
 import routes from './router/routes'
 import Call from './components/Call.vue'
 
-import { onMounted, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import BaseMask from '@/components/BaseMask.vue'
@@ -60,22 +60,31 @@ function resetVhAndPx() {
   document.documentElement.style.setProperty('--vh', `${vh}px`)
   //document.documentElement.style.fontSize = document.documentElement.clientWidth / 375 + 'px'
 }
+// onBeforeUnmount(()=>{
+//   console.log('onBeforeUnmount')
+//   store.setsession()
+// })
 
 onMounted(() => {
   //store.init()
   //判断是否登录
-  //  if (store.islogin === false ) {
-  //   //window.location.pathname = '/login'
-  //     nav('/login')
-  //   }else{
-  //     nav('/home')
-  //   }
+  console.log('store', store)
+  if (store.islogin === false) {
+    nav('/login')
+  } else {
+    nav('/home')
+  }
   resetVhAndPx()
   // 监听resize事件 视图大小发生变化就重新计算1vh的值
   window.addEventListener('resize', () => {
     //  location.href = BASE_URL + '/home'
     resetVhAndPx()
   })
+  // window.addEventListener('beforeunload', (event) => {
+  //   event.preventDefault();
+  //    store.setsession()
+  //    alert('unload')
+  // })
 })
 </script>
 

@@ -13,7 +13,7 @@
           </div>
           <transition name="fade">
             <div class="center" v-if="floatShowName">
-              <p class="name f14 mt1r mb1r">{{ userinfo.nickname }}</p>
+              <p class="name f14 mt1r mb1r">{{ userinfo?.displayname }}</p>
             </div>
           </transition>
           <div class="right">
@@ -50,21 +50,21 @@
             <header
               ref="header"
               :style="{
-                backgroundImage: `url(${_checkImgUrl(userinfo.cover_url[0].url_list[0])})`
+                backgroundImage: `url( ${_getcover(userinfo)})`
               }"
-              @click="previewImg = _checkImgUrl(userinfo.cover_url[0].url_list[0])"
+              @click="previewImg = _getcover(userinfo)"
             >
               <div class="info">
                 <img
-                  :src="_checkImgUrl(userinfo.avatar_168x168.url_list[0])"
+                  :src="_getavater(userinfo)"
                   class="avatar"
-                  @click.stop="previewImg = _checkImgUrl(userinfo.avatar_300x300.url_list[0])"
+                  @click.stop="previewImg = _getavater(userinfo)"
                 />
                 <div class="right">
-                  <p class="name">{{ userinfo.nickname }}</p>
+                  <p class="name">{{ userinfo?.displayname }}</p>
                   <div class="number mb1r">
-                    <span class="mr1r" v-if="userinfo.is_private">私密账号</span>
-                    <span>抖音号：{{ _getUserDouyinId({ author: userinfo }) }}</span>
+                    <span class="mr1r" v-if="userinfo?.is_private">私密账号</span>
+                    <span>抖音号：{{ userinfo?.uid }}</span>
                     <img
                       src="../../assets/img/icon/me/qrcode-gray.png"
                       alt=""
@@ -78,48 +78,48 @@
               <div class="head">
                 <div class="heat">
                   <div class="text" @click="isShowStarCount = true">
-                    <span class="num">{{ _formatNumber(userinfo.aweme_count) }}</span>
+                    <span class="num">{{ _formatNumber(userinfo?.aweme_count) }}</span>
                     <span>获赞</span>
                   </div>
                   <div class="text" @click="$nav('/people/follow-and-fans', { type: 0 })">
-                    <span class="num">{{ _formatNumber(userinfo.following_count) }}</span>
+                    <span class="num">{{ _formatNumber(userinfo?.following_count) }}</span>
                     <span>朋友</span>
                   </div>
                   <div class="text" @click="$nav('/people/follow-and-fans', { type: 0 })">
-                    <span class="num">{{ _formatNumber(userinfo.following_count) }}</span>
+                    <span class="num">{{ _formatNumber(userinfo?.following_count) }}</span>
                     <span>关注</span>
                   </div>
                   <div class="text" @click="$nav('/people/follow-and-fans', { type: 1 })">
-                    <span class="num">{{ _formatNumber(userinfo.follower_count) }}</span>
+                    <span class="num">{{ _formatNumber(userinfo?.follower_count) }}</span>
                     <span>粉丝</span>
                   </div>
                 </div>
                 <div class="button" @click="$nav('/people/find-acquaintance')">添加朋友</div>
               </div>
               <div class="signature" @click="$nav('/me/edit-userinfo-item', { type: 3 })">
-                <template v-if="!userinfo.signature">
+                <template v-if="!userinfo?.signature">
                   <span>点击添加介绍，让大家认识你...</span>
                   <img src="../../assets/img/icon/me/write-gray.png" alt="" />
                 </template>
-                <div v-else class="text" v-html="userinfo.signature"></div>
+                <div v-else class="text" v-html="userinfo?.signature"></div>
               </div>
               <div class="more" @click="$nav('/me/edit-userinfo')">
-                <div class="age item" v-if="userinfo.user_age !== -1">
+                <div class="age item" v-if="userinfo?.user_age !== -1">
                   <img
-                    v-if="userinfo.gender == 2"
+                    v-if="userinfo?.gender == 2"
                     src="../../assets/img/icon/me/woman.png"
                     alt=""
                   />
-                  <img v-if="userinfo.gender == 1" src="../../assets/img/icon/me/man.png" alt="" />
-                  <span>{{ userinfo.user_age }}岁</span>
+                  <img v-if="userinfo?.gender == 1" src="../../assets/img/icon/me/man.png" alt="" />
+                  <span>{{ userinfo?.userAge }}岁</span>
                 </div>
-                <div class="item" v-if="userinfo.province || userinfo.city">
-                  {{ userinfo.province }}
-                  <template v-if="userinfo.province && userinfo.city"> -</template>
-                  {{ userinfo.city }}
+                <div class="item" v-if="userinfo?.province || userinfo?.city">
+                  {{ userinfo?.province }}
+                  <template v-if="userinfo?.province && userinfo?.city"> -</template>
+                  {{ userinfo?.city }}
                 </div>
-                <div class="item" v-if="userinfo.school?.name">
-                  {{ userinfo.school.name }}
+                <div class="item" v-if="userinfo?.school?.name">
+                  {{ userinfo?.school.name }}
                 </div>
               </div>
               <div class="other">
@@ -358,7 +358,7 @@
 
     <ConfirmDialog
       v-model:visible="isShowStarCount"
-      :subtitle="`&quot;${userinfo.nickname}&quot;共获得${_formatNumber(userinfo.aweme_count)}个赞`"
+      :subtitle="`&quot;${userinfo?.displayname}&quot;共获得${_formatNumber(userinfo?.awemeCount)}个赞`"
       okText="确认"
       cancelText="取消"
       @ok="isShowStarCount = false"
@@ -378,11 +378,25 @@ import { mapState } from 'pinia'
 
 import bus from '../../utils/bus'
 import ConfirmDialog from '../../components/dialog/ConfirmDialog'
-import { _checkImgUrl, _formatNumber, _getUserDouyinId, _no, _stopPropagation } from '@/utils'
+import {
+  _checkImgUrl,
+  _formatNumber,
+  _getavater,
+  _getcover,
+  _getUserDouyinId,
+  _no,
+  _stopPropagation
+} from '@/utils/index'
 import { likeVideo, myVideo, privateVideo } from '@/api/videos'
 import { useBaseStore } from '@/store/pinia'
+import { storeToRefs } from 'pinia'
+
 import { userCollect } from '@/api/user'
 import SlideRowList from '@/components/slide/SlideRowList.vue'
+// const store =useBaseStore()
+// console.log(store.userinfo)
+//const { userinfo, bodyHeight,bodyWidth } = storeToRefs(store)
+//console.log(userinfo?.displayname)
 
 export default {
   name: 'Me',
@@ -492,6 +506,8 @@ export default {
     _getUserDouyinId,
     _checkImgUrl,
     _formatNumber,
+    _getavater,
+    _getcover,
     $nav(path) {
       this.$router.push(path)
     },

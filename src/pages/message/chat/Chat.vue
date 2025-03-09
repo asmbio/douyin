@@ -4,11 +4,7 @@
       <div class="header">
         <div class="left">
           <dy-back @click="router.back"></dy-back>
-          <img
-            :src="_checkImgUrl(store.userinfo.avatar_168x168.url_list[0])"
-            alt=""
-            style="border-radius: 50%"
-          />
+          <img :src="_getavater(store.userinfo)" alt="" style="border-radius: 50%" />
           <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{
             store.userinfo.nickname
           }}</span>
@@ -192,11 +188,7 @@
             <img src="../../../assets/img/icon/message/chat/bg-close.png" alt="" class="bg" />
             <div class="wrapper">
               <div class="top">
-                <img
-                  :src="_checkImgUrl(store.userinfo.cover_url[0].url_list[0])"
-                  alt=""
-                  class="avatar"
-                />
+                <img :src="_checkImgUrl(_getcover(store.userinfo))" alt="" class="avatar" />
                 <div class="belong">{{ store.userinfo.nickname }}的红包</div>
                 <div class="password">大吉大利</div>
               </div>
@@ -228,7 +220,7 @@ import ChatMessage from '../components/ChatMessage.vue'
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref } from 'vue'
 import Loading from '@/components/Loading.vue'
 import { useBaseStore } from '@/store/pinia'
-import { _checkImgUrl, _no, _sleep } from '@/utils'
+import { _checkImgUrl, _getavater, _getcover, _no, _sleep } from '@/utils'
 import { useRouter } from 'vue-router'
 import { useNav } from '@/utils/hooks/useNav'
 import bus, { EVENT_KEY } from '@/utils/bus'
@@ -609,7 +601,7 @@ async function handleStartRecording() {
         time: new Date().toLocaleTimeString(),
         user: {
           id: store.userinfo.uid,
-          avatar: store.userinfo.avatar_168x168.url_list[0]
+          avatar: store.userinfo.avatar168x168.urlList[0]
         }
       }
 

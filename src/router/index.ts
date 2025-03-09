@@ -15,8 +15,13 @@ const router = createRouter({
     }
   }
 })
+
 router.beforeEach((to, from) => {
   const baseStore = useBaseStore()
+  // if (!baseStore.islogin&& to.path !=='/login') {
+  //   baseStore.loadsession()
+  //   //router.push('/login')
+  // }
   //footer下面的5个按钮，对跳不要用动画
   const noAnimation = ['/', '/home', '/me', '/shop', '/message', '/publish', '/home/live', '/test']
   if (noAnimation.indexOf(from.path) !== -1 && noAnimation.indexOf(to.path) !== -1) {
