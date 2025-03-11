@@ -4,10 +4,9 @@
     <!--    <video :src="item.video + '?v=123'"-->
     <video
       @ended="videoEnded"
-      :poster="poster"
       ref="videoEl"
       :muted="state.isMuted"
-      preload="true"
+      preload="false"
       loop
       x5-video-player-type="h5-page"
       :x5-video-player-fullscreen="false"
@@ -18,7 +17,7 @@
       :autoplay="isPlay"
     >
       <source
-        v-for="(urlItem, index) in item.video.play_addr.url_list"
+        v-for="(urlItem, index) in item.video.playAddr.urlList"
         :key="index"
         :src="urlItem"
         type="video/mp4"
@@ -175,9 +174,10 @@ let state = reactive({
   commentVisible: false,
   hasEnded: false // 新增状态
 })
-const poster = $computed(() => {
-  return _checkImgUrl(props.item.video.poster ?? props.item.video.cover.url_list[0])
-})
+
+// const poster = $computed(() => {
+//   return _checkImgUrl(props.item.video.poster ?? props.item.video.cover.url_list[0])
+// })
 const durationStyle = $computed(() => {
   return { width: state.playX + 'px' }
 })

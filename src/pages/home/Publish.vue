@@ -109,10 +109,11 @@ const handleAlbumClick = () => {
   input.accept = 'video/*'
   input.onchange = (e: Event) => {
     console.log('onchange')
-    const files = (e.target as HTMLInputElement).files
     var videofmt = create(Media_Video_MixedSchema)
+    const files = (e.target as HTMLInputElement).files
     if (files && files.length > 0) {
       const promises = Array.from(files).map((file) => {
+        console.log(file)
         return new Promise<void>((resolve, reject) => {
           const reader = new FileReader()
           reader.onload = (e1) => {
@@ -136,14 +137,18 @@ const handleAlbumClick = () => {
           }
           reader.onerror = (error) => reject(error)
           reader.readAsDataURL(file)
+          console.log('readasdataurl')
         })
       })
 
       Promise.all(promises)
         .then(() => {
-          sessionStorage.setItem('tempmedia', JSON.stringify(videofmt))
+          //sessionStorage.setItem('tempmedia', JSON.stringify(files))
           console.log('setitem', videofmt)
-          router.push({ path: '/publish/confirm' })
+          router.push({
+            path: '/publish/confirm',
+            state: { objurl: JSON.stringify(videofmt) }
+          })
         })
         .catch((error) => {
           console.error('Error processing files:', error)

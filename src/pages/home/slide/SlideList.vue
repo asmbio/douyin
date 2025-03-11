@@ -83,11 +83,8 @@ async function getData(refresh = false) {
   if (!refresh && state.totalSize === state.list.length) return
   if (baseStore.loading) return
   baseStore.loading = true
-  let res = await props.api({
-    start: refresh ? 0 : state.list.length,
-    pageSize: state.pageSize
-  })
-  // console.log('getSlide4Data-', refresh, res, state.totalSize, state.list.length)
+  let res = await props.api(refresh ? 0 : state.list.length, state.pageSize)
+  console.log('getSlide4Data-', refresh, res, state.totalSize, state.list.length)
   baseStore.loading = false
   if (res.success) {
     state.totalSize = res.data.total

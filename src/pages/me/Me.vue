@@ -111,7 +111,7 @@
                     alt=""
                   />
                   <img v-if="userinfo?.gender == 1" src="../../assets/img/icon/me/man.png" alt="" />
-                  <span>{{ userinfo?.userAge }}岁</span>
+                  <span>{{ unixNanoToAge(userinfo?.userAge) }}岁</span>
                 </div>
                 <div class="item" v-if="userinfo?.province || userinfo?.city">
                   {{ userinfo?.province }}
@@ -387,9 +387,9 @@ import {
   _no,
   _stopPropagation
 } from '@/utils/index'
-import { likeVideo, myVideo, privateVideo } from '@/api/videos'
+import { likeVideo, privateVideo } from '@/api/videos'
+import { myVideo } from '@/api/moguservice'
 import { useBaseStore } from '@/store/pinia'
-import { storeToRefs } from 'pinia'
 
 import { userCollect } from '@/api/user'
 import SlideRowList from '@/components/slide/SlideRowList.vue'
@@ -430,7 +430,8 @@ export default {
         my: {
           list: [],
           total: -1,
-          pageNo: 0
+          fromtime: BigInt(Date.now() * 1_000_000)
+          //fromtime:  Long.fromNumber(Date.now()).multiply(1_000_000)
         },
         private: {
           list: [],
@@ -548,6 +549,34 @@ export default {
       }
       return scrollAreaHeight
     },
+
+    unixNanoToAge(unixNano) {
+      // 转换为出生日期的 Date 对象（UTC 时间）
+      const milliseconds = unixNano / 1_000_000n // 使用 bigint 字面量 1_000_000n
+      // 将 bigint 转换为 number（注意：确保结果不超过 Number.MAX_SAFE_INTEGER）
+      const timestamp = Number(milliseconds)
+      const birthDate = new Date(timestamp)
+      const birthYear = birthDate.getUTCFullYear()
+      const birthMonth = birthDate.getUTCMonth()
+      const birthDay = birthDate.getUTCDate()
+
+      // 当前日期（UTC 时间）
+      const now = new Date()
+      const currentYear = now.getUTCFullYear()
+      const currentMonth = now.getUTCMonth()
+      const currentDay = now.getUTCDate()
+
+      // 计算年龄
+      let age = currentYear - birthYear
+      if (currentMonth < birthMonth || (currentMonth === birthMonth && currentDay < birthDay)) {
+        age-- // 未到生日则减 1
+      }
+
+      // // 示例（假设当前是 2023 年）
+      // const age = unixNanoToAge(1324771200000000000);
+      // console.log(age); // 输出: 12（如果当前日期 >= 2023-12-25）
+      return age
+    },
     async changeIndex(newVal, oldVal) {
       // debugger
       if (this.loadings['loading' + newVal]) return
@@ -565,11 +594,18 @@ export default {
           let res
           switch (newVal) {
             case 0:
-              res = await myVideo({
-                pageNo: this.videos.my.pageNo,
-                pageSize: this.pageSize
-              })
-              if (res.success) this.videos.my = res.data
+              res = await myVideo(this.videos.my.fromtime, this.pageSize)
+              console.log(res)
+              if (res.all) {
+                // if (res.all.length < this.pageSize){
+                //   this.videos.my.total = res.all.length
+                // }else{
+                //   this.videos.my.total = this.pageSize+1
+                // }
+                this.videos.my.total = res.all.length
+                this.videos.my.list = res.all
+                this.videos.my.fromtime = res.all[res.all.length - 1].createTime
+              }
               break
             case 1:
               res = await privateVideo({
@@ -617,15 +653,12 @@ export default {
       let videoOb = this.videos[Object.keys(this.videos)[this.contentIndex]]
 
       if (this.contentIndex !== 3 && videoOb.total > videoOb.list.length) {
-        videoOb.pageNo++
+        //videoOb.pageNo++
         this.loadings['loading' + this.contentIndex] = true
         let res
         switch (this.contentIndex) {
           case 0:
-            res = await myVideo({
-              pageNo: videoOb.pageNo,
-              pageSize: this.pageSize
-            })
+            res = await myVideo(this.videos.my.fromtime, this.pageSize)
             break
           case 1:
             res = await privateVideo({
@@ -647,8 +680,16 @@ export default {
             break
         }
         this.loadings['loading' + this.contentIndex] = false
-        if (res.success) {
-          videoOb.list = videoOb.list.concat(res.data.list)
+        if (res.all) {
+          if (res.all) {
+            if (res.all.length < this.pageSize) {
+              videoOb.my.total = -1
+            } else {
+              videoOb.total = videoOb.tota + this.pageSize + 1
+            }
+            videoOb.list = videoOb.list.concat(res.all)
+            videoOb.fromtime = res.all[res.all.length - 1].createTime
+          }
         }
       }
     },

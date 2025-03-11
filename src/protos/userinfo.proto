@@ -88,8 +88,9 @@ message UserInfo {
   string cover_colour = 21;
   repeated ImageResource cover_url = 22;
   repeated ImageResource white_cover_url = 23;
-  int32 user_age = 24;
+  uint64 user_age = 24;
   ShareInfo share_info = 25;
+  
   
   // 状态标识
   int32 follow_status = 26;
@@ -111,6 +112,8 @@ message UserInfo {
   SchoolInfo school = 39;
 // 卡片信息
   repeated CardEntry card_entries = 40;
+
+  
 }
 
 message Userinfolist {

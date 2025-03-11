@@ -66,7 +66,7 @@
             "
           />
           <div class="description">
-            <div class="name f22">{{ props.currentItem.author.nickname }}</div>
+            <div class="name f22">{{ props.currentItem.author.displayname }}</div>
             <div class="certification" v-if="props.currentItem.author.certification">
               <img src="@/assets/img/icon/me/certification.webp" />
               {{ props.currentItem.author.certification }}

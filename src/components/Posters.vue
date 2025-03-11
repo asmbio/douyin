@@ -1,7 +1,15 @@
 <template>
   <div class="posters">
     <div class="poster-item" :key="index" v-for="(i, index) in list" @click="goDetail(index)">
-      <img class="poster" v-lazy="_checkImgUrl(i.video.cover.url_list[0])" alt="" />
+      <video class="poster" preload="false" :autoplay="false">
+        <source
+          v-for="(urlItem, index) in i.video.playAddr.urlList"
+          :key="index"
+          :src="urlItem"
+          type="video/mp4"
+        />
+        <p>您的浏览器不支持 video 标签。</p>
+      </video>
       <template v-if="mode === 'normal'">
         <div class="num">
           <Icon icon="icon-park-outline:like" />
@@ -21,10 +29,9 @@
 </template>
 
 <script setup>
-import { _checkImgUrl, _formatNumber } from '@/utils'
+import { _formatNumber } from '@/utils'
 import { useBaseStore } from '@/store/pinia'
 import { useRouter } from 'vue-router'
-import { cloneDeep } from '@/utils'
 
 const store = useBaseStore()
 const nav = useRouter()
@@ -46,7 +53,7 @@ defineOptions({
 })
 
 function goDetail(index) {
-  store.routeData = cloneDeep({ list: props.list, index })
+  store.routeData = { list: props.list, index }
   nav.push({ path: '/video-detail' })
 }
 
@@ -103,8 +110,6 @@ function getMonth(time) {
   .poster {
     width: 100%;
     height: 100%;
-    display: block;
-    object-fit: cover;
   }
 
   .top,

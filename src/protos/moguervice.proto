@@ -19,6 +19,7 @@ service MoguService {
   rpc StartCore (protos.String) returns (google.protobuf.Empty) {}
   // 基础信息用户
   rpc GetDftAddr (google.protobuf.Empty) returns (protos.String) {}
+  rpc EditUserInfo (UserInfo) returns (google.protobuf.Empty) {}
   rpc GetUserInfo (protos.String) returns (UserInfo) {}
   rpc GetPanel (google.protobuf.Empty) returns (UserInfo) {}
   rpc GetContacts(GetContactsRequest) returns (Userinfolist) {}
@@ -27,6 +28,7 @@ service MoguService {
   rpc GetMsgList (GetMsgListRequest) returns (Messagelist) {}
 
   //   // 视频获取
+   rpc MyVideo(MyVideoRequest)returns (VideoList){}
    rpc GetRecommendedVideos(VideoRequest) returns (VideoList) {}
    rpc PushVideo(Worksmsg) returns (google.protobuf.Empty){}
 //   rpc GetFollowingVideos(VideoRequest) returns (VideoListResponse) {}
@@ -84,4 +86,9 @@ message VideoRequest {
   int32 page_no = 1;
   int32 page_size = 2;
   VisibilityLevel visibility = 3;
+}
+
+message MyVideoRequest {
+  uint64 formtime = 1; // 从新到旧
+  int32 page_size = 2;  
 }

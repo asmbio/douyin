@@ -32,14 +32,14 @@
       <div class="l-row" v-if="data.type === 2">
         <div class="notice">我的抖音号</div>
         <div class="input-ctn" style="margin-bottom: 10rem">
-          <input type="text" v-model="data.localUserinfo.unique_id" />
+          <input type="text" v-model="data.localUserinfo.uid" />
           <img
-            v-if="data.localUserinfo.unique_id"
+            v-if="data.localUserinfo.uid"
             style="transform: scale(2)"
             class="close"
             src="../../../assets/img/icon/newicon/close-and-bg.png"
             alt=""
-            @click="data.localUserinfo.unique_id = ''"
+            @click="data.localUserinfo.uid = ''"
           />
         </div>
         <div class="num">最多16个字，只允许包含字母、数字、下划线和点，30天内仅能修改一次</div>
@@ -65,14 +65,7 @@
 //TODO 1、数据变了后，保存按钮变亮；2、数据变了，点返回，弹窗是否确认
 
 import { useBaseStore } from '@/store/pinia'
-import {
-  _hideLoading,
-  _notice,
-  _showLoading,
-  _showSimpleConfirmDialog,
-  _sleep,
-  cloneDeep
-} from '@/utils'
+import { _hideLoading, _notice, _showLoading, _showSimpleConfirmDialog, _sleep } from '@/utils'
 import { computed, onMounted, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -87,20 +80,22 @@ const data = reactive({
   localUserinfo: {
     nickname: '',
     signature: '',
-    unique_id: '',
-    desc: ''
+    uid: ''
   }
 })
 const isChanged = computed(() => {
   if (data.type === 1) if (!data.localUserinfo.nickname) return false
-  if (data.type === 2) if (!data.localUserinfo.desc) return false
+  if (data.type === 2) if (!data.localUserinfo.uid) return false
   if (store.userinfo.nickname !== data.localUserinfo.nickname) return true
-  if (store.userinfo.desc !== data.localUserinfo.desc) return true
-  return store.userinfo.unique_id !== data.localUserinfo.unique_id
+  if (store.userinfo.signature !== data.localUserinfo.signature) return true
+  return store.userinfo.uid !== data.localUserinfo.uid
 })
 
 onMounted(() => {
-  data.localUserinfo = cloneDeep(store.userinfo)
+  data.localUserinfo.nickname = store.userinfo.nickname
+  data.localUserinfo.signature = store.userinfo.signature
+  data.localUserinfo.uid = store.userinfo.uid
+
   data.type = Number(route.query.type)
 })
 
@@ -118,7 +113,18 @@ async function save() {
     if (!data.localUserinfo.nickname) return _notice('名字不能为空')
   }
   _showLoading()
-  store.setUserinfo(data.localUserinfo)
+  switch (data.type) {
+    case 1:
+      store.userinfo.nickname = data.localUserinfo.nickname
+      break
+    case 2:
+      break
+    case 3:
+      store.userinfo.signature = data.localUserinfo.signature
+      break
+    default:
+  }
+  //store.setUserinfo(data.localUserinfo)
   await _sleep(500)
   _hideLoading()
   router.back()

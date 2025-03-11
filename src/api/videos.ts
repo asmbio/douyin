@@ -31,15 +31,3 @@ export function likeVideo(params?: any, data?: any) {
 export function videoComments(params?: any, data?: any) {
   return request({ url: '/video/comments', method: 'get', params, data })
 }
-
-// 在原有导出基础上新增
-export function videoPublish(data: FormData) {
-  return request({
-    url: '/video/publish',
-    method: 'post',
-    data,
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
-  })
-}

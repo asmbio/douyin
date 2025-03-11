@@ -24,7 +24,7 @@ import type { Message } from '@bufbuild/protobuf'
 export const file_moguervice: GenFile =
   /*@__PURE__*/
   fileDesc(
-    'ChBtb2d1ZXJ2aWNlLnByb3RvEgZwcm90b3MiMwoVR2V0TXNnQ29udGFjdHNSZXF1ZXN0EgwKBHRpbWUYASABKAQSDAoEc2l6ZRgCIAEoBSI8ChFHZXRNc2dMaXN0UmVxdWVzdBIMCgR0aW1lGAEgASgEEgwKBHNpemUYAiABKAUSCwoDdWlkGAMgASgJIlEKEkdldENvbnRhY3RzUmVxdWVzdBILCgN1aWQYASABKAkSDAoEc2l6ZRgCIAEoBRIgCgN0YWcYAyABKA4yEy5wcm90b3MuQ09OVEFDVF9UQUciXwoMVmlkZW9SZXF1ZXN0Eg8KB3BhZ2Vfbm8YASABKAUSEQoJcGFnZV9zaXplGAIgASgFEisKCnZpc2liaWxpdHkYAyABKA4yFy5wcm90b3MuVmlzaWJpbGl0eUxldmVsKkwKC0NPTlRBQ1RfVEFHEgwKCFNUUkFOR0VSEAASCgoGRk9MTE9XEAESDAoIRk9MTE9XRUQQAhIKCgZGUklFTkQQAxIJCgVCTEFDSxAEMq8ECgtNb2d1U2VydmljZRI1CglTdGFydENvcmUSDi5wcm90b3MuU3RyaW5nGhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5IgASNgoKR2V0RGZ0QWRkchIWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRoOLnByb3Rvcy5TdHJpbmciABIxCgtHZXRVc2VySW5mbxIOLnByb3Rvcy5TdHJpbmcaEC5wcm90b3MuVXNlckluZm8iABI2CghHZXRQYW5lbBIWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRoQLnByb3Rvcy5Vc2VySW5mbyIAEkEKC0dldENvbnRhY3RzEhoucHJvdG9zLkdldENvbnRhY3RzUmVxdWVzdBoULnByb3Rvcy5Vc2VyaW5mb2xpc3QiABJHCg5HZXRNc2dDb250YWN0cxIdLnByb3Rvcy5HZXRNc2dDb250YWN0c1JlcXVlc3QaFC5wcm90b3MuVXNlcmluZm9saXN0IgASPgoKR2V0TXNnTGlzdBIZLnByb3Rvcy5HZXRNc2dMaXN0UmVxdWVzdBoTLnByb3Rvcy5NZXNzYWdlbGlzdCIAEkEKFEdldFJlY29tbWVuZGVkVmlkZW9zEhQucHJvdG9zLlZpZGVvUmVxdWVzdBoRLnByb3Rvcy5WaWRlb0xpc3QiABI3CglQdXNoVmlkZW8SEC5wcm90b3MuV29ya3Ntc2caFi5nb29nbGUucHJvdG9idWYuRW1wdHkiAEIWWhRkb3V5aW5hcGkvcHJvdG9zL291dGIGcHJvdG8z',
+    'ChBtb2d1ZXJ2aWNlLnByb3RvEgZwcm90b3MiMwoVR2V0TXNnQ29udGFjdHNSZXF1ZXN0EgwKBHRpbWUYASABKAQSDAoEc2l6ZRgCIAEoBSI8ChFHZXRNc2dMaXN0UmVxdWVzdBIMCgR0aW1lGAEgASgEEgwKBHNpemUYAiABKAUSCwoDdWlkGAMgASgJIlEKEkdldENvbnRhY3RzUmVxdWVzdBILCgN1aWQYASABKAkSDAoEc2l6ZRgCIAEoBRIgCgN0YWcYAyABKA4yEy5wcm90b3MuQ09OVEFDVF9UQUciXwoMVmlkZW9SZXF1ZXN0Eg8KB3BhZ2Vfbm8YASABKAUSEQoJcGFnZV9zaXplGAIgASgFEisKCnZpc2liaWxpdHkYAyABKA4yFy5wcm90b3MuVmlzaWJpbGl0eUxldmVsIjUKDk15VmlkZW9SZXF1ZXN0EhAKCGZvcm10aW1lGAEgASgEEhEKCXBhZ2Vfc2l6ZRgCIAEoBSpMCgtDT05UQUNUX1RBRxIMCghTVFJBTkdFUhAAEgoKBkZPTExPVxABEgwKCEZPTExPV0VEEAISCgoGRlJJRU5EEAMSCQoFQkxBQ0sQBDKjBQoLTW9ndVNlcnZpY2USNQoJU3RhcnRDb3JlEg4ucHJvdG9zLlN0cmluZxoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eSIAEjYKCkdldERmdEFkZHISFi5nb29nbGUucHJvdG9idWYuRW1wdHkaDi5wcm90b3MuU3RyaW5nIgASOgoMRWRpdFVzZXJJbmZvEhAucHJvdG9zLlVzZXJJbmZvGhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5IgASMQoLR2V0VXNlckluZm8SDi5wcm90b3MuU3RyaW5nGhAucHJvdG9zLlVzZXJJbmZvIgASNgoIR2V0UGFuZWwSFi5nb29nbGUucHJvdG9idWYuRW1wdHkaEC5wcm90b3MuVXNlckluZm8iABJBCgtHZXRDb250YWN0cxIaLnByb3Rvcy5HZXRDb250YWN0c1JlcXVlc3QaFC5wcm90b3MuVXNlcmluZm9saXN0IgASRwoOR2V0TXNnQ29udGFjdHMSHS5wcm90b3MuR2V0TXNnQ29udGFjdHNSZXF1ZXN0GhQucHJvdG9zLlVzZXJpbmZvbGlzdCIAEj4KCkdldE1zZ0xpc3QSGS5wcm90b3MuR2V0TXNnTGlzdFJlcXVlc3QaEy5wcm90b3MuTWVzc2FnZWxpc3QiABI2CgdNeVZpZGVvEhYucHJvdG9zLk15VmlkZW9SZXF1ZXN0GhEucHJvdG9zLlZpZGVvTGlzdCIAEkEKFEdldFJlY29tbWVuZGVkVmlkZW9zEhQucHJvdG9zLlZpZGVvUmVxdWVzdBoRLnByb3Rvcy5WaWRlb0xpc3QiABI3CglQdXNoVmlkZW8SEC5wcm90b3MuV29ya3Ntc2caFi5nb29nbGUucHJvdG9idWYuRW1wdHkiAEIWWhRkb3V5aW5hcGkvcHJvdG9zL291dGIGcHJvdG8z',
     [file_string, file_userinfo, file_message, file_video, file_video2, file_google_protobuf_empty]
   )
 
@@ -142,6 +142,31 @@ export const VideoRequestSchema: GenMessage<VideoRequest> =
   messageDesc(file_moguervice, 3)
 
 /**
+ * @generated from message protos.MyVideoRequest
+ */
+export type MyVideoRequest = Message<'protos.MyVideoRequest'> & {
+  /**
+   * 从新到旧
+   *
+   * @generated from field: uint64 formtime = 1;
+   */
+  formtime: bigint
+
+  /**
+   * @generated from field: int32 page_size = 2;
+   */
+  pageSize: number
+}
+
+/**
+ * Describes the message protos.MyVideoRequest.
+ * Use `create(MyVideoRequestSchema)` to create a new message.
+ */
+export const MyVideoRequestSchema: GenMessage<MyVideoRequest> =
+  /*@__PURE__*/
+  messageDesc(file_moguervice, 4)
+
+/**
  * @generated from enum protos.CONTACT_TAG
  */
 export enum CONTACT_TAG {
@@ -201,6 +226,14 @@ export const MoguService: GenService<{
     output: typeof StringSchema
   }
   /**
+   * @generated from rpc protos.MoguService.EditUserInfo
+   */
+  editUserInfo: {
+    methodKind: 'unary'
+    input: typeof UserInfoSchema
+    output: typeof EmptySchema
+  }
+  /**
    * @generated from rpc protos.MoguService.GetUserInfo
    */
   getUserInfo: {
@@ -245,6 +278,14 @@ export const MoguService: GenService<{
   /**
    *   // 视频获取
    *
+   * @generated from rpc protos.MoguService.MyVideo
+   */
+  myVideo: {
+    methodKind: 'unary'
+    input: typeof MyVideoRequestSchema
+    output: typeof VideoListSchema
+  }
+  /**
    * @generated from rpc protos.MoguService.GetRecommendedVideos
    */
   getRecommendedVideos: {

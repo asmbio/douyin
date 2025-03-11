@@ -174,7 +174,7 @@ export function _duration(v) {
 }
 
 export function _getUserDouyinId(item) {
-  return item.author.unique_id || item.author.short_id
+  return item.author.uid || item.author.short_id
 }
 
 /**
@@ -249,7 +249,7 @@ export function _showSelectDialog(sexList, cb) {
   app.mount(parent)
 }
 
-export function _showSimpleConfirmDialog(title, okCb, cancelCb, okText, cancelText) {
+export function _showSimpleConfirmDialog(title, okCb, cancelCb, okText?, cancelText?) {
   if (!cancelCb) {
     cancelCb = () => {}
   }
@@ -422,7 +422,7 @@ export async function _fetch(url: string): Promise<{ json(): Promise<any> } | Re
 
 export function slideItemRender(props) {
   return function render(item, index, play, uniqueId) {
-    // console.log('item', item)
+    console.log('item', item)
     let node
     switch (item.type) {
       case 'img':

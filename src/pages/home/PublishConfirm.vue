@@ -90,10 +90,7 @@ import { create } from '@bufbuild/protobuf'
 import {
   WorksmsgSchema,
   MEDIA_TYPE,
-  Media_VideoSchema,
-  type Worksmsg,
   Media_AudioSchema,
-  Media_ImgSchema,
   Media_Video_MixedSchema,
   type Media_Video_Mixed,
   IpfsFileSchema
@@ -107,6 +104,7 @@ const router = useRouter()
 const route = useRoute()
 const textareaRef = ref<HTMLTextAreaElement>()
 const isInputFocused = ref(false)
+
 const obj = create(WorksmsgSchema, {
   From: store.userinfo.uid,
   Feesrate: BigInt(0),
@@ -114,7 +112,7 @@ const obj = create(WorksmsgSchema, {
   Topic: ['topic1', 'topic2'],
   AtUsers: ['user789', 'user101'],
   Desc: '',
-  MediaType: MEDIA_TYPE._VIDEO,
+  MediaType: MEDIA_TYPE._VIDEO_MIXED,
   Time: BigInt(Date.now() * 1_000_000),
   Content: {
     case: 'MediaVideoMixed',
@@ -159,6 +157,7 @@ const showImagePreview = computed(() => {
   return ret
 })
 const showVideoPreview = computed(() => {
+  console.log('showVideoPreview', works.Content.value as Media_Video_Mixed)
   var ret = (works.Content.value as Media_Video_Mixed).Medias[0].Content.startsWith('data:video')
   // if (ret) {
   //   works.Content = {
@@ -193,12 +192,66 @@ const handleBlur = () => {
     textareaRef.value.style.height = '40rem'
   }
 }
+
 const loadmedias = () => {
-  // var medias =create(Media_Video_MixedSchema, JSON.parse( sessionStorage.getItem('tempmedia')))
-  console.log(JSON.parse(sessionStorage.getItem('tempmedia')))
-  Object.assign(works.Content.value, JSON.parse(sessionStorage.getItem('tempmedia')))
-  //var vmix= works.Content.value as Media_Video_Mixed
-  console.log(works)
+  // 从路由状态中获取文件列表
+  if (window.history.state?.objurl) {
+    // 将普通对象转换为 File 对象（如果需要）
+    // console.log(window.history.state.objurl)
+    works.Content.value = JSON.parse(window.history.state.objurl)
+    window.history.state.objurl = ''
+    //  Object.assign(works.Content.value,window.history.state.objurl)
+    //var vmix= works.Content.value as Media_Video_Mixed
+    // console.log(works)
+  }
+
+  //   var medias =create(Media_Video_MixedSchema, JSON.parse( sessionStorage.getItem('tempmedia')))
+  // //var files = JSON.parse(sessionStorage.getItem('tempmedia')) as HTMLInputElement['files']
+
+  // var videofmt = create(Media_Video_MixedSchema)
+  //   if (files && files.value.length > 0) {
+  //     const promises = Array.from(files.value).map((file) => {
+  //       console.log(file)
+  //       return new Promise<void>((resolve, reject) => {
+  //         const reader = new FileReader()
+  //         reader.onload = (e1) => {
+  //           try {
+  //             const dataURL = e1.target.result
+  //             console.log('filereader onload', e1)
+  //             // 修复文件名处理
+  //             const ext = file.name.includes('.') ? file.name.split('.').pop() : ''
+  //             const ipfsfile = create(IpfsFileSchema, {
+  //               Iscid: false,
+  //               Filename: `1${ext ? `.${ext}` : ''}`,
+  //               Content: dataURL as string
+  //             })
+  //             videofmt.Medias.push(ipfsfile)
+  //             console.log('resolve')
+  //             resolve()
+  //           } catch (error) {
+  //             console.log(error)
+  //             reject(error) // 捕获同步错误
+  //           }
+  //         }
+  //         reader.onerror = (error) => reject(error)
+  //         reader.readAsDataURL(file)
+  //         console.log('readasdataurl')
+  //       })
+  //     })
+
+  //     Promise.all(promises)
+  //       .then(() => {
+
+  //         Object.assign(works.Content.value,videofmt)
+  //         //var vmix= works.Content.value as Media_Video_Mixed
+  //         console.log(works)
+  //       })
+  //       .catch((error) => {
+  //         console.error('Error processing files:', error)
+  //         // 可选：通知用户具体哪个文件出错
+  //       })
+  //   }
+  // }
 }
 
 watch(

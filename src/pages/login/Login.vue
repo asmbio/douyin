@@ -78,15 +78,13 @@
   </div>
 </template>
 <script setup lang="ts">
-import Check from '../../components/Check.vue'
 import Tooltip from './components/Tooltip.vue'
 import Loading from '../../components/Loading.vue'
 import { onMounted, reactive } from 'vue'
 import { useNav } from '@/utils/hooks/useNav'
-import { _no, _sleep } from '@/utils'
+import { _no } from '@/utils'
 import { useBaseStore } from '@/store/pinia'
 import LoginInput from './components/LoginInput.vue'
-import { PlatformAdapter } from '@/utils/platform'
 import { getDftAddr, startCore } from '@/api/moguservice'
 
 defineOptions({
@@ -130,7 +128,7 @@ async function login() {
     data.loading.login = true
 
     try {
-      const started = await startCore(data.password)
+      await startCore(data.password)
       const result = await useStore.init()
       console.log('useStore init result:', result)
       useStore.islogin = true
@@ -187,6 +185,11 @@ async function login() {
         letter-spacing: 3rem;
         font-size: 30rem;
         margin-bottom: 10rem;
+        width: 200rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 200px; /* 根据实际情况调整 */
       }
 
       .sub-title {

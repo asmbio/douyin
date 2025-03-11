@@ -1,17 +1,24 @@
 <template>
   <div class="edit">
-    <BaseHeader>
+    <BaseHeader @onBack="save">
       <template v-slot:center>
         <div class="title">
           <span class="f16">编辑资料</span>
           <span class="sub f10">已完成85%</span>
         </div>
       </template>
+      <template v-slot:right>
+        <div class="button" @click="save">保存</div>
+      </template>
     </BaseHeader>
     <div class="userinfo">
       <div class="change-avatar">
         <div class="avatar-ctn" @click="showAvatarDialog">
-          <img class="avatar" :src="_checkImgUrl(store.userinfo.coverUrl[0]?.urlList[0])" alt="" />
+          <img
+            class="avatar"
+            :src="_checkImgUrl(store.userinfo.avatar168x168?.urlList[0])"
+            alt=""
+          />
           <img class="change" src="../../../assets/img/icon/me/camera-light.png" alt="" />
         </div>
         <span>点击更换头像</span>
@@ -19,11 +26,11 @@
       <div class="row" @click="nav('/me/edit-userinfo-item', { type: 1 })">
         <div class="left">名字</div>
         <div class="right">
-          <span>{{ isEmpty(store.userinfo.displayname) }}</span>
+          <span>{{ isEmpty(store.userinfo.nickname) }}</span>
           <dy-back scale=".8" direction="right"></dy-back>
         </div>
       </div>
-      <div class="row" @click="nav('/me/edit-userinfo-item', { type: 2 })">
+      <div class="row" @click="_notice('不可修改')">
         <div class="left">抖音号</div>
         <div class="right">
           <span>{{ isEmpty(_getUserDouyinId({ author: store.userinfo })) }}</span>
@@ -47,7 +54,7 @@
       <div class="row" @click="showBirthdayDialog">
         <div class="left">生日</div>
         <div class="right">
-          <span>{{ isEmpty(store.userinfo.userAge) }}</span>
+          <span>{{ unixNanoToYYYYMMDD(store.userinfo.userAge) }}</span>
           <div v-show="false" id="trigger1"></div>
           <dy-back scale=".8" direction="right"></dy-back>
         </div>
@@ -93,12 +100,17 @@ import {
   _getUserDouyinId,
   _hideLoading,
   _no,
+  _notice,
   _showLoading,
   _showSelectDialog,
   _sleep
 } from '@/utils'
 import { computed, reactive } from 'vue'
 import { useNav } from '@/utils/hooks/useNav'
+import router from '@/router'
+import { editUserInfo } from '@/api/moguservice'
+import { AvatarImageSchema } from '@/api/gen/userinfo_pb'
+import { create } from '@bufbuild/protobuf'
 
 defineOptions({
   name: 'EditUserInfo'
@@ -140,22 +152,92 @@ function showSexDialog() {
   _showSelectDialog(data.sexList, async (e) => {
     _showLoading()
     await _sleep(500)
-    store.setUserinfo({ ...store.userinfo, gender: e.id })
+    store.userinfo.gender = e.id
     _hideLoading()
   })
+}
+async function save() {
+  try {
+    await editUserInfo(store.getuser())
+    _notice('保存成功')
+  } catch (error) {
+    _notice(error)
+    console.log(error)
+  }
+  router.back()
 }
 
 function showAvatarDialog() {
   _showSelectDialog(data.avatarList, (e) => {
     switch (e.id) {
       case 1:
-      case 2:
         return _no()
+      case 2:
+        handleAvatarClick()
+        break
       case 3:
-        data.previewImg = _checkImgUrl(store.userinfo.coverUrl[0].urlList[0])
+        data.previewImg = _checkImgUrl(store.userinfo.avatar168x168?.urlList[0])
         break
     }
   })
+}
+
+// 影集点击处理函数
+const handleAvatarClick = () => {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.multiple = false
+  input.accept = 'image/*'
+
+  input.onchange = (e: Event) => {
+    const files = (e.target as HTMLInputElement).files
+    if (!files || files.length === 0) return
+
+    const file = files[0]
+    const reader = new FileReader()
+
+    reader.onload = (readEvent) => {
+      const img = new Image()
+      img.onload = () => {
+        // 创建画布并设置尺寸
+        const canvas = document.createElement('canvas')
+        canvas.width = 168
+        canvas.height = 168
+        const ctx = canvas.getContext('2d')
+
+        if (!ctx) return
+
+        // 计算裁剪参数
+        const targetSize = 168
+        const sourceWidth = img.width
+        const sourceHeight = img.height
+
+        // 计算缩放比例和位置
+        const scale = Math.max(targetSize / sourceWidth, targetSize / sourceHeight)
+        const scaledWidth = sourceWidth * scale
+        const scaledHeight = sourceHeight * scale
+
+        // 计算裁剪位置
+        const x = (scaledWidth - targetSize) / 2 / scale
+        const y = (scaledHeight - targetSize) / 2 / scale
+        const cropSize = targetSize / scale
+
+        // 绘制并裁剪图像
+        ctx.drawImage(img, x, y, cropSize, cropSize, 0, 0, targetSize, targetSize)
+
+        // 转换为 Blob 并创建文件
+        let aurl = canvas.toDataURL('image/jpeg', 0.85) // 质量为 85%
+        store.userinfo.avatar168x168 = create(AvatarImageSchema, { urlList: [aurl] })
+        img.src = aurl
+      }
+
+      img.src = readEvent.target?.result as string
+    }
+
+    reader.readAsDataURL(file)
+  }
+
+  input.click()
 }
 
 function showBirthdayDialog() {
@@ -176,14 +258,36 @@ function showBirthdayDialog() {
     ],
     callback: async (indexArr, data) => {
       _showLoading()
-      await _sleep(500)
-      store.setUserinfo({
-        ...store.userinfo,
-        birthday: data.join('-')
-      })
+      //  await _sleep(500)
+      store.userinfo.userAge = convertToUnixNano(data.join('-'))
+      console.log(store.getuser().userAge)
       _hideLoading()
     }
   }).show()
+}
+
+function convertToUnixNano(dateString: string): bigint {
+  const parts = dateString.split('-')
+  const year = parseInt(parts[0], 10)
+  const month = parseInt(parts[1], 10) - 1
+  const day = parseInt(parts[2], 10)
+  const timestamp = Date.UTC(year, month, day)
+  //console.log(year,month,day, timestamp)
+  return BigInt(timestamp) * 1000_000n // 转换为纳秒
+}
+function unixNanoToYYYYMMDD(unixNano: bigint): string {
+  // 将 bigint 纳秒转换为毫秒（需要先转换为 bigint 除法）
+  const milliseconds = unixNano / 1_000_000n // 使用 bigint 字面量 1_000_000n
+  // 将 bigint 转换为 number（注意：确保结果不超过 Number.MAX_SAFE_INTEGER）
+  const timestamp = Number(milliseconds)
+  const date = new Date(timestamp)
+
+  // 格式化为 YY-MM-DD（UTC 时间）
+  const year = date.getUTCFullYear().toString() // 取年份后两位
+  const month = (date.getUTCMonth() + 1).toString().padStart(2, '0') // 月份补零
+  const day = date.getUTCDate().toString().padStart(2, '0') // 日期补零
+
+  return `${year}-${month}-${day}`
 }
 </script>
 

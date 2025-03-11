@@ -3,9 +3,9 @@ import { defineStore } from 'pinia'
 import resource from '@/assets/data/resource'
 
 import { _sleep } from '@/utils'
-import { UserInfoSchema, type UserInfo, type Userinfolist } from '@/api/gen/userinfo_pb'
+import { type UserInfo } from '@/api/gen/userinfo_pb'
 import { getPanel } from '@/api/moguservice'
-
+let user: UserInfo
 export const useBaseStore = defineStore('base', {
   state: () => {
     return {
@@ -40,8 +40,9 @@ export const useBaseStore = defineStore('base', {
       while (!success) {
         try {
           const r = await getPanel()
+          user = r
           //   console.log('r.data', r);
-          this.userinfo = r
+          this.userinfo = user
           //   console.log('userinfo', this.userinfo);
           // const r2 = await getContacts('', 20, CONTACT_TAG.FRIEND);
           // console.log('r2.data', r2.userList);
@@ -56,6 +57,9 @@ export const useBaseStore = defineStore('base', {
       // 捕获刷新信号并保存状态到 sessionStorage
 
       return true
+    },
+    getuser() {
+      return user
     },
     setsession() {
       console.log('setsession')

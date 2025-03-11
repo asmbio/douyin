@@ -6,14 +6,15 @@ import {
   GetContactsRequestSchema,
   GetMsgContactsRequestSchema,
   GetMsgListRequestSchema,
-  CONTACT_TAG
+  CONTACT_TAG,
+  MyVideoRequestSchema,
+  VideoRequestSchema
 } from './gen/moguervice_pb' // 请根据实际路径调整导入
 
-import { UserInfoSchema, UserinfolistSchema } from './gen/userinfo_pb'
-import { MessagelistSchema } from './gen/message_pb'
+import { type UserInfo } from './gen/userinfo_pb'
 import { StringSchema } from './gen/string_pb'
 import { EmptySchema } from '@bufbuild/protobuf/wkt'
-import { WorksmsgSchema, type Worksmsg } from './gen/video2_pb'
+import type { Worksmsg } from './gen/video2_pb'
 
 // 创建全局的 transport 和 client 实例（单例模式）
 const transport = createGrpcWebTransport({
@@ -32,6 +33,13 @@ export async function startCore(pwd: string) {
 export async function getDftAddr() {
   const request = create(EmptySchema) // 空请求
   return client.getDftAddr(request)
+}
+
+// 2. 获取用户信息
+export async function editUserInfo(userinfo: UserInfo) {
+  //const request = create(UserInfoSchema, { Value: uid }) // 假设 StringSchema 结构为 { value: string }
+  //console.log(userinfo.userAge)
+  return client.editUserInfo(userinfo)
 }
 
 // 2. 获取用户信息
@@ -80,6 +88,21 @@ export async function getMsgList(time: bigint, size: number, uid: string) {
 
 export async function publishVideo(work: Worksmsg) {
   return client.pushVideo(work)
+}
+
+export async function myVideo(time: bigint, size: number) {
+  const request = create(MyVideoRequestSchema)
+  request.formtime = time
+  request.pageSize = size
+  return client.myVideo(request)
+}
+
+export async function getRecommendedVideos(start: number, size: number) {
+  const request = create(VideoRequestSchema, {
+    pageNo: start,
+    pageSize: size
+  })
+  return client.getRecommendedVideos(request)
 }
 
 // // 使用示例
