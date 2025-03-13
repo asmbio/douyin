@@ -19,14 +19,14 @@ import Call from './components/Call.vue'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
-import BaseMask from '@/components/BaseMask.vue'
-import { BASE_URL } from '@/config'
 import { useNav } from '@/utils/hooks/useNav'
 import { useBaseStore } from '@/store/pinia.js'
+import { useNoticeStream } from './store/noticeService'
 const nav = useNav()
 const store = useBaseStore()
 const route = useRoute()
 const transitionName = ref('go')
+const { init } = useNoticeStream()
 
 // watch $route 决定使用哪种过渡
 watch(
@@ -60,14 +60,16 @@ function resetVhAndPx() {
   document.documentElement.style.setProperty('--vh', `${vh}px`)
   //document.documentElement.style.fontSize = document.documentElement.clientWidth / 375 + 'px'
 }
-// onBeforeUnmount(()=>{
-//   console.log('onBeforeUnmount')
-//   store.setsession()
-// })
+onBeforeUnmount(() => {
+  console.log('onBeforeUnmount')
+  //store.setsession()
+})
 
 onMounted(() => {
+  init()
   //store.init()
   //判断是否登录
+
   console.log('store', store)
   if (store.islogin === false) {
     nav('/login')

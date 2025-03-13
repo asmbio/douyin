@@ -34,6 +34,7 @@
     "axios-mock-adapter": "^1.22.0",
     "core-js": "3.21.1",
     "libarchive-wasm": "^1.1.0",
+    "lodash-es": "^4.17.21",
     "mockjs": "^1.1.0",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^4.2.0",

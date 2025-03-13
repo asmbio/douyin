@@ -25,7 +25,11 @@ service MoguService {
   rpc GetContacts(GetContactsRequest) returns (Userinfolist) {}
   // 聊天消息
   rpc GetMsgContacts(GetMsgContactsRequest) returns (Userinfolist) {}
+  rpc GetNoticeStream(google.protobuf.Empty) returns (stream UserInfo){}
   rpc GetMsgList (GetMsgListRequest) returns (Messagelist) {}
+  rpc SetRead(protos.String) returns (google.protobuf.Empty) {}
+  rpc SendMessage(ChatMessage) returns (SendMessageResponse) {}
+  rpc GetChatStream(protos.String) returns (stream ChatMessage){}
 
   //   // 视频获取
    rpc MyVideo(MyVideoRequest)returns (VideoList){}
@@ -52,7 +56,9 @@ service MoguService {
 
   
 }
-
+message SendMessageResponse{
+  STATUS status=1; // 发送状态
+}
 message GetMsgContactsRequest {
   uint64 time = 1; // 最后通讯时间
   int32 size = 2;

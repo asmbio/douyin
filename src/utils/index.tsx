@@ -294,9 +294,9 @@ export function _showConfirmDialog(
   subtitleColor,
   okCb,
   cancelCb,
-  okText,
-  cancelText,
-  cancelTextColor
+  okText?,
+  cancelText?,
+  cancelTextColor?
 ) {
   const remove = () => {
     const parent = document.querySelector('.dialog-ctn')

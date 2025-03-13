@@ -52,12 +52,14 @@ message MemeContent {
   string image_url = 1;
   AUDIO_STATE state = 2;
   repeated User loved = 3;
+  bool iscid = 4;
 }
 
 message ImageContent {
   string image_url = 1;
   AUDIO_STATE state = 2;
   READ_STATE read_state = 3;
+  bool iscid = 4;
 }
 
 message VideoCallContent {
@@ -74,7 +76,7 @@ message AudioContent {
   uint32 duration = 1;
   string src = 2;
   AUDIO_STATE state = 3;
-  bool iscrypto = 4;
+  bool iscid = 4;
 }
 
 message TextContent {
@@ -91,7 +93,7 @@ message VideoContent {
   string poster = 1;
   VIDEO_STATE state = 2;
   string src=3;
-  bool iscrypto = 4;
+  bool iscid = 4;
   uint32 duration = 5;
   string title = 6;  
 }
@@ -108,9 +110,9 @@ enum STATUS {
   GOING = 2;
 }
 
-message Message {
+message ChatMessage {
   MESSAGE_TYPE type = 1;
-  string time = 2;
+  uint64 time = 2;
   User user = 3;
   
   oneof content {
@@ -127,11 +129,12 @@ message Message {
   }
   STATUS state = 14;
   //string text_content0 = 15;
+  string Receiver = 15;
   
 }
 
 
 
 message Messagelist {
-    repeated Message msg_list = 1;  
+    repeated ChatMessage msg_list = 1;  
   }

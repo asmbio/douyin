@@ -34,17 +34,17 @@
 
       <div class="protocol" :class="data.showAnim ? 'anim-bounce' : ''">
         <Tooltip style="top: -100%; left: -10rem" v-model="data.showTooltip" />
-        <!-- <div class="left">
+        <div class="left">
           <Check v-model="data.isAgree" />
-        </div> -->
-        <!-- <div class="right">
+        </div>
+        <div class="right">
           我已阅读并同意
           <span class="link" @click="nav('/service-protocol', { type: '“抖音”用户服务协议' })"
-            >用户协议</span
+            >个人数据不可侵犯</span
           >
-          和
+          <!-- 和
           <span class="link" @click="nav('/service-protocol', { type: '“抖音”隐私政策' })"
-            >隐私政策</span
+            >个人数据不可侵犯隐私政策</span
           >
           <div>
             以及
@@ -52,8 +52,8 @@
               >《中国移动认证服务条款》</span
             >
             ，同时登录并使用抖音火山版（原“火山小视频”）和抖音
-          </div>
-        </div> -->
+          </div> -->
+        </div>
       </div>
 
       <div class="other-login">

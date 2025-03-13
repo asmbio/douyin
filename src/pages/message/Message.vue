@@ -11,14 +11,14 @@
         <div class="friends">
           <div
             class="friend"
-            @click="nav('/message/chat')"
+            @click="nav('/message/chat', { uid: item.uid })"
             :key="index"
-            v-for="(item, index) in store.friends.all"
+            v-for="(item, index) in stranger"
           >
-            <div class="avatar" :class="index % 2 === 0 ? 'on-line' : ''">
-              <img :src="_checkImgUrl(item.avatar)" alt="" />
+            <div class="avatar" :class="item.isConnect ? 'on-line' : ''">
+              <img :src="_checkImgUrl(item.avatar168x168?.urlList[0])" alt="" />
             </div>
-            <span>{{ item.name }}</span>
+            <span>{{ item.displayname }}</span>
           </div>
           <div class="friend">
             <div class="avatar">
@@ -28,197 +28,7 @@
           </div>
         </div>
         <div class="messages">
-          <!--      粉丝-->
-          <div class="message" @click="nav('/message/fans')">
-            <div class="avatar">
-              <img src="../../assets/img/icon/msg-icon1.png" alt="" class="head-image" />
-            </div>
-            <div class="content">
-              <div class="left">
-                <div class="name">
-                  <span>新朋友</span>
-                </div>
-                <div class="detail">xxx 关注了你</div>
-              </div>
-              <div class="right">
-                <dy-back class="arrow" mode="gray" img="back" direction="right" />
-              </div>
-            </div>
-          </div>
-          <!--      互动消息-->
-          <div class="message" @click="nav('/message/all')">
-            <div class="avatar">
-              <img src="../../assets/img/icon/msg-icon2.png" alt="" class="head-image" />
-            </div>
-            <div class="content">
-              <div class="left">
-                <div class="name">
-                  <span>互动消息</span>
-                </div>
-                <div class="detail">xxx 近期访问过你的主页</div>
-              </div>
-              <div class="right">
-                <dy-back class="arrow" mode="gray" img="back" direction="right" />
-              </div>
-            </div>
-          </div>
-          <!--      消息-->
-          <div class="message" @click="nav('/message/chat')">
-            <div class="avatar on-line">
-              <img src="../../assets/img/icon/avatar/2.png" alt="" class="head-image" />
-            </div>
-            <div class="content">
-              <div class="left">
-                <div class="name">
-                  <span>{{ store.userinfo.nickname }}</span>
-                </div>
-                <div class="detail">
-                  哈哈哈哈哈哈
-                  <div class="point"></div>
-                  10-10
-                </div>
-              </div>
-              <div class="right">
-                <!--                          <div class="not-read"></div>-->
-                <!--                          <img class="camera" src="../../assets/img/icon/close-white.png" alt="">-->
-                <!--            <img class="arrow" src="../../assets/img/icon/close-white.png" alt="">-->
-                <div class="badge">2</div>
-              </div>
-            </div>
-          </div>
-          <!--      抖音小助手-->
-          <div class="message" @click="nav('/message/douyin-helper')">
-            <div class="avatar">
-              <img src="../../assets/img/icon/msg-icon5.webp" alt="" class="head-image" />
-            </div>
-            <div class="content">
-              <div class="left">
-                <div class="name">
-                  <span>抖音小助手</span>
-                  <span class="tag">官方</span>
-                </div>
-                <div class="detail">
-                  #今天谁请客呢
-                  <div class="point"></div>
-                  星期四
-                </div>
-              </div>
-              <div class="right">
-                <div class="not-read"></div>
-              </div>
-            </div>
-          </div>
-          <!--      系统通知-->
-          <div class="message" @click="nav('/message/system-notice')">
-            <div class="avatar">
-              <img src="../../assets/img/icon/msg-icon4.png" alt="" class="head-image" />
-            </div>
-            <div class="content">
-              <div class="left">
-                <div class="name">
-                  <span>系统通知</span>
-                  <span class="tag">官方</span>
-                </div>
-                <div class="detail">
-                  协议修订通知
-                  <div class="point"></div>
-                  08-31
-                </div>
-              </div>
-              <div class="right">
-                <div class="not-read"></div>
-              </div>
-            </div>
-          </div>
-          <!--      求更新-->
-          <div class="message" @click="nav('/me/request-update')">
-            <div class="avatar">
-              <img src="../../assets/img/icon/msg-icon7.webp" alt="" class="head-image" />
-            </div>
-            <div class="content">
-              <div class="left">
-                <div class="name">
-                  <span>求更新</span>
-                  <span class="tag">官方</span>
-                </div>
-                <div class="detail">
-                  你收到过1次求更新
-                  <div class="point"></div>
-                  10-09
-                </div>
-              </div>
-              <div class="right">
-                <div class="not-read"></div>
-              </div>
-            </div>
-          </div>
-          <!--      任务通知-->
-          <div class="message" @click="nav('/message/task-notice')">
-            <div class="avatar">
-              <img src="../../assets/img/icon/msg-icon6.webp" alt="" class="head-image" />
-            </div>
-            <div class="content">
-              <div class="left">
-                <div class="name">
-                  <span>任务通知</span>
-                  <span class="tag">官方</span>
-                </div>
-                <div class="detail">
-                  发作品得流量
-                  <div class="point"></div>
-                  05-26
-                </div>
-              </div>
-              <div class="right">
-                <div class="not-read"></div>
-              </div>
-            </div>
-          </div>
-          <!--      直播通知-->
-          <div class="message" @click="nav('/message/live-notice')">
-            <div class="avatar">
-              <img src="../../assets/img/icon/msg-icon8.webp" alt="" class="head-image" />
-            </div>
-            <div class="content">
-              <div class="left">
-                <div class="name">
-                  <span>直播通知</span>
-                  <span class="tag">官方</span>
-                </div>
-                <div class="detail">
-                  举报结果通知
-                  <div class="point"></div>
-                  05-26
-                </div>
-              </div>
-              <div class="right">
-                <div class="not-read"></div>
-              </div>
-            </div>
-          </div>
-          <!--      钱包通知-->
-          <div class="message" @click="nav('/message/money-notice')">
-            <div class="avatar">
-              <img src="../../assets/img/icon/msg-icon9.webp" alt="" class="head-image" />
-            </div>
-            <div class="content">
-              <div class="left">
-                <div class="name">
-                  <span>钱包通知</span>
-                  <span class="tag">官方</span>
-                </div>
-                <div class="detail">
-                  卡券发放提醒
-                  <div class="point"></div>
-                  05-26
-                </div>
-              </div>
-              <div class="right">
-                <div class="not-read"></div>
-              </div>
-            </div>
-          </div>
-
+          <NotificationItem v-for="(msg, index) in store.notifications" :key="index" :data="msg" />
           <NoMore />
 
           <!--      模板-->
@@ -302,9 +112,9 @@
                 v-for="(item, i) in store.friends.all"
                 @click="item.select = !item.select"
               >
-                <img class="left" :src="_checkImgUrl(item.avatar)" alt="" />
+                <img class="left" :src="_checkImgUrl(item.avatar168x168?.urlList[0])" alt="" />
                 <div class="right">
-                  <span>{{ item.name }}</span>
+                  <span>{{ item.displayname }}</span>
                   <Check mode="red" style="height: 20rem; width: 20rem" v-model="item.select" />
                 </div>
               </div>
@@ -395,7 +205,7 @@
           </div>
           <People
             v-for="item in searchFriendsAll.slice(0, 3)"
-            :key="item.id"
+            :key="item.uid"
             mode="search"
             :searchKey="data.searchKey"
             :people="item"
@@ -431,14 +241,99 @@ import People from '../people/components/Peoples.vue'
 import Scroll from '../../components/Scroll.vue'
 import { useBaseStore } from '@/store/pinia'
 
-import { computed, onMounted, reactive, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useNav } from '@/utils/hooks/useNav.js'
-import { _checkImgUrl, _sleep, cloneDeep } from '@/utils'
+import { _checkImgUrl, _notice, _sleep, cloneDeep } from '@/utils'
 import { useScroll } from '@/utils/hooks/useScroll'
+import NotificationItem from './NotificationItem.vue'
+import { type AvatarImage, type UserInfo } from '@/api/gen/userinfo_pb'
 
 defineOptions({
   name: 'Message'
 })
+// interface NotificationItem {
+//   id:string
+//   title: string
+//   icon: string
+//   content: string
+//   time: string
+//   tag?: '官方' | '紧急' | string
+//   badge?: number
+//   hasUnread?: boolean
+//   showArrow?: boolean
+//   isOnline?: boolean
+// }
+// 消息列表
+import { throttle } from 'lodash-es'
+import { getContacts, getMsgContacts } from '@/api/moguservice'
+import { CONTACT_TAG } from '@/api/gen/moguervice_pb'
+
+const lastTime = ref<bigint>(0n) // 初始时间戳设为0
+const loading = ref(false)
+const hasMore = ref(true)
+const pageSize = 10 // 每页加载数量
+
+// 加载更多数据
+const loadMore = async () => {
+  if (!hasMore.value || loading.value) return
+
+  loading.value = true
+  try {
+    const data = await getMsgContacts(lastTime.value, pageSize)
+    console.log(data)
+    if (data.all.length > 0) {
+      store.notifications.unshift(...data.all) // ✅ 仅新增节点会渲染
+
+      lastTime.value = data[data.all.length - 1].timestamp
+    }
+
+    // 判断是否还有更多数据
+    if (data.all.length < pageSize) {
+      hasMore.value = false
+    }
+  } catch (error) {
+    _notice('加载通知失败:' + error)
+    console.error('加载通知失败:', error)
+    // 这里可以添加错误处理逻辑
+  } finally {
+    loading.value = false
+  }
+}
+
+// 滚动处理函数（带节流）
+const handleScroll = throttle(() => {
+  const { scrollTop, scrollHeight, clientHeight } = document.documentElement
+  const bottomOffset = 100 // 距离底部100px触发加载
+
+  if (scrollTop + clientHeight >= scrollHeight - bottomOffset) {
+    loadMore()
+  }
+}, 200)
+
+//陌生人列表
+const stranger = reactive<UserInfo[]>([
+  // @ts-ignore - 类型不完全匹配但强制保留原始结构
+  {
+    uid: '5qMv7dFgHjK3nRtPwS4zL9',
+    avatar168x168: {
+      urlList: [new URL('../../assets/img/icon/avatar/2.png', import.meta.url).href]
+    } as AvatarImage,
+    displayname: '今日缘分(测)',
+    lastcontent: '我们连接上了',
+    lastsendtime: BigInt(Date.UTC(2025, 8, 31)) * 1_000_000n
+  }
+])
+
+async function loadstranger() {
+  try {
+    let res = await getContacts('', 100, CONTACT_TAG.STRANGER)
+    console.log(res)
+    stranger.push(...res.all)
+  } catch (error) {
+    console.log(error)
+    _notice(error)
+  }
+}
 
 const mainScroll = useScroll()
 const store = useBaseStore()
@@ -460,20 +355,24 @@ const data = reactive({
 
 onMounted(() => {
   console.log('create')
+  loadstranger()
   data.recommend = cloneDeep(store.friends.all)
   data.recommend.map((v) => {
     v.type = -2
   })
   data.moreChat = cloneDeep(store.friends.all.slice(0, 3))
+  window.addEventListener('scroll', handleScroll)
 })
-
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
 const selectFriends = computed(() => {
   return store.friends.all.filter((v) => v.select).length
 })
 
 const searchFriendsAll = computed(() => {
   return store.friends.all.filter((v) => {
-    return v.name.search(data.searchKey) !== -1 || v.account.search(data.searchKey) !== -1
+    return v.displayname.search(data.searchKey) !== -1 || v.nickname.search(data.searchKey) !== -1
   })
 })
 
@@ -483,8 +382,8 @@ watch(
     if (newVal) {
       //TODO 搜索时仅仅判断是否包含了对应字符串，抖音做了拼音判断的
       data.searchFriends = store.friends.all.filter((v) => {
-        if (v.name.includes(newVal)) return true
-        return v.account.includes(newVal)
+        if (v.displayname.includes(newVal)) return true
+        return v.nickname.includes(newVal)
       })
     } else {
       data.searchFriends = []
@@ -509,6 +408,7 @@ async function loadRecommendData() {
   data.recommend = data.recommend.concat(temp)
 }
 </script>
+
 <style scoped lang="less">
 @import '../../assets/less/index';
 

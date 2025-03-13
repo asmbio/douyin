@@ -15,6 +15,7 @@ import { type UserInfo } from './gen/userinfo_pb'
 import { StringSchema } from './gen/string_pb'
 import { EmptySchema } from '@bufbuild/protobuf/wkt'
 import type { Worksmsg } from './gen/video2_pb'
+import type { ChatMessage } from './gen/message_pb'
 
 // 创建全局的 transport 和 client 实例（单例模式）
 const transport = createGrpcWebTransport({
@@ -61,6 +62,7 @@ export async function getContacts(uid: string, size: number, tag: CONTACT_TAG) {
     size,
     tag
   })
+
   return client.getContacts(request)
 }
 
@@ -76,6 +78,46 @@ export async function getMsgContacts(
   return client.getMsgContacts(request)
 }
 
+export async function getNoticeStream() {
+  // 构建请求（根据 StringSchema 的结构可能需要包装字符串）
+  const request = create(EmptySchema)
+  return client.getNoticeStream(request)
+  // try {
+
+  //   // 4. 处理流数据
+  //   for await (const message of stream) {
+  //     // message 已自动反序列化为 MessageSchema 类型
+  //     console.log("Received message:", message.content);
+
+  //     // 这里可以更新 UI 或处理业务逻辑
+  //     // 例如：添加到消息列表、实时显示等
+  //   }
+
+  //   console.log("Stream completed");
+  // } catch (error) {
+  //   console.error("Stream error:", error);
+  // }
+}
+export async function getChatStream(chatId: string) {
+  // 构建请求（根据 StringSchema 的结构可能需要包装字符串）
+  const request = create(StringSchema, { Value: chatId })
+  return client.getChatStream(request)
+  // try {
+
+  //   // 4. 处理流数据
+  //   for await (const message of stream) {
+  //     // message 已自动反序列化为 MessageSchema 类型
+  //     console.log("Received message:", message.content);
+
+  //     // 这里可以更新 UI 或处理业务逻辑
+  //     // 例如：添加到消息列表、实时显示等
+  //   }
+
+  //   console.log("Stream completed");
+  // } catch (error) {
+  //   console.error("Stream error:", error);
+  // }
+}
 // 6. 获取消息列表
 export async function getMsgList(time: bigint, size: number, uid: string) {
   const request = create(GetMsgListRequestSchema, {
@@ -84,6 +126,17 @@ export async function getMsgList(time: bigint, size: number, uid: string) {
     uid
   })
   return client.getMsgList(request)
+}
+
+export async function sendMessage(msg: ChatMessage) {
+  return client.sendMessage(msg)
+}
+
+export async function setRead(uid: string) {
+  const request = create(StringSchema, {
+    Value: uid
+  })
+  return client.setRead(request)
 }
 
 export async function publishVideo(work: Worksmsg) {

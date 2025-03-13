@@ -8,7 +8,7 @@ import type { StringSchema } from './string_pb'
 import { file_string } from './string_pb'
 import type { UserinfolistSchema, UserInfoSchema } from './userinfo_pb'
 import { file_userinfo } from './userinfo_pb'
-import type { MessagelistSchema } from './message_pb'
+import type { ChatMessageSchema, MessagelistSchema, STATUS } from './message_pb'
 import { file_message } from './message_pb'
 import type { VideoListSchema, VisibilityLevel } from './video_pb'
 import { file_video } from './video_pb'
@@ -24,9 +24,29 @@ import type { Message } from '@bufbuild/protobuf'
 export const file_moguervice: GenFile =
   /*@__PURE__*/
   fileDesc(
-    'ChBtb2d1ZXJ2aWNlLnByb3RvEgZwcm90b3MiMwoVR2V0TXNnQ29udGFjdHNSZXF1ZXN0EgwKBHRpbWUYASABKAQSDAoEc2l6ZRgCIAEoBSI8ChFHZXRNc2dMaXN0UmVxdWVzdBIMCgR0aW1lGAEgASgEEgwKBHNpemUYAiABKAUSCwoDdWlkGAMgASgJIlEKEkdldENvbnRhY3RzUmVxdWVzdBILCgN1aWQYASABKAkSDAoEc2l6ZRgCIAEoBRIgCgN0YWcYAyABKA4yEy5wcm90b3MuQ09OVEFDVF9UQUciXwoMVmlkZW9SZXF1ZXN0Eg8KB3BhZ2Vfbm8YASABKAUSEQoJcGFnZV9zaXplGAIgASgFEisKCnZpc2liaWxpdHkYAyABKA4yFy5wcm90b3MuVmlzaWJpbGl0eUxldmVsIjUKDk15VmlkZW9SZXF1ZXN0EhAKCGZvcm10aW1lGAEgASgEEhEKCXBhZ2Vfc2l6ZRgCIAEoBSpMCgtDT05UQUNUX1RBRxIMCghTVFJBTkdFUhAAEgoKBkZPTExPVxABEgwKCEZPTExPV0VEEAISCgoGRlJJRU5EEAMSCQoFQkxBQ0sQBDKjBQoLTW9ndVNlcnZpY2USNQoJU3RhcnRDb3JlEg4ucHJvdG9zLlN0cmluZxoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eSIAEjYKCkdldERmdEFkZHISFi5nb29nbGUucHJvdG9idWYuRW1wdHkaDi5wcm90b3MuU3RyaW5nIgASOgoMRWRpdFVzZXJJbmZvEhAucHJvdG9zLlVzZXJJbmZvGhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5IgASMQoLR2V0VXNlckluZm8SDi5wcm90b3MuU3RyaW5nGhAucHJvdG9zLlVzZXJJbmZvIgASNgoIR2V0UGFuZWwSFi5nb29nbGUucHJvdG9idWYuRW1wdHkaEC5wcm90b3MuVXNlckluZm8iABJBCgtHZXRDb250YWN0cxIaLnByb3Rvcy5HZXRDb250YWN0c1JlcXVlc3QaFC5wcm90b3MuVXNlcmluZm9saXN0IgASRwoOR2V0TXNnQ29udGFjdHMSHS5wcm90b3MuR2V0TXNnQ29udGFjdHNSZXF1ZXN0GhQucHJvdG9zLlVzZXJpbmZvbGlzdCIAEj4KCkdldE1zZ0xpc3QSGS5wcm90b3MuR2V0TXNnTGlzdFJlcXVlc3QaEy5wcm90b3MuTWVzc2FnZWxpc3QiABI2CgdNeVZpZGVvEhYucHJvdG9zLk15VmlkZW9SZXF1ZXN0GhEucHJvdG9zLlZpZGVvTGlzdCIAEkEKFEdldFJlY29tbWVuZGVkVmlkZW9zEhQucHJvdG9zLlZpZGVvUmVxdWVzdBoRLnByb3Rvcy5WaWRlb0xpc3QiABI3CglQdXNoVmlkZW8SEC5wcm90b3MuV29ya3Ntc2caFi5nb29nbGUucHJvdG9idWYuRW1wdHkiAEIWWhRkb3V5aW5hcGkvcHJvdG9zL291dGIGcHJvdG8z',
+    'ChBtb2d1ZXJ2aWNlLnByb3RvEgZwcm90b3MiNQoTU2VuZE1lc3NhZ2VSZXNwb25zZRIeCgZzdGF0dXMYASABKA4yDi5wcm90b3MuU1RBVFVTIjMKFUdldE1zZ0NvbnRhY3RzUmVxdWVzdBIMCgR0aW1lGAEgASgEEgwKBHNpemUYAiABKAUiPAoRR2V0TXNnTGlzdFJlcXVlc3QSDAoEdGltZRgBIAEoBBIMCgRzaXplGAIgASgFEgsKA3VpZBgDIAEoCSJRChJHZXRDb250YWN0c1JlcXVlc3QSCwoDdWlkGAEgASgJEgwKBHNpemUYAiABKAUSIAoDdGFnGAMgASgOMhMucHJvdG9zLkNPTlRBQ1RfVEFHIl8KDFZpZGVvUmVxdWVzdBIPCgdwYWdlX25vGAEgASgFEhEKCXBhZ2Vfc2l6ZRgCIAEoBRIrCgp2aXNpYmlsaXR5GAMgASgOMhcucHJvdG9zLlZpc2liaWxpdHlMZXZlbCI1Cg5NeVZpZGVvUmVxdWVzdBIQCghmb3JtdGltZRgBIAEoBBIRCglwYWdlX3NpemUYAiABKAUqTAoLQ09OVEFDVF9UQUcSDAoIU1RSQU5HRVIQABIKCgZGT0xMT1cQARIMCghGT0xMT1dFRBACEgoKBkZSSUVORBADEgkKBUJMQUNLEAQylgcKC01vZ3VTZXJ2aWNlEjUKCVN0YXJ0Q29yZRIOLnByb3Rvcy5TdHJpbmcaFi5nb29nbGUucHJvdG9idWYuRW1wdHkiABI2CgpHZXREZnRBZGRyEhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5Gg4ucHJvdG9zLlN0cmluZyIAEjoKDEVkaXRVc2VySW5mbxIQLnByb3Rvcy5Vc2VySW5mbxoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eSIAEjEKC0dldFVzZXJJbmZvEg4ucHJvdG9zLlN0cmluZxoQLnByb3Rvcy5Vc2VySW5mbyIAEjYKCEdldFBhbmVsEhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5GhAucHJvdG9zLlVzZXJJbmZvIgASQQoLR2V0Q29udGFjdHMSGi5wcm90b3MuR2V0Q29udGFjdHNSZXF1ZXN0GhQucHJvdG9zLlVzZXJpbmZvbGlzdCIAEkcKDkdldE1zZ0NvbnRhY3RzEh0ucHJvdG9zLkdldE1zZ0NvbnRhY3RzUmVxdWVzdBoULnByb3Rvcy5Vc2VyaW5mb2xpc3QiABI/Cg9HZXROb3RpY2VTdHJlYW0SFi5nb29nbGUucHJvdG9idWYuRW1wdHkaEC5wcm90b3MuVXNlckluZm8iADABEj4KCkdldE1zZ0xpc3QSGS5wcm90b3MuR2V0TXNnTGlzdFJlcXVlc3QaEy5wcm90b3MuTWVzc2FnZWxpc3QiABIzCgdTZXRSZWFkEg4ucHJvdG9zLlN0cmluZxoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eSIAEkEKC1NlbmRNZXNzYWdlEhMucHJvdG9zLkNoYXRNZXNzYWdlGhsucHJvdG9zLlNlbmRNZXNzYWdlUmVzcG9uc2UiABI4Cg1HZXRDaGF0U3RyZWFtEg4ucHJvdG9zLlN0cmluZxoTLnByb3Rvcy5DaGF0TWVzc2FnZSIAMAESNgoHTXlWaWRlbxIWLnByb3Rvcy5NeVZpZGVvUmVxdWVzdBoRLnByb3Rvcy5WaWRlb0xpc3QiABJBChRHZXRSZWNvbW1lbmRlZFZpZGVvcxIULnByb3Rvcy5WaWRlb1JlcXVlc3QaES5wcm90b3MuVmlkZW9MaXN0IgASNwoJUHVzaFZpZGVvEhAucHJvdG9zLldvcmtzbXNnGhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5IgBCFloUZG91eWluYXBpL3Byb3Rvcy9vdXRiBnByb3RvMw',
     [file_string, file_userinfo, file_message, file_video, file_video2, file_google_protobuf_empty]
   )
+
+/**
+ * @generated from message protos.SendMessageResponse
+ */
+export type SendMessageResponse = Message<'protos.SendMessageResponse'> & {
+  /**
+   * 发送状态
+   *
+   * @generated from field: protos.STATUS status = 1;
+   */
+  status: STATUS
+}
+
+/**
+ * Describes the message protos.SendMessageResponse.
+ * Use `create(SendMessageResponseSchema)` to create a new message.
+ */
+export const SendMessageResponseSchema: GenMessage<SendMessageResponse> =
+  /*@__PURE__*/
+  messageDesc(file_moguervice, 0)
 
 /**
  * @generated from message protos.GetMsgContactsRequest
@@ -51,7 +71,7 @@ export type GetMsgContactsRequest = Message<'protos.GetMsgContactsRequest'> & {
  */
 export const GetMsgContactsRequestSchema: GenMessage<GetMsgContactsRequest> =
   /*@__PURE__*/
-  messageDesc(file_moguervice, 0)
+  messageDesc(file_moguervice, 1)
 
 /**
  * @generated from message protos.GetMsgListRequest
@@ -79,7 +99,7 @@ export type GetMsgListRequest = Message<'protos.GetMsgListRequest'> & {
  */
 export const GetMsgListRequestSchema: GenMessage<GetMsgListRequest> =
   /*@__PURE__*/
-  messageDesc(file_moguervice, 1)
+  messageDesc(file_moguervice, 2)
 
 /**
  * @generated from message protos.GetContactsRequest
@@ -111,7 +131,7 @@ export type GetContactsRequest = Message<'protos.GetContactsRequest'> & {
  */
 export const GetContactsRequestSchema: GenMessage<GetContactsRequest> =
   /*@__PURE__*/
-  messageDesc(file_moguervice, 2)
+  messageDesc(file_moguervice, 3)
 
 /**
  * @generated from message protos.VideoRequest
@@ -139,7 +159,7 @@ export type VideoRequest = Message<'protos.VideoRequest'> & {
  */
 export const VideoRequestSchema: GenMessage<VideoRequest> =
   /*@__PURE__*/
-  messageDesc(file_moguervice, 3)
+  messageDesc(file_moguervice, 4)
 
 /**
  * @generated from message protos.MyVideoRequest
@@ -164,7 +184,7 @@ export type MyVideoRequest = Message<'protos.MyVideoRequest'> & {
  */
 export const MyVideoRequestSchema: GenMessage<MyVideoRequest> =
   /*@__PURE__*/
-  messageDesc(file_moguervice, 4)
+  messageDesc(file_moguervice, 5)
 
 /**
  * @generated from enum protos.CONTACT_TAG
@@ -268,12 +288,44 @@ export const MoguService: GenService<{
     output: typeof UserinfolistSchema
   }
   /**
+   * @generated from rpc protos.MoguService.GetNoticeStream
+   */
+  getNoticeStream: {
+    methodKind: 'server_streaming'
+    input: typeof EmptySchema
+    output: typeof UserInfoSchema
+  }
+  /**
    * @generated from rpc protos.MoguService.GetMsgList
    */
   getMsgList: {
     methodKind: 'unary'
     input: typeof GetMsgListRequestSchema
     output: typeof MessagelistSchema
+  }
+  /**
+   * @generated from rpc protos.MoguService.SetRead
+   */
+  setRead: {
+    methodKind: 'unary'
+    input: typeof StringSchema
+    output: typeof EmptySchema
+  }
+  /**
+   * @generated from rpc protos.MoguService.SendMessage
+   */
+  sendMessage: {
+    methodKind: 'unary'
+    input: typeof ChatMessageSchema
+    output: typeof SendMessageResponseSchema
+  }
+  /**
+   * @generated from rpc protos.MoguService.GetChatStream
+   */
+  getChatStream: {
+    methodKind: 'server_streaming'
+    input: typeof StringSchema
+    output: typeof ChatMessageSchema
   }
   /**
    *   // 视频获取

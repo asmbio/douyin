@@ -4,7 +4,7 @@
 
 import type { GenEnum, GenFile, GenMessage } from '@bufbuild/protobuf/codegenv1'
 import { enumDesc, fileDesc, messageDesc } from '@bufbuild/protobuf/codegenv1'
-import type { Message as Message$1 } from '@bufbuild/protobuf'
+import type { Message } from '@bufbuild/protobuf'
 
 /**
  * Describes the file message.proto.
@@ -12,13 +12,13 @@ import type { Message as Message$1 } from '@bufbuild/protobuf'
 export const file_message: GenFile =
   /*@__PURE__*/
   fileDesc(
-    'Cg1tZXNzYWdlLnByb3RvEgZwcm90b3MiNwoEVXNlchIKCgJpZBgBIAEoCRIOCgZhdmF0YXIYAiABKAkSEwoLZGlzcGxheW5hbWUYAyABKAkiDQoLVGltZUNvbnRlbnQiYQoLTWVtZUNvbnRlbnQSEQoJaW1hZ2VfdXJsGAEgASgJEiIKBXN0YXRlGAIgASgOMhMucHJvdG9zLkFVRElPX1NUQVRFEhsKBWxvdmVkGAMgAygLMgwucHJvdG9zLlVzZXIibQoMSW1hZ2VDb250ZW50EhEKCWltYWdlX3VybBgBIAEoCRIiCgVzdGF0ZRgCIAEoDjITLnByb3Rvcy5BVURJT19TVEFURRImCgpyZWFkX3N0YXRlGAMgASgOMhIucHJvdG9zLlJFQURfU1RBVEUiSAoQVmlkZW9DYWxsQ29udGVudBIRCgljYWxsX3RpbWUYASABKAkSIQoFc3RhdGUYAiABKA4yEi5wcm90b3MuQ0FMTF9TVEFURSJIChBBdWRpb0NhbGxDb250ZW50EhEKCWNhbGxfdGltZRgBIAEoCRIhCgVzdGF0ZRgCIAEoDjISLnByb3Rvcy5DQUxMX1NUQVRFImMKDEF1ZGlvQ29udGVudBIQCghkdXJhdGlvbhgBIAEoDRILCgNzcmMYAiABKAkSIgoFc3RhdGUYAyABKA4yEy5wcm90b3MuQVVESU9fU1RBVEUSEAoIaXNjcnlwdG8YBCABKAgiGwoLVGV4dENvbnRlbnQSDAoEdGV4dBgBIAEoCSJXChJEb3V5aW5WaWRlb0NvbnRlbnQSIwoFdmlkZW8YASABKAsyFC5wcm90b3MuVmlkZW9Db250ZW50EhwKBmF1dGhvchgCIAEoCzIMLnByb3Rvcy5Vc2VyIoIBCgxWaWRlb0NvbnRlbnQSDgoGcG9zdGVyGAEgASgJEiIKBXN0YXRlGAIgASgOMhMucHJvdG9zLlZJREVPX1NUQVRFEgsKA3NyYxgDIAEoCRIQCghpc2NyeXB0bxgEIAEoCBIQCghkdXJhdGlvbhgFIAEoDRINCgV0aXRsZRgGIAEoCSJmChBSZWRQYWNrZXRDb250ZW50EiUKBG1vZGUYASABKA4yFy5wcm90b3MuUkVEX1BBQ0tFVF9NT0RFEg0KBW1vbmV5GAIgASgBEg0KBXRpdGxlGAMgASgJEg0KBXN0YXRlGAQgASgJIvkECgdNZXNzYWdlEiIKBHR5cGUYASABKA4yFC5wcm90b3MuTUVTU0FHRV9UWVBFEgwKBHRpbWUYAiABKAkSGgoEdXNlchgDIAEoCzIMLnByb3Rvcy5Vc2VyEisKDHRpbWVfY29udGVudBgEIAEoCzITLnByb3Rvcy5UaW1lQ29udGVudEgAEisKDG1lbWVfY29udGVudBgFIAEoCzITLnByb3Rvcy5NZW1lQ29udGVudEgAEi0KDWltYWdlX2NvbnRlbnQYBiABKAsyFC5wcm90b3MuSW1hZ2VDb250ZW50SAASNgoSdmlkZW9fY2FsbF9jb250ZW50GAcgASgLMhgucHJvdG9zLlZpZGVvQ2FsbENvbnRlbnRIABI2ChJhdWRpb19jYWxsX2NvbnRlbnQYCCABKAsyGC5wcm90b3MuQXVkaW9DYWxsQ29udGVudEgAEi0KDWF1ZGlvX2NvbnRlbnQYCSABKAsyFC5wcm90b3MuQXVkaW9Db250ZW50SAASKwoMdGV4dF9jb250ZW50GAogASgLMhMucHJvdG9zLlRleHRDb250ZW50SAASOgoUZG91eWluX3ZpZGVvX2NvbnRlbnQYCyABKAsyGi5wcm90b3MuRG91eWluVmlkZW9Db250ZW50SAASLQoNdmlkZW9fY29udGVudBgMIAEoCzIULnByb3Rvcy5WaWRlb0NvbnRlbnRIABI2ChJyZWRfcGFja2V0X2NvbnRlbnQYDSABKAsyGC5wcm90b3MuUmVkUGFja2V0Q29udGVudEgAEh0KBXN0YXRlGA4gASgOMg4ucHJvdG9zLlNUQVRVU0IJCgdjb250ZW50IjAKC01lc3NhZ2VsaXN0EiEKCG1zZ19saXN0GAEgAygLMg8ucHJvdG9zLk1lc3NhZ2UqjwEKDE1FU1NBR0VfVFlQRRIICgRUSU1FEAASCAoETUVNRRABEgkKBUlNQUdFEAISDgoKVklERU9fQ0FMTBADEg4KCkFVRElPX0NBTEwQBBIJCgVBVURJTxAFEggKBFRFWFQQBhIQCgxET1VZSU5fVklERU8QBxIJCgVWSURFTxAIEg4KClJFRF9QQUNLRVQQCSofCgtBVURJT19TVEFURRIQCgxBVURJT19OT1JNQUwQACo+CgpDQUxMX1NUQVRFEg8KC0NBTExfUkVKRUNUEAASEAoMQ0FMTF9SRVNPTFZFEAESDQoJQ0FMTF9OT05FEAIqHgoLVklERU9fU1RBVEUSDwoLVklERU9fVkFMSUQQACoeCgpSRUFEX1NUQVRFEhAKDFJFQURfQVJSSVZFRBAAKkEKD1JFRF9QQUNLRVRfTU9ERRIVChFSRURfUEFDS0VUX1NJTkdMRRAAEhcKE1JFRF9QQUNLRVRfTVVMVElQTEUQASosCgZTVEFUVVMSCwoHU1VDQ0VFRBAAEgoKBkZBSUxFRBABEgkKBUdPSU5HEAJCFloUZG91eWluYXBpL3Byb3Rvcy9vdXRiBnByb3RvMw'
+    'Cg1tZXNzYWdlLnByb3RvEgZwcm90b3MiNwoEVXNlchIKCgJpZBgBIAEoCRIOCgZhdmF0YXIYAiABKAkSEwoLZGlzcGxheW5hbWUYAyABKAkiDQoLVGltZUNvbnRlbnQicAoLTWVtZUNvbnRlbnQSEQoJaW1hZ2VfdXJsGAEgASgJEiIKBXN0YXRlGAIgASgOMhMucHJvdG9zLkFVRElPX1NUQVRFEhsKBWxvdmVkGAMgAygLMgwucHJvdG9zLlVzZXISDQoFaXNjaWQYBCABKAgifAoMSW1hZ2VDb250ZW50EhEKCWltYWdlX3VybBgBIAEoCRIiCgVzdGF0ZRgCIAEoDjITLnByb3Rvcy5BVURJT19TVEFURRImCgpyZWFkX3N0YXRlGAMgASgOMhIucHJvdG9zLlJFQURfU1RBVEUSDQoFaXNjaWQYBCABKAgiSAoQVmlkZW9DYWxsQ29udGVudBIRCgljYWxsX3RpbWUYASABKAkSIQoFc3RhdGUYAiABKA4yEi5wcm90b3MuQ0FMTF9TVEFURSJIChBBdWRpb0NhbGxDb250ZW50EhEKCWNhbGxfdGltZRgBIAEoCRIhCgVzdGF0ZRgCIAEoDjISLnByb3Rvcy5DQUxMX1NUQVRFImAKDEF1ZGlvQ29udGVudBIQCghkdXJhdGlvbhgBIAEoDRILCgNzcmMYAiABKAkSIgoFc3RhdGUYAyABKA4yEy5wcm90b3MuQVVESU9fU1RBVEUSDQoFaXNjaWQYBCABKAgiGwoLVGV4dENvbnRlbnQSDAoEdGV4dBgBIAEoCSJXChJEb3V5aW5WaWRlb0NvbnRlbnQSIwoFdmlkZW8YASABKAsyFC5wcm90b3MuVmlkZW9Db250ZW50EhwKBmF1dGhvchgCIAEoCzIMLnByb3Rvcy5Vc2VyIn8KDFZpZGVvQ29udGVudBIOCgZwb3N0ZXIYASABKAkSIgoFc3RhdGUYAiABKA4yEy5wcm90b3MuVklERU9fU1RBVEUSCwoDc3JjGAMgASgJEg0KBWlzY2lkGAQgASgIEhAKCGR1cmF0aW9uGAUgASgNEg0KBXRpdGxlGAYgASgJImYKEFJlZFBhY2tldENvbnRlbnQSJQoEbW9kZRgBIAEoDjIXLnByb3Rvcy5SRURfUEFDS0VUX01PREUSDQoFbW9uZXkYAiABKAESDQoFdGl0bGUYAyABKAkSDQoFc3RhdGUYBCABKAkijwUKC0NoYXRNZXNzYWdlEiIKBHR5cGUYASABKA4yFC5wcm90b3MuTUVTU0FHRV9UWVBFEgwKBHRpbWUYAiABKAQSGgoEdXNlchgDIAEoCzIMLnByb3Rvcy5Vc2VyEisKDHRpbWVfY29udGVudBgEIAEoCzITLnByb3Rvcy5UaW1lQ29udGVudEgAEisKDG1lbWVfY29udGVudBgFIAEoCzITLnByb3Rvcy5NZW1lQ29udGVudEgAEi0KDWltYWdlX2NvbnRlbnQYBiABKAsyFC5wcm90b3MuSW1hZ2VDb250ZW50SAASNgoSdmlkZW9fY2FsbF9jb250ZW50GAcgASgLMhgucHJvdG9zLlZpZGVvQ2FsbENvbnRlbnRIABI2ChJhdWRpb19jYWxsX2NvbnRlbnQYCCABKAsyGC5wcm90b3MuQXVkaW9DYWxsQ29udGVudEgAEi0KDWF1ZGlvX2NvbnRlbnQYCSABKAsyFC5wcm90b3MuQXVkaW9Db250ZW50SAASKwoMdGV4dF9jb250ZW50GAogASgLMhMucHJvdG9zLlRleHRDb250ZW50SAASOgoUZG91eWluX3ZpZGVvX2NvbnRlbnQYCyABKAsyGi5wcm90b3MuRG91eWluVmlkZW9Db250ZW50SAASLQoNdmlkZW9fY29udGVudBgMIAEoCzIULnByb3Rvcy5WaWRlb0NvbnRlbnRIABI2ChJyZWRfcGFja2V0X2NvbnRlbnQYDSABKAsyGC5wcm90b3MuUmVkUGFja2V0Q29udGVudEgAEh0KBXN0YXRlGA4gASgOMg4ucHJvdG9zLlNUQVRVUxIQCghSZWNlaXZlchgPIAEoCUIJCgdjb250ZW50IjQKC01lc3NhZ2VsaXN0EiUKCG1zZ19saXN0GAEgAygLMhMucHJvdG9zLkNoYXRNZXNzYWdlKo8BCgxNRVNTQUdFX1RZUEUSCAoEVElNRRAAEggKBE1FTUUQARIJCgVJTUFHRRACEg4KClZJREVPX0NBTEwQAxIOCgpBVURJT19DQUxMEAQSCQoFQVVESU8QBRIICgRURVhUEAYSEAoMRE9VWUlOX1ZJREVPEAcSCQoFVklERU8QCBIOCgpSRURfUEFDS0VUEAkqHwoLQVVESU9fU1RBVEUSEAoMQVVESU9fTk9STUFMEAAqPgoKQ0FMTF9TVEFURRIPCgtDQUxMX1JFSkVDVBAAEhAKDENBTExfUkVTT0xWRRABEg0KCUNBTExfTk9ORRACKh4KC1ZJREVPX1NUQVRFEg8KC1ZJREVPX1ZBTElEEAAqHgoKUkVBRF9TVEFURRIQCgxSRUFEX0FSUklWRUQQACpBCg9SRURfUEFDS0VUX01PREUSFQoRUkVEX1BBQ0tFVF9TSU5HTEUQABIXChNSRURfUEFDS0VUX01VTFRJUExFEAEqLAoGU1RBVFVTEgsKB1NVQ0NFRUQQABIKCgZGQUlMRUQQARIJCgVHT0lORxACQhZaFGRvdXlpbmFwaS9wcm90b3Mvb3V0YgZwcm90bzM'
   )
 
 /**
  * @generated from message protos.User
  */
-export type User = Message$1<'protos.User'> & {
+export type User = Message<'protos.User'> & {
   /**
    * @generated from field: string id = 1;
    */
@@ -44,7 +44,7 @@ export const UserSchema: GenMessage<User> = /*@__PURE__*/ messageDesc(file_messa
 /**
  * @generated from message protos.TimeContent
  */
-export type TimeContent = Message$1<'protos.TimeContent'> & {}
+export type TimeContent = Message<'protos.TimeContent'> & {}
 
 /**
  * Describes the message protos.TimeContent.
@@ -55,7 +55,7 @@ export const TimeContentSchema: GenMessage<TimeContent> = /*@__PURE__*/ messageD
 /**
  * @generated from message protos.MemeContent
  */
-export type MemeContent = Message$1<'protos.MemeContent'> & {
+export type MemeContent = Message<'protos.MemeContent'> & {
   /**
    * @generated from field: string image_url = 1;
    */
@@ -70,6 +70,11 @@ export type MemeContent = Message$1<'protos.MemeContent'> & {
    * @generated from field: repeated protos.User loved = 3;
    */
   loved: User[]
+
+  /**
+   * @generated from field: bool iscid = 4;
+   */
+  iscid: boolean
 }
 
 /**
@@ -81,7 +86,7 @@ export const MemeContentSchema: GenMessage<MemeContent> = /*@__PURE__*/ messageD
 /**
  * @generated from message protos.ImageContent
  */
-export type ImageContent = Message$1<'protos.ImageContent'> & {
+export type ImageContent = Message<'protos.ImageContent'> & {
   /**
    * @generated from field: string image_url = 1;
    */
@@ -96,6 +101,11 @@ export type ImageContent = Message$1<'protos.ImageContent'> & {
    * @generated from field: protos.READ_STATE read_state = 3;
    */
   readState: READ_STATE
+
+  /**
+   * @generated from field: bool iscid = 4;
+   */
+  iscid: boolean
 }
 
 /**
@@ -109,7 +119,7 @@ export const ImageContentSchema: GenMessage<ImageContent> =
 /**
  * @generated from message protos.VideoCallContent
  */
-export type VideoCallContent = Message$1<'protos.VideoCallContent'> & {
+export type VideoCallContent = Message<'protos.VideoCallContent'> & {
   /**
    * @generated from field: string call_time = 1;
    */
@@ -132,7 +142,7 @@ export const VideoCallContentSchema: GenMessage<VideoCallContent> =
 /**
  * @generated from message protos.AudioCallContent
  */
-export type AudioCallContent = Message$1<'protos.AudioCallContent'> & {
+export type AudioCallContent = Message<'protos.AudioCallContent'> & {
   /**
    * @generated from field: string call_time = 1;
    */
@@ -155,7 +165,7 @@ export const AudioCallContentSchema: GenMessage<AudioCallContent> =
 /**
  * @generated from message protos.AudioContent
  */
-export type AudioContent = Message$1<'protos.AudioContent'> & {
+export type AudioContent = Message<'protos.AudioContent'> & {
   /**
    * @generated from field: uint32 duration = 1;
    */
@@ -172,9 +182,9 @@ export type AudioContent = Message$1<'protos.AudioContent'> & {
   state: AUDIO_STATE
 
   /**
-   * @generated from field: bool iscrypto = 4;
+   * @generated from field: bool iscid = 4;
    */
-  iscrypto: boolean
+  iscid: boolean
 }
 
 /**
@@ -188,7 +198,7 @@ export const AudioContentSchema: GenMessage<AudioContent> =
 /**
  * @generated from message protos.TextContent
  */
-export type TextContent = Message$1<'protos.TextContent'> & {
+export type TextContent = Message<'protos.TextContent'> & {
   /**
    * @generated from field: string text = 1;
    */
@@ -204,7 +214,7 @@ export const TextContentSchema: GenMessage<TextContent> = /*@__PURE__*/ messageD
 /**
  * @generated from message protos.DouyinVideoContent
  */
-export type DouyinVideoContent = Message$1<'protos.DouyinVideoContent'> & {
+export type DouyinVideoContent = Message<'protos.DouyinVideoContent'> & {
   /**
    * @generated from field: protos.VideoContent video = 1;
    */
@@ -227,7 +237,7 @@ export const DouyinVideoContentSchema: GenMessage<DouyinVideoContent> =
 /**
  * @generated from message protos.VideoContent
  */
-export type VideoContent = Message$1<'protos.VideoContent'> & {
+export type VideoContent = Message<'protos.VideoContent'> & {
   /**
    * @generated from field: string poster = 1;
    */
@@ -244,9 +254,9 @@ export type VideoContent = Message$1<'protos.VideoContent'> & {
   src: string
 
   /**
-   * @generated from field: bool iscrypto = 4;
+   * @generated from field: bool iscid = 4;
    */
-  iscrypto: boolean
+  iscid: boolean
 
   /**
    * @generated from field: uint32 duration = 5;
@@ -270,7 +280,7 @@ export const VideoContentSchema: GenMessage<VideoContent> =
 /**
  * @generated from message protos.RedPacketContent
  */
-export type RedPacketContent = Message$1<'protos.RedPacketContent'> & {
+export type RedPacketContent = Message<'protos.RedPacketContent'> & {
   /**
    * @generated from field: protos.RED_PACKET_MODE mode = 1;
    */
@@ -301,18 +311,18 @@ export const RedPacketContentSchema: GenMessage<RedPacketContent> =
   messageDesc(file_message, 10)
 
 /**
- * @generated from message protos.Message
+ * @generated from message protos.ChatMessage
  */
-export type Message = Message$1<'protos.Message'> & {
+export type ChatMessage = Message<'protos.ChatMessage'> & {
   /**
    * @generated from field: protos.MESSAGE_TYPE type = 1;
    */
   type: MESSAGE_TYPE
 
   /**
-   * @generated from field: string time = 2;
+   * @generated from field: uint64 time = 2;
    */
-  time: string
+  time: bigint
 
   /**
    * @generated from field: protos.User user = 3;
@@ -320,7 +330,7 @@ export type Message = Message$1<'protos.Message'> & {
   user?: User
 
   /**
-   * @generated from oneof protos.Message.content
+   * @generated from oneof protos.ChatMessage.content
    */
   content:
     | {
@@ -396,27 +406,34 @@ export type Message = Message$1<'protos.Message'> & {
     | { case: undefined; value?: undefined }
 
   /**
-   * string text_content0 = 15;
-   *
    * @generated from field: protos.STATUS state = 14;
    */
   state: STATUS
+
+  /**
+   * string text_content0 = 15;
+   *
+   * @generated from field: string Receiver = 15;
+   */
+  Receiver: string
 }
 
 /**
- * Describes the message protos.Message.
- * Use `create(MessageSchema)` to create a new message.
+ * Describes the message protos.ChatMessage.
+ * Use `create(ChatMessageSchema)` to create a new message.
  */
-export const MessageSchema: GenMessage<Message> = /*@__PURE__*/ messageDesc(file_message, 11)
+export const ChatMessageSchema: GenMessage<ChatMessage> =
+  /*@__PURE__*/
+  messageDesc(file_message, 11)
 
 /**
  * @generated from message protos.Messagelist
  */
-export type Messagelist = Message$1<'protos.Messagelist'> & {
+export type Messagelist = Message<'protos.Messagelist'> & {
   /**
-   * @generated from field: repeated protos.Message msg_list = 1;
+   * @generated from field: repeated protos.ChatMessage msg_list = 1;
    */
-  msgList: Message[]
+  msgList: ChatMessage[]
 }
 
 /**

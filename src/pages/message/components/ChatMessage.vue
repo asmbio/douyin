@@ -5,27 +5,28 @@
     :style="message.type === MESSAGE_TYPE.TIME && 'margin-bottom: 0;'"
   >
     <div class="time" v-if="message.type === MESSAGE_TYPE.TIME">
-      {{ message.time }}
+      {{ unixNanoToYYYYMMDD(message.time) }}
     </div>
     <template v-else>
       <img v-if="!isMe" :src="message.user.avatar" alt="" class="avatar" />
       <div class="chat-wrapper" @click="$emit('itemClick', message)">
         <div class="chat-text" v-if="message.type === MESSAGE_TYPE.TEXT">
-          {{ message.data }}
+          {{ message.content.value.text }}
         </div>
 
         <div class="douyin_video" v-if="message.type === MESSAGE_TYPE.DOUYIN_VIDEO">
-          <img class="poster" :src="message.data.poster" alt="" />
-          <div class="title">{{ message.data.title }}</div>
+          <img class="poster" :src="message.content.value.poster" alt="" />
+          <div class="title">{{ message.content.value.title }}</div>
           <img src="../../../assets/img/icon/play-white.png" class="pause" />
           <div class="author">
-            <img class="video-avatar" :src="message.data.author.avatar" alt="" />
-            <span class="name">{{ message.data.author.name }}</span>
+            <img class="video-avatar" :src="message.content.value.author.avatar" alt="" />
+            <span class="name">{{ message.content.value.author.name }}</span>
           </div>
         </div>
 
         <div class="douyin_video" v-if="message.type === MESSAGE_TYPE.VIDEO">
-          <img class="poster" :src="message.data.poster" alt="" />
+          <!-- <video class="poster" ></video> -->
+          <img class="poster" :src="message.content.value.poster" alt="" />
           <img src="../../../assets/img/icon/play-white.png" class="pause" />
         </div>
 
@@ -85,35 +86,35 @@
         </div>
 
         <div class="image" v-if="message.type === MESSAGE_TYPE.IMAGE">
-          <img :src="message.data" alt="" />
+          <img :src="message.content.value.imageurl" alt="" />
         </div>
 
         <div class="meme" v-if="message.type === MESSAGE_TYPE.MEME">
-          <img :src="message.data" alt="" />
+          <img :src="message.content.value.imageurl" alt="" />
         </div>
 
         <div
           class="red_packet"
-          :class="message.data.state !== '未领取' ? 'invalid' : ''"
+          :class="message.content.value.state !== '未领取' ? 'invalid' : ''"
           v-if="message.type === MESSAGE_TYPE.RED_PACKET"
         >
           <div class="top">
             <img src="../../../assets/img/icon/message/chat/redpack-logo.webp" alt="" />
             <div class="right">
-              <div class="title">{{ message.data.title }}</div>
-              <div v-if="message.data.state !== '未领取'" class="state">
-                {{ message.data.state }}
+              <div class="title">{{ message.content.value.title }}</div>
+              <div v-if="message.content.value.state !== '未领取'" class="state">
+                {{ message.content.value.state }}
               </div>
             </div>
           </div>
           <span class="bottom">抖音红包</span>
         </div>
 
-        <div class="loves" v-if="message.loved?.length">
+        <div class="loves" v-if="message.content.value.loved?.length">
           <img src="../../../assets/img/icon/loved.svg" alt="" />
           <img
             :key="user"
-            v-for="user in message.loved"
+            v-for="user in message.content.value.loved"
             src="../../../assets/img/icon/head-image.jpeg"
             alt=""
             class="love-avatar"
@@ -128,44 +129,10 @@
 <script>
 import { mapState } from 'pinia'
 import { useBaseStore } from '@/store/pinia'
+import { CALL_STATE, MESSAGE_TYPE, RED_PACKET_MODE } from '@/api/gen/message_pb'
+import { unixNanoToYYYYMMDD } from '@/utils/date'
 //
-let CALL_STATE = {
-  REJECT: 0,
-  RESOLVE: 1,
-  NONE: 2
-}
-// eslint-disable-next-line
-let VIDEO_STATE = {
-  VALID: 0,
-  INVALID: 1
-}
-// eslint-disable-next-line
-let AUDIO_STATE = {
-  NORMAL: 0,
-  SENDING: 1
-}
-// eslint-disable-next-line
-let READ_STATE = {
-  SENDING: 0,
-  ARRIVED: 1,
-  READ: 1
-}
-let RED_PACKET_MODE = {
-  SINGLE: 1,
-  MULTIPLE: 2
-}
-let MESSAGE_TYPE = {
-  TEXT: 0,
-  TIME: 1,
-  VIDEO: 2,
-  DOUYIN_VIDEO: 9,
-  AUDIO: 3,
-  IMAGE: 6,
-  VIDEO_CALL: 4,
-  AUDIO_CALL: 5,
-  MEME: 7, //表情包
-  RED_PACKET: 8 //红包
-}
+
 export default {
   name: 'ChatMessage',
   props: {
@@ -189,18 +156,18 @@ export default {
     ...mapState(useBaseStore, ['userinfo']),
     formattedDuration() {
       // 将秒转换为 mm:ss 格式
-      const duration = this.currentDuration || this.message.data.duration
+      const duration = this.currentDuration || this.message.content.value.duration
       const minutes = Math.floor(duration / 60)
       const seconds = Math.floor(duration % 60)
       return `${minutes}:${seconds.toString().padStart(2, '0')}`
     },
     validAudioSrc() {
       // // 确保音频路径有效性
-      // if (this.message.data.src.startsWith('http') || this.message.data.src.startsWith('/')) {
-      //   return this.message.data.src;
+      // if (this.message.content.value.src.startsWith('http') || this.message.content.value.src.startsWith('/')) {
+      //   return this.message.content.value.src;
       // }
-      // return require(`@/assets/${this.message.data.src}`);
-      return this.message.data.src
+      // return require(`@/assets/${this.message.content.value.src}`);
+      return this.message.content.value.src
     },
     isMe() {
       return this.userinfo.uid === this.message.user.id
@@ -208,6 +175,7 @@ export default {
   },
   created() {},
   methods: {
+    unixNanoToYYYYMMDD,
     toggleAudioPlayback() {
       const audio = this.$refs.audioPlayer
       if (!audio) return
@@ -348,7 +316,7 @@ export default {
     border-radius: @border-radius;
     @not-received: rgb(253, 92, 72);
     @received: rgba(253, 92, 72, 0.8);
-    width: 60vw;
+    width: 300rem;
     background: @not-received;
     display: flex;
     flex-direction: column;
@@ -490,7 +458,8 @@ export default {
     .poster {
       border-radius: @border-radius;
       //height: 30vh;
-      width: 40vw;
+      max-width: 300rem;
+      max-height: 500rem;
     }
 
     .author {

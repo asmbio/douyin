@@ -113,7 +113,7 @@ message UserInfo {
 // 卡片信息
   repeated CardEntry card_entries = 40;
 
-  
+  bool select =41;  
 }
 
 message Userinfolist {

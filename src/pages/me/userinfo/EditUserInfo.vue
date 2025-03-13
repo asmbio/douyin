@@ -158,7 +158,7 @@ function showSexDialog() {
 }
 async function save() {
   try {
-    await editUserInfo(store.getuser())
+    await editUserInfo(store.userinfo)
     _notice('保存成功')
   } catch (error) {
     _notice(error)
@@ -260,7 +260,6 @@ function showBirthdayDialog() {
       _showLoading()
       //  await _sleep(500)
       store.userinfo.userAge = convertToUnixNano(data.join('-'))
-      console.log(store.getuser().userAge)
       _hideLoading()
     }
   }).show()
@@ -275,6 +274,7 @@ function convertToUnixNano(dateString: string): bigint {
   //console.log(year,month,day, timestamp)
   return BigInt(timestamp) * 1000_000n // 转换为纳秒
 }
+
 function unixNanoToYYYYMMDD(unixNano: bigint): string {
   // 将 bigint 纳秒转换为毫秒（需要先转换为 bigint 除法）
   const milliseconds = unixNano / 1_000_000n // 使用 bigint 字面量 1_000_000n
