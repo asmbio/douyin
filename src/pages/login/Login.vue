@@ -5,11 +5,11 @@
         <span class="f14" @click="nav('/login/help')">帮助与设置</span>
       </template>
     </BaseHeader>
-    <Loading v-if="data.loading.getPhone" />
+    <Loading v-if="useStore.loading" />
     <div v-else class="content">
       <div class="desc">
         <div class="title">登录看朋友内容</div>
-        <div class="phone-number" v-if="data.uid">{{ data.uid }}</div>
+        <div class="phone-number" v-if="useStore.userinfo.uid">{{ useStore.userinfo.uid }}</div>
         <div class="phone-number" v-else>未注册</div>
         <div class="sub-title">输入密码后自动生成随机密钥</div>
       </div>
@@ -101,24 +101,15 @@ const data = reactive({
   isOtherLogin: false,
   showAnim: false,
   showTooltip: false,
-  uid: '',
   password: '',
   loading: {
-    login: false,
-    getPhone: false
+    login: false
   }
 })
 
 onMounted(() => {
-  getPhone()
+  console.log('login onmounted')
 })
-
-async function getPhone() {
-  data.loading.getPhone = true
-  const addr = await getDftAddr()
-  data.uid = addr.Value
-  data.loading.getPhone = false
-}
 
 async function login() {
   if (useStore.islogin) {
@@ -136,7 +127,7 @@ async function login() {
     } catch (error) {
       console.error('Initialization failed:', error)
     } finally {
-      data.loading.login = false
+      useStore.islogin = false
     }
   } else {
     if (!data.showAnim && !data.showTooltip) {

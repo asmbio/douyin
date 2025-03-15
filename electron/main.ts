@@ -47,13 +47,14 @@ function createWindow() {
   //
   // 开发环境加载Vue开发服务器
   if (process.env.NODE_ENV === 'development') {
-    win.loadURL('http://localhost:3000')
+    win.loadURL('http://127.0.0.1:3000')
     // win.loadFile(path.join(__dirname, '../dist/index.html'))
     win.webContents.openDevTools()
   } else {
     //app.isPackaged
     // 生产环境加载打包后的文件
     win.loadFile(path.join(__dirname, '../dist/index.html'))
+    // win.webContents.openDevTools()
   }
 }
 

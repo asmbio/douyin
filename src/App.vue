@@ -65,7 +65,7 @@ onBeforeUnmount(() => {
   //store.setsession()
 })
 
-onMounted(() => {
+onMounted(async () => {
   init()
   //store.init()
   //判断是否登录

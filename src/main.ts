@@ -8,14 +8,9 @@ import VueLazyload from '@jambonn/vue-lazyload'
 import { createPinia } from 'pinia'
 import { useClick } from '@/utils/hooks/useClick'
 import bus, { EVENT_KEY } from '@/utils/bus'
-import { PlatformAdapter } from './utils/platform'
+
 import { useBaseStore } from './store/pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
-
-const platformAdapter = new PlatformAdapter()
-// 获取当前平台
-console.log('Current platform:', platformAdapter.platform)
-//platformAdapter.executePlatformAction(data.password)
 
 console.log('main.ts')
 

@@ -596,7 +596,7 @@ export default {
             case 0:
               res = await myVideo(this.videos.my.fromtime, this.pageSize)
               console.log(res)
-              if (res.all) {
+              if (res.all?.length > 0) {
                 // if (res.all.length < this.pageSize){
                 //   this.videos.my.total = res.all.length
                 // }else{

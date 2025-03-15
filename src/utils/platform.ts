@@ -64,7 +64,7 @@ export class PlatformDetector {
 
 // platform-action-handler.ts
 type PlatformActionMap = {
-  [key in Platform]: (pwd: string) => void
+  [key in Platform]: (pwd: string) => Promise<{ value: string }>
 }
 
 export class PlatformActionHandler {
@@ -77,47 +77,21 @@ export class PlatformActionHandler {
     //   console.log('Executing macOS specific action')
     //   // macOS 原生 API 调用
     // },
-    [Platform.Desktop]: (pwd: string) => {
-      console.log('Executing desktop specific action')
-      window.electronAPI
-        .startApp(pwd)
-        .then((result) => {
-          console.log('Success:', result.value)
-        })
-        .catch((error) => {
-          alert(error.message)
-        })
+    [Platform.Desktop]: async (pwd: string) => {
+      return window.electronAPI?.startApp(pwd)
     },
-    [Platform.Mobile]: (pwd: string) => {
-      console.log('Executing mobile specific action')
-      if (typeof navigator !== 'undefined' && navigator.vibrate) {
-        navigator.vibrate(200)
-        Mogu.start({ pwd: '123456' })
-          .then((result) => {
-            console.log('Success:', result.value)
-          })
-          .catch((error) => {
-            console.error('Error:', error.message)
-            alert(error.message)
-          })
-      } else {
-        window.electronAPI
-          .startApp(pwd)
-          .then((result) => {
-            console.log('Success:', result.value)
-          })
-          .catch((error) => {
-            alert(error.message)
-          })
-      }
+    [Platform.Mobile]: async (pwd: string) => {
+      return Mogu.start({ pwd: '123456' })
     },
     [Platform.Unknown]: (pwd: string) => {
       console.log('Default action for unknown platform')
+      return window.electronAPI?.startApp(pwd)
     }
   }
 
-  static execute(platform: Platform, pwd: string): void {
-    this.actions[platform]?.(pwd)
+  static async execute(platform: Platform, pwd: string): Promise<{ value: string }> {
+    console.log('Executing desktop specific action')
+    return this.actions[platform]?.(pwd)
   }
 }
 
@@ -146,8 +120,8 @@ export class PlatformAdapter {
     return PlatformDetector.isMobile(this.currentPlatform)
   }
 
-  public executePlatformAction(pwd: string): void {
-    PlatformActionHandler.execute(this.currentPlatform, pwd)
+  public async executePlatformAction(pwd: string): Promise<{ value: string }> {
+    return PlatformActionHandler.execute(this.currentPlatform, pwd)
   }
 
   public subscribe(callback: PlatformChangeCallback): void {

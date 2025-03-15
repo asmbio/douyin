@@ -327,7 +327,7 @@ const data = reactive({
       time: BigInt(Date.UTC(2021, 1, 2, 21, 21)) * 1_000_000n,
       user: {
         id: '2739632844317827',
-        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
+        avatar: new URL('../../../assets/img/icon/avatar/2.png', import.meta.url).href
       },
       content: {
         case: 'redPacketContent',
