@@ -156,9 +156,9 @@
             v-model:active-index="contentIndex"
           >
             <SlideItem class="SlideItem" @scroll="scroll" :style="SlideItemStyle">
-              <Posters v-if="videos.my.total !== -1" :list="videos.my.list"></Posters>
+              <Posters v-if="videos.my.total !== 0" :list="videos.my.list"></Posters>
               <Loading v-if="loadings.loading0" :is-full-screen="false"></Loading>
-              <no-more v-else />
+              <no-more v-if="!videos.my.hasmore" />
             </SlideItem>
             <SlideItem class="SlideItem" @scroll="scroll" :style="SlideItemStyle">
               <div class="notice">
@@ -426,34 +426,7 @@ export default {
       canTransformY: 0,
       startTime: 0,
       floatHeight: 46,
-      videos: {
-        my: {
-          list: [],
-          total: -1,
-          fromtime: BigInt(Date.now() * 1_000_000)
-          //fromtime:  Long.fromNumber(Date.now()).multiply(1_000_000)
-        },
-        private: {
-          list: [],
-          total: -1,
-          pageNo: 0
-        },
-        like: {
-          list: [],
-          total: -1,
-          pageNo: 0
-        },
-        collect: {
-          video: {
-            list: [],
-            total: -1
-          },
-          music: {
-            list: [],
-            total: -1
-          }
-        }
-      },
+
       pageSize: 15,
       initSlideHeight: 0,
       loadings: {
@@ -481,7 +454,7 @@ export default {
       if (this.tempScroll || this.isScroll) return { overflow: 'auto' }
       return { overflow: 'hidden' }
     },
-    ...mapState(useBaseStore, ['userinfo', 'bodyHeight', 'bodyWidth'])
+    ...mapState(useBaseStore, ['userinfo', 'bodyHeight', 'bodyWidth', 'videos'])
   },
   watch: {
     contentIndex(newVal, oldVal) {
@@ -489,6 +462,7 @@ export default {
     }
   },
   mounted() {
+    console.log('me mounted')
     nextTick(() => {
       this.refs.header = this.$refs.header
       this.refs.headerHeight = this.$refs.header.offsetHeight
@@ -589,21 +563,19 @@ export default {
           if (res.success) this.videos.collect = res.data
         }
       } else {
-        if (videoOb.total === -1) {
+        if (videoOb.total <= this.pageSize && videoOb.hasmore) {
           this.loadings['loading' + newVal] = true
           let res
           switch (newVal) {
             case 0:
               res = await myVideo(this.videos.my.fromtime, this.pageSize)
-              console.log(res)
+              console.log('changeIndex myVideo', res)
               if (res.all?.length > 0) {
-                // if (res.all.length < this.pageSize){
-                //   this.videos.my.total = res.all.length
-                // }else{
-                //   this.videos.my.total = this.pageSize+1
-                // }
-                this.videos.my.total = res.all.length
-                this.videos.my.list = res.all
+                if (res.all.length < this.pageSize) {
+                  this.videos.my.hasmore = false
+                }
+                this.videos.my.total += res.all.length
+                this.videos.my.list.push(...res.all)
                 this.videos.my.fromtime = res.all[res.all.length - 1].createTime
               }
               break
@@ -652,7 +624,7 @@ export default {
       console.log('到底了')
       let videoOb = this.videos[Object.keys(this.videos)[this.contentIndex]]
 
-      if (this.contentIndex !== 3 && videoOb.total > videoOb.list.length) {
+      if (this.contentIndex !== 3 && videoOb.hasmore) {
         //videoOb.pageNo++
         this.loadings['loading' + this.contentIndex] = true
         let res
@@ -683,11 +655,10 @@ export default {
         if (res.all) {
           if (res.all) {
             if (res.all.length < this.pageSize) {
-              videoOb.my.total = -1
-            } else {
-              videoOb.total = videoOb.tota + this.pageSize + 1
+              videoOb.hasmore = false
             }
-            videoOb.list = videoOb.list.concat(res.all)
+            videoOb.total += res.all.length
+            this.videos.my.list.push(...res.all)
             videoOb.fromtime = res.all[res.all.length - 1].createTime
           }
         }

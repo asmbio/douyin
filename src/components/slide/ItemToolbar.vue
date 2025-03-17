@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import BaseMusic from '../BaseMusic.vue'
-import { _formatNumber, cloneDeep } from '@/utils'
+import { _formatNumber, _getavater, cloneDeep } from '@/utils'
 import bus, { EVENT_KEY } from '@/utils/bus'
 import { Icon } from '@iconify/vue'
 import { useClick } from '@/utils/hooks/useClick'
 import { inject } from 'vue'
+import { Dftimg } from '@/utils/const_var'
 
 const props = defineProps({
   isMy: {
@@ -77,7 +78,7 @@ const vClick = useClick()
     <div class="avatar-ctn mb2r">
       <img
         class="avatar"
-        :src="item.author?.avatar_168x168?.url_list?.[0]"
+        :src="item.author?.avatar?.urlList[0] || Dftimg.avatar"
         alt=""
         v-click="() => bus.emit(EVENT_KEY.GO_USERINFO)"
       />
@@ -93,11 +94,11 @@ const vClick = useClick()
         <img src="../../assets/img/icon/love.svg" class="love-image" v-if="!item.isLoved" />
         <img src="../../assets/img/icon/loved.svg" class="love-image" v-if="item.isLoved" />
       </div>
-      <span>{{ _formatNumber(item.statistics.digg_count) }}</span>
+      <span>{{ _formatNumber(item.statistics.diggCount) }}</span>
     </div>
     <div class="message mb2r" v-click="showComments">
       <Icon icon="mage:message-dots-round-fill" class="icon" style="color: white" />
-      <span>{{ _formatNumber(item.statistics.comment_count) }}</span>
+      <span>{{ _formatNumber(item.statistics.commentCount) }}</span>
     </div>
     <!--TODO     -->
     <div class="message mb2r" v-click="collected">
@@ -108,7 +109,7 @@ const vClick = useClick()
         style="color: rgb(252, 179, 3)"
       />
       <Icon v-else icon="ic:round-star" class="icon" style="color: white" />
-      <span>{{ _formatNumber(item.statistics.collect_count) }}</span>
+      <span>{{ _formatNumber(item.statistics.collectCount) }}</span>
     </div>
     <div v-if="!props.isMy" class="share mb2r" v-click="() => bus.emit(EVENT_KEY.SHOW_SHARE)">
       <img src="../../assets/img/icon/share-white-full.png" alt="" class="share-image" />

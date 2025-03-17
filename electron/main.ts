@@ -61,6 +61,10 @@ function createWindow() {
 app.whenReady().then(() => {
   ipcMain.handle('start-app', async (event, arg) => {
     console.log('start-app')
+    if (process.env.NODE_ENV === 'development') {
+      console.log(' start-app dev')
+      return { value: 'App started dev ' }
+    }
     if (subProcess && !subProcess.killed) {
       throw new Error('App is already running')
     }

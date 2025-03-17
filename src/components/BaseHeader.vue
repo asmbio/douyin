@@ -73,7 +73,6 @@ function back() {
     box-sizing: border-box;
     border-bottom: 1px solid #cccccc11;
     position: relative;
-    margin-top: var(--common-header-height);
 
     .left {
       position: absolute;

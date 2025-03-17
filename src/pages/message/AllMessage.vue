@@ -52,7 +52,7 @@
           @click="nav('/message/visitors')"
         >
           <div class="left">
-            <img v-lazy="_checkImgUrl(item.avatar168x168?.urlList[0])" alt="" class="avatar" />
+            <img v-lazy="item.avatar168x168?.urlList[0] || Dftimg.avatar" alt="" class="avatar" />
           </div>
           <div class="right">
             <div class="desc">
@@ -76,6 +76,7 @@ import { _checkImgUrl, _getcover } from '@/utils'
 
 import { computed, reactive } from 'vue'
 import { useNav } from '@/utils/hooks/useNav.js'
+import { Dftimg } from '@/utils/const_var'
 
 defineOptions({
   name: 'AllMessage'

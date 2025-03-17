@@ -1,4 +1,4 @@
-import { getDftAddr, getMsgContacts, getNoticeStream } from '@/api/moguservice'
+import { getDftAddr, getNoticeList, getNoticeStream } from '@/api/moguservice'
 import { useBaseStore } from './pinia'
 import { onUnmounted } from 'vue'
 import { PlatformAdapter } from '@/utils/platform'
@@ -16,16 +16,15 @@ export function useNoticeStream() {
       // 获取当前平台
       console.log('Current platform:', platformAdapter.platform)
       const start = await platformAdapter.executePlatformAction('')
-      console.log('executePlatformAction', start.value)
+      console.log('executePlatformAction', start?.value)
 
       const uid = await getDftAddr()
       console.log('getDftAddr')
       store.userinfo.uid = uid.Value
       store.loading = false
 
-      console.log('useNoticeStream init')
-      //const notices = await getMsgContacts(BigInt(0), 30)
-      // store.notifications.push(...notices.all)
+      store.initChatStream()
+      console.log('init noticestream')
       const stm = await getNoticeStream()
       for await (const message of stm) {
         store.addOrUpdateNotification(message)

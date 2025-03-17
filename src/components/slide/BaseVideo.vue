@@ -6,7 +6,7 @@
       @ended="videoEnded"
       ref="videoEl"
       :muted="state.isMuted"
-      preload="false"
+      preload="metadata"
       loop
       x5-video-player-type="h5-page"
       :x5-video-player-fullscreen="false"

@@ -1,3 +1,5 @@
+import { _checkImgUrl } from '.'
+
 export default {
   REDIRECT: 'redirect',
   // 请求方法
@@ -88,4 +90,9 @@ export const DefaultUser = {
   avatar_300x300: {
     url_list: []
   }
+}
+
+export const Dftimg = {
+  avatar: new URL('../assets/img/default/23.png', import.meta.url).href,
+  cover: new URL('../assets/img/default/cover.png', import.meta.url).href
 }

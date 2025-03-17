@@ -194,10 +194,10 @@
             <img
               :style="item.select ? 'opacity: .5;' : ''"
               class="avatar"
-              :src="_checkImgUrl(item.avatar)"
+              :src="item.avatar168x168?.urlList[0] || Dftimg.avatar"
               alt=""
             />
-            <span class="name">{{ item.name }}</span>
+            <span class="name">{{ item.displayname }}</span>
             <span class="tips">可能感兴趣的人</span>
             <dy-button type="primary">关注</dy-button>
             <div class="close">
@@ -240,7 +240,7 @@ import {
 } from '@/utils'
 import { useNav } from '@/utils/hooks/useNav'
 import Posters from '@/components/Posters.vue'
-import { DefaultUser } from '@/utils/const_var'
+import { DefaultUser, Dftimg } from '@/utils/const_var'
 import Loading from '@/components/Loading.vue'
 import { useBaseStore } from '@/store/pinia'
 import { userVideoList } from '@/api/user'

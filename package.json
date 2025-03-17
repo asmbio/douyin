@@ -4,6 +4,7 @@
   "private": true,
   "main": "dist-electron/main.js",
   "scripts": {
+    "capacitor:build": "vite build && npx cap sync android",
     "electron:dev": "vite --host",
     "electron:build": "vite build --mode electron && electron-builder",
     "dev": "vite --host",
@@ -25,8 +26,10 @@
     "@bufbuild/protobuf": "^2.2.3",
     "@bufbuild/protoc-gen-es": "^2.2.3",
     "@capacitor/android": "^7.0.1",
+    "@capacitor/app": "^7.0.0",
     "@capacitor/core": "^7.0.1",
     "@capacitor/ios": "^7.0.1",
+    "@capacitor/toast": "^7.0.0",
     "@connectrpc/connect": "^2.0.1",
     "@connectrpc/connect-web": "^2.0.1",
     "@jambonn/vue-lazyload": "1.0.9",

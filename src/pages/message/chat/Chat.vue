@@ -4,9 +4,9 @@
       <div class="header">
         <div class="left">
           <dy-back @click="back()"></dy-back>
-          <img :src="_getavater(store.userinfo)" alt="" style="border-radius: 50%" />
+          <img :src="_getavater(data.friend)" alt="" style="border-radius: 50%" />
           <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{
-            store.userinfo.nickname
+            data.friend.displayname
           }}</span>
         </div>
         <div class="right">
@@ -235,7 +235,13 @@ import bus, { EVENT_KEY } from '@/utils/bus'
 
 // 在现有import后添加：
 import { onBeforeUnmount } from 'vue'
-import { getChatStream, getMsgList, sendMessage, setRead } from '@/api/moguservice'
+import {
+  getChatStream,
+  getConversation,
+  getUserInfo,
+  sendMessage,
+  setRead
+} from '@/api/moguservice'
 import {
   AUDIO_STATE,
   MESSAGE_TYPE,
@@ -244,6 +250,7 @@ import {
   type ChatMessage as cMessage
 } from '@/api/gen/message_pb'
 import { throttle } from 'lodash-es'
+import type { UserInfo } from '@/api/gen/userinfo_pb'
 
 defineOptions({
   name: 'Chat'
@@ -260,85 +267,85 @@ const data = reactive({
   videoCall: [],
   MESSAGE_TYPE,
   messages: [
-    {
-      type: MESSAGE_TYPE.TIME,
-      time: BigInt(Date.UTC(2021, 1, 2, 21, 21)) * 1_000_000n,
-      user: {
-        id: '2739632844317827',
-        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
-      },
-      content: {
-        case: 'timeContent',
-        value: {} // TimeContent 是空消息
-      }
-    },
-    {
-      type: MESSAGE_TYPE.MEME,
-      time: BigInt(Date.UTC(2021, 1, 2, 21, 21)) * 1_000_000n,
-      user: {
-        id: '2739632844317827',
-        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
-      },
-      content: {
-        case: 'memeContent',
-        value: {
-          imageurl: new URL('../../../assets/img/poster/1.jpg', import.meta.url).href,
-          state: AUDIO_STATE.AUDIO_NORMAL,
-          loved: [
-            { id: '2', avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png' },
-            { id: '2', avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png' }
-          ]
-        }
-      }
-    },
-    {
-      type: MESSAGE_TYPE.IMAGE,
-      time: BigInt(Date.UTC(2021, 1, 2, 21, 21)) * 1_000_000n,
-      user: {
-        id: '1',
-        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
-      },
-      content: {
-        case: 'imageContent',
-        value: {
-          imageurl: new URL('../../../assets/img/poster/1.jpg', import.meta.url).href,
-          state: AUDIO_STATE.AUDIO_NORMAL
-        }
-      }
-    },
-    // 其他消息类型类似处理...
-    {
-      type: MESSAGE_TYPE.TEXT,
-      time: BigInt(Date.UTC(2021, 1, 2, 21, 21)) * 1_000_000n,
-      user: {
-        id: '2739632844317827',
-        avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
-      },
-      content: {
-        case: 'textContent',
-        value: {
-          text: '我昨天@你那个视频发给我下'
-        }
-      }
-    },
-    // 红包消息示例
-    {
-      type: MESSAGE_TYPE.RED_PACKET,
-      time: BigInt(Date.UTC(2021, 1, 2, 21, 21)) * 1_000_000n,
-      user: {
-        id: '2739632844317827',
-        avatar: new URL('../../../assets/img/icon/avatar/2.png', import.meta.url).href
-      },
-      content: {
-        case: 'redPacketContent',
-        value: {
-          mode: RED_PACKET_MODE.RED_PACKET_MULTIPLE,
-          money: 5.11,
-          title: '大吉大利',
-          state: '未领取'
-        }
-      }
-    }
+    // {
+    //   type: MESSAGE_TYPE.TIME,
+    //   time: BigInt(Date.UTC(2021, 1, 2, 21, 21)) * 1_000_000n,
+    //   user: {
+    //     id: '2739632844317827',
+    //     avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
+    //   },
+    //   content: {
+    //     case: 'timeContent',
+    //     value: {} // TimeContent 是空消息
+    //   }
+    // },
+    // {
+    //   type: MESSAGE_TYPE.MEME,
+    //   time: BigInt(Date.UTC(2021, 1, 2, 21, 21)) * 1_000_000n,
+    //   user: {
+    //     id: '2739632844317827',
+    //     avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
+    //   },
+    //   content: {
+    //     case: 'memeContent',
+    //     value: {
+    //       imageurl: new URL('../../../assets/img/poster/1.jpg', import.meta.url).href,
+    //       state: AUDIO_STATE.AUDIO_NORMAL,
+    //       loved: [
+    //         { id: '2', avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png' },
+    //         { id: '2', avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png' }
+    //       ]
+    //     }
+    //   }
+    // },
+    // {
+    //   type: MESSAGE_TYPE.IMAGE,
+    //   time: BigInt(Date.UTC(2021, 1, 2, 21, 21)) * 1_000_000n,
+    //   user: {
+    //     id: '1',
+    //     avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
+    //   },
+    //   content: {
+    //     case: 'imageContent',
+    //     value: {
+    //       imageurl: new URL('../../../assets/img/poster/1.jpg', import.meta.url).href,
+    //       state: AUDIO_STATE.AUDIO_NORMAL
+    //     }
+    //   }
+    // },
+    // // 其他消息类型类似处理...
+    // {
+    //   type: MESSAGE_TYPE.TEXT,
+    //   time: BigInt(Date.UTC(2021, 1, 2, 21, 21)) * 1_000_000n,
+    //   user: {
+    //     id: '2739632844317827',
+    //     avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
+    //   },
+    //   content: {
+    //     case: 'textContent',
+    //     value: {
+    //       text: '我昨天@你那个视频发给我下'
+    //     }
+    //   }
+    // },
+    // // 红包消息示例
+    // {
+    //   type: MESSAGE_TYPE.RED_PACKET,
+    //   time: BigInt(Date.UTC(2021, 1, 2, 21, 21)) * 1_000_000n,
+    //   user: {
+    //     id: '2739632844317827',
+    //     avatar: new URL('../../../assets/img/icon/avatar/2.png', import.meta.url).href
+    //   },
+    //   content: {
+    //     case: 'redPacketContent',
+    //     value: {
+    //       mode: RED_PACKET_MODE.RED_PACKET_MULTIPLE,
+    //       money: 5.11,
+    //       title: '大吉大利',
+    //       state: '未领取'
+    //     }
+    //   }
+    // }
   ] as cMessage[],
   typing: false,
   loading: false,
@@ -359,7 +366,7 @@ const data = reactive({
 
   audioChunks: [] as Blob[], // 存储录音数据块
   recordingTimer: null, // 录音计时器
-
+  friend: {} as UserInfo,
   uid: '',
   lasttime: BigInt(0),
   pagesize: 15,
@@ -390,29 +397,26 @@ const handleScroll = throttle((e) => {
   }
 }, 1000)
 
-// 使用Composition API实现
-function useChatStream() {
-  const controller = new AbortController()
+// // 使用Composition API实现
+// async function useChatStream() {
+// //  const controller = new AbortController()
+//   var stm =null as AsyncIterable<cMessage>
 
-  const init = async () => {
-    try {
-      console.log('useChatStream init')
-      const stm = await getChatStream(data.uid)
-      for await (const message of stm) {
-        data.messages.push(message)
-      }
-    } catch (err) {
-      if (err.name !== 'AbortError') {
-        console.error('Notice stream error:', err)
-      }
-    }
-  }
+//     try {
+//       console.log('useChatStream init')
+//        stm = await getChatStream(data.uid)
+//       for await (const message of stm) {
+//         data.messages.push(message)
+//         nextTick(scrollBottom)
+//       }
+//     } catch (err) {
+//       if (err.name !== 'AbortError') {
+//         console.error('Notice stream error:', err)
+//       }
+//      //stm[1]
+//     }
 
-  // 组件卸载时中止流
-  onUnmounted(() => controller.abort())
-
-  return { init }
-}
+// }
 
 async function loadmoremessages() {
   console.log('loadmoremessages', data.lasttime, data.hasMoredata, msgWrapper.value.scrollTop)
@@ -426,7 +430,7 @@ async function loadmoremessages() {
     }
 
     console.log('data.loading', data.loading)
-    let res = await getMsgList(data.lasttime, data.pagesize, data.uid)
+    let res = await getConversation(data.lasttime, data.pagesize, data.uid)
     console.log('getMsgList', res)
     //.reverse()
 
@@ -455,7 +459,8 @@ const handleKeyDown = (e: KeyboardEvent) => {
 const handlePopState = () => {
   router.back()
 }
-const { init } = useChatStream()
+//const { init } = useChatStream()
+
 onMounted(async () => {
   console.log('onMounted')
   msgWrapper.value
@@ -466,9 +471,20 @@ onMounted(async () => {
   // 加载message 列表
   try {
     data.uid = route.query.uid as string
-    await loadmoremessages()
+    data.friend = store.notifications.find((e) => e.uid === data.uid)
+    if (data.friend == null) {
+      data.friend = await getUserInfo(data.uid)
+      store.addOrUpdateNotification(data.friend)
+    }
+    store.activeConversasion(data.uid, (msg: cMessage) => {
+      data.messages.push(msg)
+      nextTick(scrollBottom)
+    })
+    //data.messages=store.conversasions.get(data.uid).msgList
 
-    init()
+    await loadmoremessages()
+    nextTick(scrollBottom)
+    // useChatStream()
   } catch (error) {
     console.log(error)
   }
@@ -636,8 +652,8 @@ async function handleSend() {
       }
     },
     user: {
-      id: store.userinfo.uid, // 当前用户ID
-      avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
+      id: store.userinfo.uid,
+      avatar: store.userinfo.avatar168x168.urlList[0]
     },
     Receiver: data.uid
   } as cMessage
@@ -678,7 +694,9 @@ function scrollBottom() {
     let wrapper = msgWrapper.value
     // console.log('wrapper.clientHeight', wrapper.clientHeight)
     // console.log('wrapper.scrollHeight', wrapper.scrollHeight)
+    // if(wrapper.scrollHeight<100){
     wrapper.scrollTo({ top: wrapper.scrollHeight - wrapper.clientHeight })
+    // }
   })
 }
 

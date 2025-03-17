@@ -2,7 +2,7 @@
   <div class="message" @click="handleClick">
     <div class="avatar" :class="{ 'on-line': data.isConnect }">
       <img
-        :src="getImgSrcByMessageId(data.uid) || data.avatar168x168?.urlList[0]"
+        :src="getImgSrcByMessageId(data.uid) || data.avatar168x168?.urlList[0] || Dftimg.avatar"
         alt=""
         class="head-image"
       />
@@ -10,7 +10,7 @@
     <div class="content">
       <div class="left">
         <div class="name">
-          <span>{{ getNameByMessageId(data.uid) }}</span>
+          <span>{{ getNameByMessageId(data.uid) || data.displayname }}</span>
           <span v-if="getTagByMessageId(data.uid)" class="tag">{{
             getTagByMessageId(data.uid) || data.displayname
           }}</span>
@@ -35,6 +35,7 @@ import { type UserInfo } from '../../api/gen/userinfo_pb'
 import { useRouter } from 'vue-router'
 import { unixNanoToYYYYMMDD } from '@/utils/date'
 import { setRead } from '@/api/moguservice'
+import { Dftimg } from '@/utils/const_var'
 
 const router = useRouter()
 

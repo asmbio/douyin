@@ -67,7 +67,7 @@ export async function getContacts(uid: string, size: number, tag: CONTACT_TAG) {
 }
 
 // 5. 获取消息联系人
-export async function getMsgContacts(
+export async function getNoticeList(
   time: bigint, // 使用 bigint 类型处理时间戳
   size: number
 ) {
@@ -75,7 +75,7 @@ export async function getMsgContacts(
     time,
     size
   })
-  return client.getMsgContacts(request)
+  return client.getNoticeList(request)
 }
 
 export async function getNoticeStream() {
@@ -119,13 +119,13 @@ export async function getChatStream(chatId: string) {
   // }
 }
 // 6. 获取消息列表
-export async function getMsgList(time: bigint, size: number, uid: string) {
+export async function getConversation(time: bigint, size: number, uid: string) {
   const request = create(GetMsgListRequestSchema, {
     time,
     size,
     uid
   })
-  return client.getMsgList(request)
+  return client.getConversation(request)
 }
 
 export async function sendMessage(msg: ChatMessage) {
@@ -137,6 +137,13 @@ export async function setRead(uid: string) {
     Value: uid
   })
   return client.setRead(request)
+}
+
+export async function deleteConversation(uid: string) {
+  const request = create(StringSchema, {
+    Value: uid
+  })
+  return client.deleteConversation(request)
 }
 
 export async function publishVideo(work: Worksmsg) {

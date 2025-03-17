@@ -11,7 +11,7 @@
         <div class="title">登录看朋友内容</div>
         <div class="phone-number" v-if="useStore.userinfo.uid">{{ useStore.userinfo.uid }}</div>
         <div class="phone-number" v-else>未注册</div>
-        <div class="sub-title">输入密码后自动生成随机密钥</div>
+        <div class="sub-title">输入密码后自动生成随机公钥密钥对</div>
       </div>
       <LoginInput
         autofocus

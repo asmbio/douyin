@@ -14,11 +14,7 @@
     <div class="userinfo">
       <div class="change-avatar">
         <div class="avatar-ctn" @click="showAvatarDialog">
-          <img
-            class="avatar"
-            :src="_checkImgUrl(store.userinfo.avatar168x168?.urlList[0])"
-            alt=""
-          />
+          <img class="avatar" :src="store.userinfo.avatar168x168?.urlList[0]" alt="" />
           <img class="change" src="../../../assets/img/icon/me/camera-light.png" alt="" />
         </div>
         <span>点击更换头像</span>
@@ -176,7 +172,7 @@ function showAvatarDialog() {
         handleAvatarClick()
         break
       case 3:
-        data.previewImg = _checkImgUrl(store.userinfo.avatar168x168?.urlList[0])
+        data.previewImg = store.userinfo.avatar168x168?.urlList[0]
         break
     }
   })

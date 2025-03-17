@@ -24,12 +24,13 @@ service MoguService {
   rpc GetPanel (google.protobuf.Empty) returns (UserInfo) {}
   rpc GetContacts(GetContactsRequest) returns (Userinfolist) {}
   // 聊天消息
-  rpc GetMsgContacts(GetMsgContactsRequest) returns (Userinfolist) {}
+  rpc GetNoticeList(GetMsgContactsRequest) returns (Userinfolist) {}
   rpc GetNoticeStream(google.protobuf.Empty) returns (stream UserInfo){}
-  rpc GetMsgList (GetMsgListRequest) returns (Messagelist) {}
+  rpc GetConversation (GetMsgListRequest) returns (Messagelist) {}
   rpc SetRead(protos.String) returns (google.protobuf.Empty) {}
   rpc SendMessage(ChatMessage) returns (SendMessageResponse) {}
   rpc GetChatStream(protos.String) returns (stream ChatMessage){}
+  rpc DeleteConversation(protos.String) returns (google.protobuf.Empty) {}
 
   //   // 视频获取
    rpc MyVideo(MyVideoRequest)returns (VideoList){}

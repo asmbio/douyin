@@ -1,7 +1,7 @@
 <template>
   <router-view v-slot="{ Component }">
     <transition :name="transitionName">
-      <keep-alive :exclude="store.excludeNames">
+      <keep-alive :include="store.includeNames">
         <component :is="Component" />
       </keep-alive>
     </transition>
@@ -17,16 +17,47 @@ import routes from './router/routes'
 import Call from './components/Call.vue'
 
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import { useNav } from '@/utils/hooks/useNav'
 import { useBaseStore } from '@/store/pinia.js'
 import { useNoticeStream } from './store/noticeService'
+import { App } from '@capacitor/app'
+import { Toast } from '@capacitor/toast'
+
 const nav = useNav()
 const store = useBaseStore()
 const route = useRoute()
+const router = useRouter()
 const transitionName = ref('go')
 const { init } = useNoticeStream()
+
+const lastBackTime = ref(0)
+let backButtonListener = null
+
+const handleBackButton = () => {
+  // 判断当前是否在根路由
+  if (
+    router.currentRoute.value.path !== '/login' &&
+    router.currentRoute.value.path !== '/home' &&
+    router.currentRoute.value.path !== '/me' &&
+    router.currentRoute.value.path !== '/message' &&
+    router.currentRoute.value.path !== '/shop' &&
+    router.currentRoute.value.path !== '/publish'
+  ) {
+    //console.log(router.getRoutes())
+    router.back() // 执行路由返回
+  } else {
+    const now = Date.now()
+    // 2秒内重复点击则退出
+    if (now - lastBackTime.value < 2000) {
+      App.exitApp() // 退出应用
+    } else {
+      Toast.show({ text: '再按一次退出应用', duration: 'short' })
+      lastBackTime.value = now
+    }
+  }
+}
 
 // watch $route 决定使用哪种过渡
 watch(
@@ -62,11 +93,16 @@ function resetVhAndPx() {
 }
 onBeforeUnmount(() => {
   console.log('onBeforeUnmount')
+  // 移除监听防止内存泄漏
+  if (backButtonListener) {
+    backButtonListener.remove()
+  }
   //store.setsession()
 })
 
 onMounted(async () => {
   init()
+
   //store.init()
   //判断是否登录
 
@@ -82,6 +118,8 @@ onMounted(async () => {
     //  location.href = BASE_URL + '/home'
     resetVhAndPx()
   })
+  // 添加返回键监听
+  backButtonListener = await App.addListener('backButton', handleBackButton)
   // window.addEventListener('beforeunload', (event) => {
   //   event.preventDefault();
   //    store.setsession()

@@ -98,6 +98,10 @@ import {
 import { useBaseStore } from '@/store/pinia'
 import { publishVideo } from '@/api/moguservice'
 import { _notice } from '@/utils'
+
+defineOptions({
+  name: 'PublishConfirm'
+})
 const store = useBaseStore()
 
 const router = useRouter()
@@ -291,6 +295,9 @@ const handlePublish = async () => {
   publishVideo(obj)
     .then(() => {
       _notice('发布成功')
+      // 添加到列表
+      store.getpublishvideo()
+      //store.videos.my.list.unshift(obj)
       router.back()
     })
     .catch((err) => {

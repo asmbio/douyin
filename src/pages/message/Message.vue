@@ -13,10 +13,10 @@
             class="friend"
             @click="nav('/message/chat', { uid: item.uid })"
             :key="index"
-            v-for="(item, index) in stranger"
+            v-for="(item, index) in store.stranger"
           >
             <div class="avatar" :class="item.isConnect ? 'on-line' : ''">
-              <img :src="_checkImgUrl(item.avatar168x168?.urlList[0])" alt="" />
+              <img :src="item.avatar168x168?.urlList[0] || Dftimg.avatar" alt="" />
             </div>
             <span>{{ item.displayname }}</span>
           </div>
@@ -112,7 +112,7 @@
                 v-for="(item, i) in store.friends.all"
                 @click="item.select = !item.select"
               >
-                <img class="left" :src="_checkImgUrl(item.avatar168x168?.urlList[0])" alt="" />
+                <img class="left" :src="item.avatar168x168?.urlList[0] || Dftimg.avatar" alt="" />
                 <div class="right">
                   <span>{{ item.displayname }}</span>
                   <Check mode="red" style="height: 20rem; width: 20rem" v-model="item.select" />
@@ -241,7 +241,7 @@ import People from '../people/components/Peoples.vue'
 import Scroll from '../../components/Scroll.vue'
 import { useBaseStore } from '@/store/pinia'
 
-import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useNav } from '@/utils/hooks/useNav.js'
 import { _checkImgUrl, _notice, _sleep, cloneDeep } from '@/utils'
 import { useScroll } from '@/utils/hooks/useScroll'
@@ -265,8 +265,9 @@ defineOptions({
 // }
 // 消息列表
 import { throttle } from 'lodash-es'
-import { getContacts, getMsgContacts } from '@/api/moguservice'
+import { getContacts, getNoticeList } from '@/api/moguservice'
 import { CONTACT_TAG } from '@/api/gen/moguervice_pb'
+import { Dftimg } from '@/utils/const_var'
 
 const lastTime = ref<bigint>(0n) // 初始时间戳设为0
 const loading = ref(false)
@@ -279,7 +280,7 @@ const loadMore = async () => {
 
   loading.value = true
   try {
-    const data = await getMsgContacts(lastTime.value, pageSize)
+    const data = await getNoticeList(lastTime.value, pageSize)
     console.log(data)
     if (data.all.length > 0) {
       store.notifications.unshift(...data.all) // ✅ 仅新增节点会渲染
@@ -310,25 +311,11 @@ const handleScroll = throttle(() => {
   }
 }, 200)
 
-//陌生人列表
-const stranger = reactive<UserInfo[]>([
-  // @ts-ignore - 类型不完全匹配但强制保留原始结构
-  {
-    uid: '5qMv7dFgHjK3nRtPwS4zL9',
-    avatar168x168: {
-      urlList: [new URL('../../assets/img/icon/avatar/2.png', import.meta.url).href]
-    } as AvatarImage,
-    displayname: '今日缘分(测)',
-    lastcontent: '我们连接上了',
-    lastsendtime: BigInt(Date.UTC(2025, 8, 31)) * 1_000_000n
-  }
-])
-
 async function loadstranger() {
   try {
     let res = await getContacts('', 100, CONTACT_TAG.STRANGER)
     console.log(res)
-    stranger.push(...res.all)
+    store.stranger.push(...res.all)
   } catch (error) {
     console.log(error)
     _notice(error)
@@ -353,15 +340,28 @@ const data = reactive({
   moreChat: []
 })
 
-onMounted(() => {
-  console.log('create')
-  loadstranger()
-  data.recommend = cloneDeep(store.friends.all)
-  data.recommend.map((v) => {
-    v.type = -2
-  })
-  data.moreChat = cloneDeep(store.friends.all.slice(0, 3))
-  window.addEventListener('scroll', handleScroll)
+onMounted(async () => {
+  console.log('message.vue create')
+  try {
+    if (lastTime.value === BigInt(0)) {
+      const notices = await getNoticeList(BigInt(0), 30)
+      if (notices.all.length > 0) {
+        lastTime.value = notices.all[notices.all.length - 1].lastsendtime
+      }
+      console.log(notices)
+      store.notifications.unshift(...notices.all)
+    }
+
+    await loadstranger()
+    data.recommend = cloneDeep(store.friends.all)
+    data.recommend.map((v) => {
+      v.type = -2
+    })
+    data.moreChat = cloneDeep(store.friends.all.slice(0, 3))
+    window.addEventListener('scroll', handleScroll)
+  } catch (error) {
+    console.log(error)
+  }
 })
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', handleScroll)

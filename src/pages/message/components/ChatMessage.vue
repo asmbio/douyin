@@ -8,7 +8,7 @@
       {{ unixNanoToYYYYMMDD(message.time) }}
     </div>
     <template v-else>
-      <img v-if="!isMe" :src="message.user.avatar" alt="" class="avatar" />
+      <img v-if="!isMe" :src="message.user.avatar || Dftimg.avatar" alt="" class="avatar" />
       <div class="chat-wrapper" @click="$emit('itemClick', message)">
         <div class="chat-text" v-if="message.type === MESSAGE_TYPE.TEXT">
           {{ message.content.value.text }}
@@ -121,7 +121,7 @@
           />
         </div>
       </div>
-      <img v-if="isMe" :src="message.user.avatar" alt="" class="avatar" />
+      <img v-if="isMe" :src="message.user.avatar || Dftimg.avatar" alt="" class="avatar" />
     </template>
   </div>
 </template>
@@ -131,6 +131,7 @@ import { mapState } from 'pinia'
 import { useBaseStore } from '@/store/pinia'
 import { CALL_STATE, MESSAGE_TYPE, RED_PACKET_MODE } from '@/api/gen/message_pb'
 import { unixNanoToYYYYMMDD } from '@/utils/date'
+import { Dftimg } from '@/utils/const_var'
 //
 
 export default {
@@ -149,7 +150,8 @@ export default {
       currentDuration: 0,
       MESSAGE_TYPE,
       CALL_STATE,
-      RED_PACKET_MODE
+      RED_PACKET_MODE,
+      Dftimg: Dftimg
     }
   },
   computed: {

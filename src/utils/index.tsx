@@ -9,6 +9,7 @@ import { ArchiveReader, libarchiveWasm } from 'libarchive-wasm'
 import SlideUser from '@/components/slide/SlideUser.vue'
 import BaseVideo from '@/components/slide/BaseVideo.vue'
 import type { UserInfo } from '@/api/gen/userinfo_pb'
+import { Dftimg } from './const_var'
 
 export function _storageSet(key, value) {
   localStorage.setItem(key, JSON.stringify(value))
@@ -121,9 +122,11 @@ export function _time(time) {
 }
 
 export function _getavater(userinfo: UserInfo) {
+  // console.log(userinfo)
+  // console.log(Dftimg.avatar)
   return userinfo.avatar168x168?.urlList && userinfo.avatar168x168?.urlList.length > 0
     ? userinfo.avatar168x168.urlList[0]
-    : 'images/default/cover.png'
+    : Dftimg.avatar
 }
 export function _getcover(userinfo: UserInfo) {
   return userinfo.coverUrl &&
@@ -131,7 +134,7 @@ export function _getcover(userinfo: UserInfo) {
     userinfo.coverUrl[0].urlList &&
     userinfo.coverUrl[0].urlList.length > 0
     ? userinfo.coverUrl[0].urlList[0]
-    : 'images/default/cover.png'
+    : Dftimg.cover
 }
 export function _checkImgUrl(url) {
   // console.log(url)
@@ -347,6 +350,7 @@ export function _showNoticeDialog(title, subtitle, subtitleColor, cancelCb, canc
   const tempCancelCb = (e) => {
     remove()
     cancelCb(e)
+    return 0
   }
   const app = Vue.createApp({
     render() {
@@ -422,7 +426,7 @@ export async function _fetch(url: string): Promise<{ json(): Promise<any> } | Re
 
 export function slideItemRender(props) {
   return function render(item, index, play, uniqueId) {
-    console.log('item', item)
+    //console.log('item', item)
     let node
     switch (item.type) {
       case 'img':

@@ -1,19 +1,23 @@
 <template>
   <div class="posters">
     <div class="poster-item" :key="index" v-for="(i, index) in list" @click="goDetail(index)">
-      <video class="poster" preload="false" :autoplay="false">
-        <source
-          v-for="(urlItem, index) in i.video.playAddr.urlList"
+      <video
+        class="poster"
+        @loadedmetadata="handleMetadata($event, index)"
+        :src="i.video?.playAddr?.urlList[0]"
+      >
+        <!-- <source
+          v-for="(urlItem, index) in i.video?.playAddr?.urlList"
           :key="index"
           :src="urlItem"
           type="video/mp4"
-        />
+        /> -->
         <p>您的浏览器不支持 video 标签。</p>
       </video>
       <template v-if="mode === 'normal'">
         <div class="num">
           <Icon icon="icon-park-outline:like" />
-          <span>{{ _formatNumber(i.statistics.digg_count) }}</span>
+          <span>{{ _formatNumber(i.statistics?.digg_count) }}</span>
         </div>
         <div class="top" v-if="i.is_top">置顶</div>
       </template>
@@ -33,8 +37,16 @@ import { _formatNumber } from '@/utils'
 import { useBaseStore } from '@/store/pinia'
 import { useRouter } from 'vue-router'
 
+// Mozilla/5.0 (Linux; Android 15; LGE-AN00 Build/HONORLGE-AN00; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.6723.58 Mobile Safari/537.36
+
+// Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) mogu-vue/1.1.0 Chrome/132.0.6834.210 Electron/34.3.0 Safari/537.36
+
+// Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0
 const store = useBaseStore()
 const nav = useRouter()
+
+//const videoEl = $ref<HTMLVideoElement>()
+
 const props = defineProps({
   list: {
     type: [Array, Number],
@@ -91,6 +103,22 @@ function getMonth(time) {
     case 12:
       return '十二月'
   }
+}
+
+function handleMetadata(event, index) {
+  const video = event.target
+  // const duration = video.duration;
+  // const width = video.videoWidth;
+  // const height = video.videoHeight;
+
+  // console.log(`Index ${index}:`, {
+  //   duration: duration + "s",
+  //   width: width + "px",
+  //   height: height + "px"
+  // });
+  video.currentTime = 0
+  // 可选：将元数据保存到 list 数组中（确保响应式更新）
+  //this.$set(this.list[index], 'metadata', { duration, width, height });
 }
 </script>
 
