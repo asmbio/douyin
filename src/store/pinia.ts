@@ -212,9 +212,15 @@ export const useBaseStore = defineStore('base', {
         // 新通知添加到最前面
         if (payload.followStatus == 0) {
           //
-          this.stranger.push(payload)
+          if (payload.isConnect) {
+            this.stranger.push(payload)
+          } else {
+            const delindex = this.stranger.findIndex((e) => e.uid === payload.uid)
+            this.stranger.splice(delindex, 1)
+          }
+        } else {
+          this.notifications.unshift(payload)
         }
-        this.notifications.unshift(payload)
       }
     },
     // getuser() {

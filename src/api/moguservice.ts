@@ -19,7 +19,7 @@ import type { ChatMessage } from './gen/message_pb'
 
 // 创建全局的 transport 和 client 实例（单例模式）
 const transport = createGrpcWebTransport({
-  baseUrl: 'http://127.0.0.1:8081' // 根据实际服务地址修改
+  baseUrl: 'http://127.0.0.1:9081' // 根据实际服务地址修改
 })
 
 const client = createClient(MoguService, transport)
@@ -36,7 +36,7 @@ export async function getDftAddr() {
   return client.getDftAddr(request)
 }
 
-// 2. 获取用户信息
+// 2. 编辑用户信息
 export async function editUserInfo(userinfo: UserInfo) {
   //const request = create(UserInfoSchema, { Value: uid }) // 假设 StringSchema 结构为 { value: string }
   //console.log(userinfo.userAge)
@@ -66,7 +66,7 @@ export async function getContacts(uid: string, size: number, tag: CONTACT_TAG) {
   return client.getContacts(request)
 }
 
-// 5. 获取消息联系人
+// 5. 获取通知
 export async function getNoticeList(
   time: bigint, // 使用 bigint 类型处理时间戳
   size: number
