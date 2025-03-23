@@ -8,7 +8,7 @@ let subProcess: ChildProcess | null = null
 
 function getAppPath() {
   const resourcesPath = app.isPackaged
-    ? path.join(process.resourcesPath, 'resources')
+    ? process.resourcesPath
     : path.join(__dirname, '../electron/bin')
   let platformSubdir
   switch (process.platform) {
@@ -21,6 +21,7 @@ function getAppPath() {
     default:
       platformSubdir = 'linux'
   }
+  console.log(resourcesPath, platformSubdir)
   const exeName = process.platform === 'win32' ? 'mogu.exe' : 'mogu'
   return path.join(resourcesPath, platformSubdir, exeName)
 }
@@ -66,7 +67,7 @@ app.whenReady().then(() => {
       return { value: 'App started dev ' }
     }
     if (subProcess && !subProcess.killed) {
-      throw new Error('App is already running')
+      return { value: 'App is already running' }
     }
 
     try {
@@ -85,7 +86,7 @@ app.whenReady().then(() => {
         subProcess = null
       })
 
-      return { value: 'App started ' }
+      return { value: exePath }
     } catch (error) {
       throw new Error(`Failed to start app: ${error}`)
     }

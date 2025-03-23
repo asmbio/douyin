@@ -653,7 +653,7 @@ async function handleSend() {
     },
     user: {
       id: store.userinfo.uid,
-      avatar: store.userinfo.avatar168x168.urlList[0]
+      avatar: store.userinfo.avatar168x168?.urlList[0]
     },
     Receiver: data.uid
   } as cMessage

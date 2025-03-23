@@ -1,6 +1,8 @@
 package com.asmbio.p2psosial;
 
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Environment;
 import android.util.Log;
 
@@ -33,22 +35,23 @@ public class MoguPlugin extends Plugin {
             call.resolve(ret);
             return;
         }
-        var  filesDir= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        File appDataDir = new File(filesDir, "mogu");
-        // 创建测试文件并写入数据
-        File testFile = new File(appDataDir, "test.txt");
-        String testContent = "这是一条测试数据";
-        try (FileOutputStream fos = new FileOutputStream(testFile)) {
-                fos.write(testContent.getBytes());
-        } catch (FileNotFoundException e) {
-            Log.e("",e.getMessage());
-        } catch (IOException e) {
-            Log.e("",e.getMessage());
-        }
-        Log.e("",filesDir.getAbsolutePath());
+
         try {
-            String pwd = call.getString("pwd");
+//            Context context = getContext();
+//            Intent serviceIntent = new Intent(context, MoguService.class);
+//            // 添加前台服务配置（可选）
+//            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+//                context.startForegroundService(serviceIntent);
+//            } else {
+//                context.startService(serviceIntent);
+//            }
+
+            var  filesDir= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            File appDataDir = new File(filesDir, "mogu");
             Mogu.startGrpcAndWeb(appDataDir.getAbsolutePath());
+
+//            String pwd = call.getString("pwd");
+//            Mogu.startGrpcAndWeb(appDataDir.getAbsolutePath());
             hasStarted = true;
             JSObject ret = new JSObject();
             ret.put("value", 1);
@@ -57,7 +60,17 @@ public class MoguPlugin extends Plugin {
             call.reject(e.getMessage());
         }
     }
+
+    @PluginMethod
+    public void stopService(PluginCall call) {
+        Context context = getContext();
+        Intent serviceIntent = new Intent(context, MoguService.class);
+        context.stopService(serviceIntent);
+        call.resolve();
+    }
 }
+
+
 //
 //
 //// 创建应用数据目录并写入测试文件

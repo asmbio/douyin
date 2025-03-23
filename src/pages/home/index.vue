@@ -234,12 +234,16 @@ import Community from '@/pages/home/slide/Community.vue'
 import Slide0 from '@/pages/home/slide/Slide0.vue'
 import Slide2 from '@/pages/home/slide/Slide2.vue'
 import Slide4 from '@/pages/home/slide/Slide4.vue'
-import { DefaultUser } from '@/utils/const_var'
 import { _no } from '@/utils'
 import LongVideo from '@/pages/home/slide/LongVideo.vue'
 import { useBaseStore } from '@/store/pinia'
 import BaseMask from '@/components/BaseMask.vue'
+import type { UserInfo } from '@/api/gen/userinfo_pb'
+import type { VideoList } from '@/api/gen/video_pb'
 
+defineOptions({
+  name: 'Home'
+})
 const nav = useNav()
 const baseStore = useBaseStore()
 const uploader = ref()
@@ -270,9 +274,9 @@ const state = reactive({
   fullScreen: false,
   currentItem: {
     aweme_id: '',
-    author: DefaultUser,
+    author: {} as UserInfo,
     isRequest: false,
-    aweme_list: []
+    aweme_list: {} as VideoList
   }
 })
 
@@ -288,13 +292,14 @@ function setCurrentItem(item) {
     state.currentItem = {
       ...item,
       isRequest: false,
-      aweme_list: []
+      aweme_list: {}
     }
   }
   // console.log('item', item)
 }
 
 onMounted(() => {
+  console.log('index onmounted')
   bus.on(EVENT_KEY.ENTER_FULLSCREEN, () => {
     if (!state.active) return
     state.fullScreen = true
@@ -333,11 +338,13 @@ onUnmounted(() => {
 })
 
 onActivated(() => {
+  console.log('index onactivated')
   state.active = true
   bus.emit(EVENT_KEY.TOGGLE_CURRENT_VIDEO)
 })
 
 onDeactivated(() => {
+  console.log('index onDeactivated')
   state.active = false
   bus.emit(EVENT_KEY.TOGGLE_CURRENT_VIDEO)
 })

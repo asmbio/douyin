@@ -4,7 +4,7 @@
       <video
         ref="videoEl"
         src="https://www.douyin.com/aweme/v1/play/?video_id=v0d00fg10000cj1lq4jc77u0ng6s1gt0&amp;line=0&amp;file_id=bed51c00899b458cbc5d8280147c22a1&amp;sign=7749aec7bd62a3760065f60e40fc1867&amp;is_play_url=1&amp;source=PackSourceEnum_PUBLISH"
-        poster="/images/jwWCPZVTIA4IKM-8WipLF.png"
+        poster=""
         preload=""
         loop=""
         muted

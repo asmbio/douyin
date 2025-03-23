@@ -171,6 +171,7 @@ watch(
   (newVal) => {
     //当激活此页时，如果list为空，那么向上发射事件通知父组件请求数据
     if (newVal && !props.list.length) {
+      console.log('watch newval', newVal, props.list)
       return emit('refresh')
     }
     let t = newVal ? 0 : 200
@@ -305,6 +306,7 @@ function touchEnd(e) {
     state.move.y > baseStore.homeRefresh + baseStore.judgeValue
   ) {
     emit('refresh')
+    console.log('touchEnd')
   }
   slideTouchEnd(e, state, canNext, (isNext) => {
     let half = parseInt((props.virtualTotal / 2).toString()) //虚拟列表的一半

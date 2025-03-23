@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-package protos;
-
-option go_package = "douyinapi/protos/out";
-
-message String {
-    string Value = 1;
-}

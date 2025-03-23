@@ -6,6 +6,7 @@
 
 ## 安装体验
 
+https://github.com/asmbio/Release
 
 ## 链接
 

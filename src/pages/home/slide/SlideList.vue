@@ -80,19 +80,24 @@ function loadMore() {
 }
 
 async function getData(refresh = false) {
-  if (!refresh && state.totalSize === state.list.length) return
+  console.log('getSlide4Data-', refresh, state.totalSize, state.list.length)
+  if (!refresh && state.totalSize === state.list.length && state.totalSize > 0) return
   if (baseStore.loading) return
   baseStore.loading = true
-  let res = await props.api(refresh ? 0 : state.list.length, state.pageSize)
-  console.log('getSlide4Data-', refresh, res, state.totalSize, state.list.length)
-  baseStore.loading = false
-  if (res.success) {
-    state.totalSize = res.data.total
-    if (refresh) {
-      state.list = []
+  try {
+    let res = await props.api(refresh ? 0 : state.list.length, state.pageSize)
+    console.log('getSlide4Data-', refresh, res, state.totalSize, state.list.length)
+    baseStore.loading = false
+    if (res.all.length > 0) {
+      state.totalSize = res.all.length
+      if (refresh) {
+        state.list = []
+      }
+      // console.log(res.all)
+      state.list = state.list.concat(res.all)
     }
-    console.log(res.data.list)
-    state.list = state.list.concat(res.data.list)
+  } catch (error) {
+    console.log(error)
   }
 }
 
@@ -132,6 +137,7 @@ function togglePlay() {
 }
 
 onMounted(() => {
+  console.log('slidelist onMounted')
   bus.on(EVENT_KEY.SINGLE_CLICK, click)
   bus.on(EVENT_KEY.UPDATE_ITEM, updateItem)
   bus.on(EVENT_KEY.TOGGLE_CURRENT_VIDEO, togglePlay)

@@ -5,25 +5,22 @@
         <Icon @click="emit('back')" class="icon" icon="eva:arrow-ios-back-fill" />
         <transition name="fade">
           <div class="float-user" v-if="state.floatFixed">
+            <img v-lazy="_getavater(props.currentItem.author)" class="avatar" />
             <img
-              v-lazy="_checkImgUrl(props.currentItem.author.avatar_168x168.url_list[0])"
-              class="avatar"
-            />
-            <img
-              v-if="!props.currentItem.author.follow_status"
+              v-if="!props.currentItem.author.followStatus"
               src="@/assets/img/icon/add-light.png"
               alt=""
               class="add"
             />
             <span @click="followButton">{{
-              props.currentItem.author.follow_status ? '私信' : '关注'
+              props.currentItem.author.followStatus ? '私信' : '关注'
             }}</span>
           </div>
         </transition>
       </div>
       <div class="right">
         <transition name="fade">
-          <div class="request" v-if="!state.floatFixed && props.currentItem.author.is_follow">
+          <div class="request" v-if="!state.floatFixed && props.currentItem.author.followStatus">
             <img
               @click="$nav('/me/request-update')"
               src="@/assets/img/icon/me/finger-right.png"
@@ -47,29 +44,25 @@
       <header>
         <img
           :style="{
-            opacity: props.currentItem.author.cover_url[0].url_list.length ? 1 : 0
+            opacity: _getcover(props.currentItem.author) ? 1 : 0
           }"
           ref="cover"
-          :src="_checkImgUrl(props.currentItem.author.cover_url[0].url_list[0])"
-          @click="
-            state.previewImg = _checkImgUrl(props.currentItem.author.cover_url[0].url_list[0])
-          "
+          :src="_getcover(props.currentItem.author)"
+          @click="state.previewImg = _getcover(props.currentItem.author)"
           alt=""
           class="cover"
         />
         <div class="avatar-wrapper">
           <img
-            v-lazy="_checkImgUrl(props.currentItem.author.avatar_168x168.url_list[0])"
+            v-lazy="_getavater(props.currentItem.author)"
             class="avatar"
-            @click="
-              state.previewImg = _checkImgUrl(props.currentItem.author.avatar_300x300.url_list[0])
-            "
+            @click="state.previewImg = _getavater(props.currentItem.author)"
           />
           <div class="description">
             <div class="name f22">{{ props.currentItem.author.displayname }}</div>
-            <div class="certification" v-if="props.currentItem.author.certification">
+            <div class="certification" v-if="false">
               <img src="@/assets/img/icon/me/certification.webp" />
-              {{ props.currentItem.author.certification }}
+              {{ 'wu' }}
             </div>
             <div class="number" v-else>
               <span>抖音号：{{ _getUserDouyinId(props.currentItem) }}</span>
@@ -85,17 +78,15 @@
       <div class="info">
         <div class="heat">
           <div class="text">
-            <span class="num">{{ _formatNumber(props.currentItem.author.total_favorited) }}</span>
+            <span class="num">{{ _formatNumber(0) }}</span>
             <span>获赞</span>
           </div>
           <div class="text">
-            <span class="num">{{ _formatNumber(props.currentItem.author.following_count) }}</span>
+            <span class="num">{{ _formatNumber(props.currentItem.author.followingCount) }}</span>
             <span>关注</span>
           </div>
           <div class="text">
-            <span class="num">{{
-              _formatNumber(props.currentItem.author.mplatform_followers_count)
-            }}</span>
+            <span class="num">{{ _formatNumber(props.currentItem.author.followerCount) }}</span>
             <span>粉丝</span>
           </div>
         </div>
@@ -104,7 +95,7 @@
           <div class="text" v-html="props.currentItem.author.signature"></div>
         </div>
         <div class="more">
-          <div class="age item" v-if="props.currentItem.author.user_age !== -1">
+          <div class="age item" v-if="props.currentItem.author.userAge">
             <img
               v-if="props.currentItem.author.gender == 1"
               src="@/assets/img/icon/me/man.png"
@@ -115,10 +106,10 @@
               src="@/assets/img/icon/me/woman.png"
               alt=""
             />
-            <span>{{ props.currentItem.author.user_age }}岁</span>
+            <span>{{ unixNanoToAge(props.currentItem.author.userAge) }}岁</span>
           </div>
-          <div class="item" v-if="props.currentItem.author.ip_location">
-            {{ props.currentItem.author.ip_location }}
+          <div class="item" v-if="false">
+            {{ 'props.currentItem.author.ipLocation' }}
           </div>
           <div
             class="item"
@@ -137,11 +128,11 @@
       </div>
       <div class="other">
         <div class="scroll-x" @touchmove="stop">
-          <div class="item" :key="i" v-for="(item, i) in props.currentItem.author.card_entries">
-            <img :src="_checkImgUrl(item.icon_dark.url_list[0])" alt="" />
+          <div class="item" :key="i" v-for="(item, i) in props.currentItem.author.cardEntries">
+            <img :src="_checkImgUrl(item.iconDark.urlList[0])" alt="" />
             <div class="right">
               <div class="top">{{ item.title }}</div>
-              <div class="bottom">{{ item.sub_title }}</div>
+              <div class="bottom">{{ item.subTitle }}</div>
             </div>
           </div>
         </div>
@@ -151,10 +142,10 @@
         <div class="follow-display">
           <div
             class="follow-wrapper"
-            :class="props.currentItem.author.follow_status ? 'follow-wrapper-followed' : ''"
+            :class="props.currentItem.author.followStatus ? 'follow-wrapper-followed' : ''"
           >
             <!--            eslint-disable-next-line vue/no-mutating-props-->
-            <div class="no-follow" @click="props.currentItem.author.follow_status = 1">
+            <div class="no-follow" @click="props.currentItem.author.followStatus = 1">
               <img src="@/assets/img/icon/add-white.png" alt="" />
               <span>关注</span>
             </div>
@@ -214,13 +205,13 @@
       </div>
 
       <div class="total" ref="total">
-        作品 {{ props.currentItem.author.aweme_count }}
+        作品 {{ props.currentItem.author.awemeCount }}
         <img class="arrow" src="@/assets/img/icon/arrow-up-white.png" alt="" />
       </div>
       <div class="videos">
         <Posters
-          v-if="props.currentItem.aweme_list.length"
-          :list="props.currentItem.aweme_list"
+          v-if="props.currentItem.aweme_list.all?.length > 0"
+          :list="props.currentItem.aweme_list.all"
         ></Posters>
         <Loading :isFullScreen="false" v-else />
       </div>
@@ -234,16 +225,21 @@ import {
   _checkImgUrl,
   _copy,
   _formatNumber,
+  _getavater,
+  _getcover,
   _getUserDouyinId,
   _no,
   _stopPropagation
 } from '@/utils'
 import { useNav } from '@/utils/hooks/useNav'
 import Posters from '@/components/Posters.vue'
-import { DefaultUser, Dftimg } from '@/utils/const_var'
+import { Dftimg } from '@/utils/const_var'
 import Loading from '@/components/Loading.vue'
 import { useBaseStore } from '@/store/pinia'
 import { userVideoList } from '@/api/user'
+import type { UserInfo } from '@/api/gen/userinfo_pb'
+import { unixNanoToAge } from '@/utils/date'
+import type { Author, VideoList } from '@/api/gen/video_pb'
 
 const $nav = useNav()
 const baseStore = useBaseStore()
@@ -253,30 +249,40 @@ const emit = defineEmits<{
   showFollowSetting: []
   showFollowSetting2: []
 }>()
+// const props = defineProps<{
+// message: string;
+// count: number;
+// }>();
+// const props = defineProps<{
+//   currentItem: {
+//     author: UserInfo;       // 移除类型断言直接使用类型
+//     aweme_list: any[];     // 明确数组类型（或用具体类型替换 any）
+//   };
+//   active: boolean;         // 类型改为 boolean（原 false 是值不是类型）
+// }>();
 
-const props = defineProps({
-  currentItem: {
-    type: Object,
-    default() {
-      return {
-        author: DefaultUser,
-        aweme_list: []
-      }
+// 如果需要设置默认值，需要用 withDefaults
+const props = withDefaults(
+  defineProps<{
+    currentItem: {
+      author: UserInfo
+      aweme_list: VideoList
     }
-  },
-  active: {
-    type: Boolean,
-    default() {
-      return false
-    }
+    active: boolean
+  }>(),
+  {
+    active: false // 默认值在这里设置
+    // currentItem 如果是可选参数也需要在这里设置默认值
   }
-})
+)
+
 const main = ref(null)
 const page = ref(null)
 const cover = ref(null)
 const total = ref(null)
 
 const state = reactive({
+  aweme_list: {} as VideoList,
   isShowRecommend: false, //是否显示推荐
   previewImg: '',
   floatFixed: false,
@@ -300,14 +306,14 @@ const state = reactive({
 watch(
   () => props.active,
   async (newVal) => {
-    if (newVal && !props.currentItem.aweme_list.length) {
+    if (newVal) {
       // console.log('props.currentItem',props.currentItem)
       let id = _getUserDouyinId(props.currentItem)
       let r: any = await userVideoList({ id })
       if (r.success) {
         setTimeout(() => {
           r.data = r.data.map((a) => {
-            a.author = props.currentItem.author
+            a.author = props.currentItem
             return a
           })
           emit('update:currentItem', Object.assign(props.currentItem, { aweme_list: r.data }))
