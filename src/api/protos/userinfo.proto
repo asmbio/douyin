@@ -1,0 +1,127 @@
+syntax = "proto3";
+
+package protos;
+
+option go_package = "douyinapi/protos/out";
+
+message AvatarImage {
+  int64 height = 1;
+  string uri = 2;
+  repeated string url_list = 3;
+  int64 width = 4;
+}
+
+message CommerceInfo {
+  repeated string challenge_list = 1;       // 根据数据null处理为empty repeated
+  repeated string head_image_list = 2;      // 根据数据null处理为empty repeated
+  repeated string offline_info_list = 3;    // 空数组保持为repeated
+  repeated string smart_phone_list = 4;     // 根据数据null处理为empty repeated
+  repeated string task_list = 5;            // 根据数据null处理为empty repeated
+}
+
+message CommerceUserInfo {
+  bool has_ads_entry = 2;
+  bool show_star_atlas_cooperation = 3;
+  int32 star_atlas = 4;
+}
+
+message ImageResource {
+  string uri = 1;
+  repeated string url_list = 2;
+}
+
+message ShareInfo {
+  int32 bool_persist = 1;
+  string share_desc = 2;
+  ImageResource share_image_url = 3;
+  ImageResource share_qrcode_url = 4;
+  string share_title = 5;
+  string share_url = 6;
+  string share_weibo_desc = 7;
+}
+
+message SchoolInfo {
+  string name = 1;
+  string department = 2;
+  string joinTime = 3;
+  string education = 4;
+  int32 displayType = 5;
+}
+
+message CardEntry {
+  ImageResource icon_dark = 1;
+  ImageResource icon_light = 2;
+  string sub_title = 3;
+  string title = 4;
+  int32 type = 5;
+}
+message UserInfo {
+  // 基础信息
+  AvatarImage avatar_168x168 = 1;
+  AvatarImage avatar_300x300 = 2;
+  string nickname = 3;
+  string signature = 4;
+  string short_id = 5;
+  string uid = 6;
+  
+  // 地理位置
+  string country = 7;
+  string province = 8;
+  string city = 9;
+  string district = 10;
+  
+  // 社交数据
+  int64 follower_count = 11;
+  int64 following_count = 12;
+  int64 aweme_count = 13;
+  int64 total_favorited = 14;
+  int64 max_follower_count = 15;
+  int64 mplatform_followers_count = 16;
+  
+  // 商业信息
+  CommerceInfo commerce_info = 17;
+  CommerceUserInfo commerce_user_info = 18;
+  int32 commerce_user_level = 19;
+  
+  // 其他元数据
+  int32 gender = 20;
+  string cover_colour = 21;
+  repeated ImageResource cover_url = 22;
+  repeated ImageResource white_cover_url = 23;
+  uint64 user_age = 24;
+  ShareInfo share_info = 25;
+  
+  
+  // 状态标识
+  int32 follow_status = 26;
+  int32 follower_status = 27;
+  int32 follower_request_status = 28;
+  int32 birthday_hide_level = 29;
+
+  //  附加信息联系人
+  string displayname_py=30;
+  string displayname=31;
+  bool isgroup=32;
+  bool isnotice=33;
+  bool istop=34;
+  bool is_connect=35;
+  int32 unread=36;
+  string lastcontent= 37;
+  uint64 lastsendtime=38;
+  // 学校信息
+  SchoolInfo school = 39;
+// 卡片信息
+  repeated CardEntry card_entries = 40;
+
+  bool select =41;  
+}
+
+message Userinfolist {
+  repeated UserInfo all = 1;
+}
+// 枚举扩展建议：
+enum Gender {
+  UNDEFINED = 0;
+  MALE = 1; 
+  FEMALE = 2;
+}

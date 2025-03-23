@@ -6,7 +6,7 @@
 
 ## 安装体验
 
-https://github.com/asmbio/Release
+https://github.com/asmbio/Release/tree/main/p2psosial_v0.0.1-dev
 
 ## 链接
 

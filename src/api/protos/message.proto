@@ -1,0 +1,140 @@
+syntax = "proto3";
+
+package protos;
+
+option go_package = "douyinapi/protos/out";
+
+enum MESSAGE_TYPE {
+  TIME = 0;
+  MEME = 1;
+  IMAGE = 2;
+  VIDEO_CALL = 3;
+  AUDIO_CALL = 4;
+  AUDIO = 5;
+  TEXT = 6;
+  DOUYIN_VIDEO = 7;
+  VIDEO = 8;
+  RED_PACKET = 9;
+}
+
+enum AUDIO_STATE {
+  AUDIO_NORMAL = 0;
+}
+
+enum CALL_STATE {
+  CALL_REJECT = 0;
+  CALL_RESOLVE = 1;
+  CALL_NONE = 2;
+}
+
+enum VIDEO_STATE {
+  VIDEO_VALID = 0;
+}
+
+enum READ_STATE {
+  READ_ARRIVED = 0;
+}
+
+enum RED_PACKET_MODE {
+  RED_PACKET_SINGLE = 0;
+  RED_PACKET_MULTIPLE = 1;
+}
+
+message User {
+  string id = 1;
+  string avatar = 2;
+  string displayname = 3;
+}
+
+message TimeContent {}
+
+message MemeContent {
+  string image_url = 1;
+  AUDIO_STATE state = 2;
+  repeated User loved = 3;
+  bool iscid = 4;
+}
+
+message ImageContent {
+  string image_url = 1;
+  AUDIO_STATE state = 2;
+  READ_STATE read_state = 3;
+  bool iscid = 4;
+}
+
+message VideoCallContent {
+  string call_time = 1;
+  CALL_STATE state = 2;
+}
+
+message AudioCallContent {
+  string call_time = 1;
+  CALL_STATE state = 2;
+}
+
+message AudioContent {
+  uint32 duration = 1;
+  string src = 2;
+  AUDIO_STATE state = 3;
+  bool iscid = 4;
+}
+
+message TextContent {
+  string text = 1;
+}
+
+message DouyinVideoContent {
+  VideoContent video = 1;
+  User author = 2;
+  
+}
+
+message VideoContent {
+  string poster = 1;
+  VIDEO_STATE state = 2;
+  string src=3;
+  bool iscid = 4;
+  uint32 duration = 5;
+  string title = 6;  
+}
+
+message RedPacketContent {
+  RED_PACKET_MODE mode = 1;
+  double money = 2;
+  string title = 3;
+  string state = 4;
+}
+enum STATUS {
+  SUCCEED = 0;
+  FAILED = 1;
+  GOING = 2;
+}
+
+message ChatMessage {
+  MESSAGE_TYPE type = 1;
+  uint64 time = 2;
+  User user = 3;
+  
+  
+  oneof content {
+    TimeContent time_content = 4;
+    MemeContent meme_content = 5;
+    ImageContent image_content = 6;
+    VideoCallContent video_call_content = 7;
+    AudioCallContent audio_call_content = 8;
+    AudioContent audio_content = 9;
+    TextContent text_content = 10;
+    DouyinVideoContent douyin_video_content = 11;
+    VideoContent video_content = 12;
+    RedPacketContent red_packet_content = 13;
+  }
+  STATUS state = 14;
+  //string text_content0 = 15;
+  string Receiver = 15;
+}
+
+
+
+message Messagelist {
+    repeated ChatMessage msg_list = 1;  
+  }
