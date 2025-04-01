@@ -5,7 +5,8 @@ import "string.proto";
 import "userinfo.proto";
 import "message.proto";
 import "video.proto";
-import "video2.proto";
+import "trans_worksmsg.proto";
+import "trans.proto";
 
 import "google/protobuf/empty.proto";
 
@@ -36,6 +37,10 @@ service MoguService {
    rpc MyVideo(MyVideoRequest)returns (VideoList){}
    rpc GetRecommendedVideos(VideoRequest) returns (VideoList) {}
    rpc PushVideo(Worksmsg) returns (google.protobuf.Empty){}
+
+
+   // blocks
+    rpc SignAndPubMsg(MessageBS) returns (google.protobuf.Empty) {}
 //   rpc GetFollowingVideos(VideoRequest) returns (VideoListResponse) {}
 //   rpc GetPrivateVideos(VideoRequest) returns (VideoListResponse) {}
 //   rpc GetHistoryVideos(HistoryRequest) returns (VideoListResponse) {}

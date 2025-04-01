@@ -81,7 +81,7 @@ export class PlatformActionHandler {
       return window.electronAPI?.startApp(pwd)
     },
     [Platform.Mobile]: async (pwd: string) => {
-      return Mogu.start({ pwd: '123456' })
+      return Mogu?.start({ pwd: pwd })
     },
     [Platform.Unknown]: (pwd: string) => {
       console.log('Default action for unknown platform')

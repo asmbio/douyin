@@ -235,17 +235,10 @@ import bus, { EVENT_KEY } from '@/utils/bus'
 
 // 在现有import后添加：
 import { onBeforeUnmount } from 'vue'
-import {
-  getChatStream,
-  getConversation,
-  getUserInfo,
-  sendMessage,
-  setRead
-} from '@/api/moguservice'
+import { getConversation, getUserInfo, sendMessage, setRead } from '@/api/moguservice'
 import {
   AUDIO_STATE,
   MESSAGE_TYPE,
-  RED_PACKET_MODE,
   STATUS,
   type ChatMessage as cMessage
 } from '@/api/gen/message_pb'
@@ -462,12 +455,7 @@ const handlePopState = () => {
 //const { init } = useChatStream()
 
 onMounted(async () => {
-  console.log('onMounted')
-  msgWrapper.value
-    .querySelectorAll('img')
-    .forEach((item) => item.addEventListener('load', scrollBottom))
-  scrollBottom()
-
+  console.log('chat onMounted')
   // 加载message 列表
   try {
     data.uid = route.query.uid as string
@@ -475,6 +463,7 @@ onMounted(async () => {
     if (data.friend == null) {
       data.friend = await getUserInfo(data.uid)
       store.addOrUpdateNotification(data.friend)
+      console.log('getUserInfo', data.friend)
     }
     store.activeConversasion(data.uid, (msg: cMessage) => {
       data.messages.push(msg)
@@ -488,7 +477,10 @@ onMounted(async () => {
   } catch (error) {
     console.log(error)
   }
-
+  msgWrapper.value
+    .querySelectorAll('img')
+    .forEach((item) => item.addEventListener('load', scrollBottom))
+  scrollBottom()
   // 新增键盘事件监听
   window.addEventListener('keydown', handleKeyDown)
   window.addEventListener('popstate', handlePopState)

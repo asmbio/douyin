@@ -1,0 +1,256 @@
+syntax = "proto3";
+
+package protos;
+
+import "trans_worksmsg.proto";
+
+option go_package = "douyinapi/protos/out";
+
+// ========== Msgtype Enum ==========
+enum MsgType {
+  UNKNOWN = 0;
+  PUB_BLOCK = 1;
+  JION_PD = 2;
+  SYS_COINBASE = 3;
+  SIGN_TRANS = 4;
+  CFM_TRANS = 5;
+  SIGN_VOTE = 6;
+  CFM_VOTE = 7;
+  SIGN_CANCELVOTE = 8;
+  CFM_CANCELVOTE = 9;
+  SIGN_VOTEINFO = 10;
+  SIGN_META_INFO = 11;
+  SIGN_META_FOLLOW = 12;
+  CFM_META_FOLLOW = 13;  
+  SIGN_EGG1 = 26;
+  CFM_EGG1 = 27;
+  WORKS_WITH_EX = 31;
+  SIGN_WORKS = 32;
+  CHAN_SIGN_WORKS = 33;
+  SWORKS_COMMENT = 34;
+  CFM_SWORKS_COMMENT = 35;
+  SIGN_EX_INFO = 36;
+  WORKS_COMMENT_WITH_EX = 37;
+  PUB_PBFT = 100;
+}
+
+// ========== Common Structures ==========
+
+
+message BigInt {
+  bytes value = 1; // Using bytes to represent big.Int
+}
+
+message Signature {
+  bytes value = 1;
+}
+
+// ========== Messagebs ==========
+message MessageBS {
+  MsgType msg_type = 1;
+  oneof body {
+    TransBS trans_bs = 5;    
+    SignSysCoinbaseMsg sys_coinbase = 7;
+    SignTransMsg trans = 8;
+    SignVoteMsg vote = 9;
+    SignVoteInfoMsg vote_info = 10;
+    SignMetaFollowMsg meta_follow = 11;
+    SignMetaInfoMsg meta_info = 12;
+    SignEgg1Msg egg1 = 13;
+    SignWorksMsg works = 14;
+    SignWorksCommentMsg works_comment = 15;
+    SignExMsg ex_info = 16;    
+    PubPbftMsg pbft = 18;
+  }
+}
+
+// ========== TransBS ==========
+message TransBS {
+  bytes value = 1;
+}
+
+// ========== Egg1 ==========
+message Egg1Msg {
+  string from = 1;
+  bytes random_code = 2;
+  uint64 time = 3;
+  //bytes code2 = 4;
+}
+
+message SignEgg1Msg {
+  Egg1Msg msg = 1;
+  bytes sign = 2;
+}
+
+// ========== Ex ==========
+message ExMsg {
+  string from = 1;
+  uint32 ptl_no = 2;
+  bytes obj_data = 3;
+  uint64 fees_rate = 4;
+  uint64 time = 5;
+}
+
+message SignExMsg {
+  ExMsg msg = 1;
+  bytes sign = 2;
+}
+
+// ========== MetaFollow ==========
+message FriendRemarks {
+  string group = 1;
+  string remarks = 2;
+  uint32 flags = 3;
+}
+
+message MetaFollowMsg {
+  string from = 1;
+  string to = 2; 
+  enum FollowAction {
+    STRANGER = 0; // 0 - unknown
+    FOLLOW = 1; // 1 - follow
+    UNFOLLOW = 2; // 2 - unfollow
+    MODIFY_REMARK = 3; // 3 - 修改remark
+    BLACKLIST = 4; // 4 - 黑名单
+    UNBLACKLIST =5; // 5 - 取消黑名单
+  }
+  FollowAction tag = 3;
+  FriendRemarks friend_remarks = 4;
+  uint64 fees_rate = 5;
+  uint64 time = 6;
+}
+
+message SignMetaFollowMsg {
+  MetaFollowMsg msg = 1;
+  bytes sign = 2;
+}
+// ========== MetaInfo ==========
+
+message MetaEx {
+    string name = 1; // Nickname
+    bytes avatar = 2; // Virtual avatar, encrypted serialized data, IPFS CID value
+    repeated string peerid = 3; // Peer node IDs
+    uint64 age = 4; // Age, calculated from birthdate
+    uint32 sex = 5; // Gender
+    string info = 6; // Introduction or signature
+    uint32 flags = 7; // Flags/Group indicator
+    MetaRcp rcp = 8; // Merkle tree root hash and related metadata
+    bytes metadata = 9; // Personal metaverse decoration data
+    bytes ex = 10; // Extended data
+}
+message MetaRcp {
+    uint32 following = 1; // Number of accounts being followed
+    uint32 followers = 2; // Number of followers
+    bytes rcp = 3; // Merkle tree root hash
+}
+message MetaInfoMsg {
+  string from = 1;
+  MetaEx meta_ex = 2;
+  uint64 fees_rate = 3;
+  uint64 time = 4;
+}
+
+message SignMetaInfoMsg {
+  MetaInfoMsg msg = 1;
+  bytes sign = 2;
+}
+
+// ========== SysCoinbase ==========
+message SysCoinbaseMsg {
+  bytes hash = 1;
+  bytes s_slice = 2;
+  string miner = 3;
+  uint64 fees_rate = 4;
+  uint64 time = 5;
+}
+
+message SignSysCoinbaseMsg {
+  SysCoinbaseMsg msg = 1;
+  bytes sign = 2;
+}
+
+// ========== Trans ==========
+message TransMsg {
+  string from = 1;
+  string to = 2;
+  BigInt balance = 3;
+  uint64 fees_rate = 4;
+  string marks = 5;
+  uint64 time = 6;
+}
+
+message SignTransMsg {
+  TransMsg msg = 1;
+  bytes sign = 2;
+}
+
+// ========== VoteInfo ==========
+message VoteInfoMsg {
+  string from = 1;
+  string ipns = 2;
+  string info = 3;
+  bytes ex_info = 4;
+  uint64 fees_rate = 5;
+  uint64 time = 6;
+}
+
+message SignVoteInfoMsg {
+  VoteInfoMsg msg = 1;
+  bytes sign = 2;
+}
+
+// ========== Vote ==========
+message VoteMsg {
+  MsgType msg_type = 1;
+  string from = 2;
+  string to = 3;
+  BigInt balance = 4;
+  uint64 fees_rate = 5;
+  uint64 time = 6;
+}
+
+message SignVoteMsg {
+  VoteMsg msg = 1;
+  bytes sign = 2;
+}
+
+// // ========== Works ==========
+// enum MediaType {
+//   MEDIA_UNKNOWN = 0;
+//   MEDIA_AUDIO = 1;
+//   MEDIA_VIDEO = 2;
+//   MEDIA_IMAGE = 3;
+//   MEDIA_TEXT = 4;
+//   MEDIA_VIDEO_MIXED = 5;
+// }
+
+// message WorksMsg {
+//   string from = 1;
+//   uint64 fees_rate = 2;
+//   string title = 3;
+//   repeated string topic = 4;
+//   repeated string at_users = 5;
+//   string desc = 6;
+//   MediaType media_type = 7;
+//   bytes content = 8;
+//   uint64 time = 9;
+// }
+
+
+// // ========== WorksComment ==========
+// message WorksCommentMsg {
+//   string from = 1;
+//   string to = 2;
+//   bytes key = 3;
+//   uint64 fees_rate = 4;
+//   MediaType tag = 5;
+//   bytes content = 6;
+//   uint64 time = 7;
+// }
+
+
+// ========== PBFT ==========
+message PubPbftMsg {
+  // Define PBFT fields based on implementation
+  bytes data = 1;
+}

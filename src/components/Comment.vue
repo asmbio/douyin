@@ -280,7 +280,7 @@ export default {
       const baseStore = useBaseStore()
       const commentData = {
         ip_location: baseStore.userinfo.ip_location,
-        aweme_id: this.videoId,
+        awemeId: this.videoId,
         content: this.comment,
         create_time: Date.now(),
         uid: String(baseStore.userinfo.uid),

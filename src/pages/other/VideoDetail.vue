@@ -43,7 +43,7 @@
 
     <Comment
       page-id="video-detail"
-      :video-id="state.currentItem.aweme_id"
+      :video-id="state.currentItem.awemeId"
       v-model="state.commentVisible"
       @close="closeComments"
     />

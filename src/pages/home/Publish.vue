@@ -49,7 +49,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { IpfsFileSchema, Media_Video_MixedSchema } from '@/api/gen/video2_pb'
+import { IpfsFileSchema, Media_Video_MixedSchema } from '@/api/gen/trans_worksmsg_pb'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { create } from '@bufbuild/protobuf'

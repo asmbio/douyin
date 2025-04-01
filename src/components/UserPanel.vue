@@ -2,7 +2,16 @@
   <div id="UserPanel" @scroll="scroll" @dragstart="(e) => _stopPropagation(e)" ref="page">
     <div ref="float" class="float" :class="state.floatFixed ? 'fixed' : ''">
       <div class="left">
-        <Icon @click="emit('back')" class="icon" icon="eva:arrow-ios-back-fill" />
+        <Icon
+          @click="
+            () => {
+              console.log('Back clicked')
+              emit('back')
+            }
+          "
+          class="icon"
+          icon="eva:arrow-ios-back-fill"
+        />
         <transition name="fade">
           <div class="float-user" v-if="state.floatFixed">
             <img v-lazy="_getavater(props.currentItem.author)" class="avatar" />
@@ -213,7 +222,7 @@
           v-if="props.currentItem.aweme_list.all?.length > 0"
           :list="props.currentItem.aweme_list.all"
         ></Posters>
-        <Loading :isFullScreen="false" v-else />
+        <!-- <Loading :isFullScreen="false" v-else /> -->
       </div>
     </div>
   </div>
@@ -234,17 +243,18 @@ import {
 import { useNav } from '@/utils/hooks/useNav'
 import Posters from '@/components/Posters.vue'
 import { Dftimg } from '@/utils/const_var'
-import Loading from '@/components/Loading.vue'
 import { useBaseStore } from '@/store/pinia'
-import { userVideoList } from '@/api/user'
 import type { UserInfo } from '@/api/gen/userinfo_pb'
 import { unixNanoToAge } from '@/utils/date'
-import type { Author, VideoList } from '@/api/gen/video_pb'
+import { metaFollow } from '@/api/moguservice'
+import { MetaFollowMsg_FollowAction } from '@/api/gen/trans_pb'
+import type { VideoList } from '@/api/gen/video_pb'
 
 const $nav = useNav()
 const baseStore = useBaseStore()
 const emit = defineEmits<{
   'update:currentItem': [val: any]
+  'update-follow': [val: number]
   back: []
   showFollowSetting: []
   showFollowSetting2: []
@@ -307,18 +317,18 @@ watch(
   () => props.active,
   async (newVal) => {
     if (newVal) {
-      // console.log('props.currentItem',props.currentItem)
-      let id = _getUserDouyinId(props.currentItem)
-      let r: any = await userVideoList({ id })
-      if (r.success) {
-        setTimeout(() => {
-          r.data = r.data.map((a) => {
-            a.author = props.currentItem
-            return a
-          })
-          emit('update:currentItem', Object.assign(props.currentItem, { aweme_list: r.data }))
-        }, 300)
-      }
+      console.log('props.currentItem', props.currentItem)
+      //let id = _getUserDouyinId(props.currentItem)
+      // let r: any = await userVideoList({ id })
+      // if (r.success) {
+      //   setTimeout(() => {
+      //     r.data = r.data.map((a) => {
+      //       a.author = props.currentItem
+      //       return a
+      //     })
+      //     emit('update:currentItem', Object.assign(props.currentItem, { aweme_list: r.data }))
+      //   }, 300)
+      // }
     }
   }
 )
@@ -337,9 +347,35 @@ function stop(e) {
   e.stopPropagation()
 }
 
-function followButton() {}
+async function followButton() {
+  if (props.currentItem.author.followStatus) {
+    $nav('/message/chat', { uid: props.currentItem.author.uid })
+  } else {
+    try {
+      await metaFollow(
+        baseStore.userinfo.uid,
+        props.currentItem.author.uid,
+        MetaFollowMsg_FollowAction.FOLLOW
+      )
+      emit('update-follow', 1) // 传递新值
+    } catch (error) {
+      console.log(error)
+    }
+  }
+}
 
-function cancelFollow() {}
+async function cancelFollow() {
+  try {
+    await metaFollow(
+      baseStore.userinfo.uid,
+      props.currentItem.author.uid,
+      MetaFollowMsg_FollowAction.UNFOLLOW
+    )
+    emit('update-follow', 0) // 传递新值
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 defineExpose({ cancelFollow })
 

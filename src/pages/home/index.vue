@@ -140,13 +140,14 @@
           @back="state.baseIndex = 1"
           @showFollowSetting="state.showFollowSetting = true"
           @showFollowSetting2="state.showFollowSetting2 = true"
+          @update-follow="handleUpdateFollow"
         />
       </SlideItem>
     </SlideHorizontal>
 
     <Comment
       page-id="home-index"
-      :video-id="state.currentItem.aweme_id"
+      :video-id="state.currentItem.awemeId"
       v-model="state.commentVisible"
       @close="closeComments"
     />
@@ -189,7 +190,10 @@
       v-model="state.showFollowSetting2"
     />
 
-    <BlockDialog v-model="state.showBlockDialog" />
+    <BlockDialog
+      v-model="state.showBlockDialog"
+      v-model:blockedUserId="state.currentItem.author.uid"
+    />
 
     <ConfirmDialog title="设置备注名" ok-text="确认" v-model:visible="state.showChangeNote">
       <Search mode="light" v-model="state.test" :isShowSearchIcon="false" />
@@ -273,12 +277,17 @@ const state = reactive({
   commentVisible: false,
   fullScreen: false,
   currentItem: {
-    aweme_id: '',
+    awemeId: '',
     author: {} as UserInfo,
     isRequest: false,
     aweme_list: {} as VideoList
   }
 })
+function handleUpdateFollow(newStatus) {
+  // 直接修改父组件的数据（假设 currentItem 是父组件的响应式对象）
+  state.currentItem.author.followStatus = newStatus
+  // 若数据来自 Vuex，需通过 commit mutation 修改
+}
 
 function delayShowDialog(cb: Function) {
   setTimeout(cb, 400)
@@ -331,6 +340,7 @@ onMounted(() => {
     state.baseIndex = 2
   })
   bus.on(EVENT_KEY.CURRENT_ITEM, setCurrentItem)
+  //bus.on(EVENT_KEY.CURRENT_ITEM, setCurrentItem)
 })
 
 onUnmounted(() => {

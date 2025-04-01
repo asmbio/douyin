@@ -94,7 +94,7 @@ import {
   Media_Video_MixedSchema,
   type Media_Video_Mixed,
   IpfsFileSchema
-} from '@/api/gen/video2_pb'
+} from '@/api/gen/trans_worksmsg_pb'
 import { useBaseStore } from '@/store/pinia'
 import { publishVideo } from '@/api/moguservice'
 import { _notice } from '@/utils'

@@ -12,37 +12,44 @@
     <div class="follow-setting-dialog">
       <div class="dialog-header">
         <div class="title-wrapper">
-          <span class="title">{{ currentItem.author.nickname }}</span>
-          <span class="subtitle">抖音号：{{ _getUserDouyinId(currentItem) }}</span>
+          <span class="title">{{ currentItem.author.displayname }}</span>
+          <span class="subtitle">抖音号：{{ _getUserDouyinId(props.currentItem) }}</span>
         </div>
         <dy-back mode="dark" img="close" direction="right" @click="cancel()"></dy-back>
       </div>
       <div class="options">
-        <div class="option" @click="cancel((e) => $emit('showShare'))">
+        <div class="option" @click="cancel(() => $emit('showShare'))">
           <img src="../../../assets/img/icon/components/follow/share.png" alt="" />
           <span>分享主页</span>
         </div>
-        <div class="option" @click="cancel((e) => $router.push('/message/chat'))">
+        <div
+          class="option"
+          @click="
+            cancel(async () => {
+              await $router.push({ path: '/message/chat', query: { uid: currentItem.author.uid } })
+            })
+          "
+        >
           <img src="../../../assets/img/icon/components/follow/private-chat.png" alt="" />
           <span>发私信</span>
         </div>
-        <div class="option" @click="cancel((e) => $router.push('/home/report', { mode: 'chat' }))">
+        <div class="option" @click="cancel(() => nav('/home/report', { mode: 'chat' }))">
           <img src="../../../assets/img/icon/components/follow/report.png" alt="" />
           <span>举报</span>
         </div>
-        <div class="option" @click="cancel((e) => $emit('showBlockDialog'))">
+        <div class="option" @click="cancel(() => $emit('showBlockDialog'))">
           <img src="../../../assets/img/icon/components/follow/forbid.png" alt="" />
           <span>拉黑</span>
         </div>
       </div>
       <div class="l-rows">
-        <div class="l-row" @click="cancel((e) => $emit('showChangeNote'))">
+        <div class="l-row" @click="cancel(() => $emit('showChangeNote'))">
           <div class="left">设置分组</div>
           <div class="right">
             <img src="../../../assets/img/icon/components/follow/write.png" alt="" />
           </div>
         </div>
-        <div class="l-row" @click="cancel((e) => $emit('showChangeNote'))">
+        <div class="l-row" @click="cancel(() => $emit('showChangeNote'))">
           <div class="left">设置备注名</div>
           <div class="right">
             <img src="../../../assets/img/icon/components/follow/write.png" alt="" />
@@ -66,7 +73,11 @@
             <switches v-model="switches1" theme="bootstrap" color="success"></switches>
           </div>
         </div>
-        <div class="l-row" @click="cancel((e) => $emit('cancelFollow'))">
+        <div
+          v-if="currentItem.author.followStatus"
+          class="l-row"
+          @click="cancel(() => $emit('cancelFollow'))"
+        >
           <div class="left" style="color: red">取消关注</div>
           <div class="right">
             <img src="../../../assets/img/icon/components/follow/reduce.png" alt="" />
@@ -76,51 +87,57 @@
     </div>
   </from-bottom-dialog>
 </template>
-<script>
-import FromBottomDialog from '../../../components/dialog/FromBottomDialog'
-import Switches from '../../message/components/swtich/switches'
-import { DefaultUser } from '@/utils/const_var'
+<script lang="ts" setup>
+import { ref, defineProps, defineEmits } from 'vue'
+import FromBottomDialog from '@/components/dialog/FromBottomDialog.vue'
+import Switches from '@/pages/message/components/swtich/switches.vue'
 import { _getUserDouyinId } from '@/utils'
+import type { UserInfo } from '@/api/gen/userinfo_pb'
+import { useNav } from '@/utils/hooks/useNav'
 
-export default {
-  name: 'FollowSetting',
-  components: {
-    FromBottomDialog,
-    Switches
-  },
-  props: {
+const nav = useNav()
+
+const props = withDefaults(
+  defineProps<{
     currentItem: {
-      type: Object,
-      default() {
-        return {
-          user: DefaultUser,
-          isRequest: false,
-          post: []
-        }
-      }
-    },
-    modelValue: {
-      type: Boolean,
-      default() {
-        return false
-      }
+      author: UserInfo
     }
-  },
-  data() {
-    return {
-      switches1: false,
-      switches2: false
-    }
-  },
-  computed: {},
-  created() {},
-  methods: {
-    _getUserDouyinId,
-    cancel(cb) {
-      this.$emit('update:modelValue', false)
-      cb && cb()
-    }
+    modelValue: boolean
+  }>(),
+  {
+    // active: false, // 默认值在这里设置
+    modelValue: false // modelValue 也可以在这里设置默认值
+    // currentItem 如果是可选参数也需要在这里设置默认值
   }
+)
+
+// const props = defineProps({
+//   currentItem: {
+//     type: Object,
+//     default: () => ({
+//       author: {} as UserInfo,
+//     })
+//   },
+//   modelValue: {
+//     type: Boolean,
+//     default: false
+//   }
+// });
+
+const emit = defineEmits([
+  'update:modelValue',
+  'showShare',
+  'showBlockDialog',
+  'showChangeNote',
+  'cancelFollow'
+])
+
+const switches1 = ref(false)
+//const switches2 = ref(false);
+
+function cancel(cb?: () => void) {
+  emit('update:modelValue', false)
+  cb && cb()
 }
 </script>
 

@@ -5,22 +5,33 @@ import bus, { EVENT_KEY } from '@/utils/bus'
 import { Icon } from '@iconify/vue'
 import { useClick } from '@/utils/hooks/useClick'
 import { inject } from 'vue'
-import { Dftimg } from '@/utils/const_var'
+import type { Video } from '@/api/gen/video_pb'
 
-const props = defineProps({
-  isMy: {
-    type: Boolean,
-    default: () => {
-      return false
-    }
-  },
-  item: {
-    type: Object,
-    default: () => {
-      return {}
-    }
+const props = withDefaults(
+  defineProps<{
+    item: Video
+    isMy: boolean
+  }>(),
+  {
+    isMy: false // 默认值在这里设置
+    // currentItem 如果是可选参数也需要在这里设置默认值
   }
-})
+)
+
+// const props = defineProps({
+//   isMy: {
+//     type: Boolean,
+//     default: () => {
+//       return false
+//     }
+//   },
+//   item: {
+//     type: Object,
+//     default: () => {
+//       return {}
+//     }
+//   }
+// })
 
 const position = inject<any>('position')
 
@@ -39,10 +50,10 @@ function loved() {
   }, 100)
   if (!props.item.isLoved) {
     // eslint-disable-next-line vue/no-mutating-props
-    props.item.statistics.digg_count++
+    props.item.statistics.diggCount++
   } else {
     // eslint-disable-next-line vue/no-mutating-props
-    props.item.statistics.digg_count--
+    props.item.statistics.diggCount--
   }
 }
 
@@ -52,10 +63,10 @@ function collected() {
   }, 100)
   if (!props.item.isCollect) {
     // eslint-disable-next-line vue/no-mutating-props
-    props.item.statistics.collect_count++
+    props.item.statistics.collectCount++
   } else {
     // eslint-disable-next-line vue/no-mutating-props
-    props.item.statistics.collect_count--
+    props.item.statistics.collectCount--
   }
 }
 
@@ -67,7 +78,7 @@ function attention(e) {
 }
 
 function showComments() {
-  bus.emit(EVENT_KEY.OPEN_COMMENTS, props.item.aweme_id)
+  bus.emit(EVENT_KEY.OPEN_COMMENTS, props.item.awemeId)
 }
 
 const vClick = useClick()
@@ -78,12 +89,12 @@ const vClick = useClick()
     <div class="avatar-ctn mb2r">
       <img
         class="avatar"
-        :src="item.author?.avatar?.urlList[0] || Dftimg.avatar"
+        :src="_getavater(item.author)"
         alt=""
         v-click="() => bus.emit(EVENT_KEY.GO_USERINFO)"
       />
       <transition name="fade">
-        <div v-if="!item.isAttention" v-click="attention" class="options">
+        <div v-if="false" v-click="attention" class="options">
           <img class="no" src="../../assets/img/icon/add-light.png" alt="" />
           <img class="yes" src="../../assets/img/icon/ok-red.png" alt="" />
         </div>
@@ -113,7 +124,7 @@ const vClick = useClick()
     </div>
     <div v-if="!props.isMy" class="share mb2r" v-click="() => bus.emit(EVENT_KEY.SHOW_SHARE)">
       <img src="../../assets/img/icon/share-white-full.png" alt="" class="share-image" />
-      <span>{{ _formatNumber(item.statistics.share_count) }}</span>
+      <span>{{ _formatNumber(item.statistics.shareCount) }}</span>
     </div>
     <div v-else class="share mb2r" v-click="() => bus.emit(EVENT_KEY.SHOW_SHARE)">
       <img src="../../assets/img/icon/menu-white.png" alt="" class="share-image" />

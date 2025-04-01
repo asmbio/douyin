@@ -4,44 +4,47 @@
     :modelValue="modelValue"
     @update:modelValue="(e) => $emit('update:modelValue', e)"
     :show-heng-gang="false"
-    height="20rem"
     @cancel="cancel"
     mode="white"
   >
     <div class="block-dialog">
       <div class="notice">拉黑后，对方将无法搜索到你，也不能再给你发私信</div>
-      <div class="row red">确认拉黑</div>
+      <div class="row red" @click="handleConfirmBlock">确认拉黑</div>
       <div class="row">不让 TA 看</div>
       <div class="space"></div>
       <div class="row" @click="cancel">取消</div>
     </div>
   </from-bottom-dialog>
 </template>
-<script>
-import FromBottomDialog from '../../../components/dialog/FromBottomDialog'
 
-export default {
-  name: 'BlockDialog',
-  components: {
-    FromBottomDialog
-  },
-  props: {
-    modelValue: {
-      type: Boolean,
-      default() {
-        return false
-      }
-    }
-  },
-  data() {
-    return {}
-  },
-  computed: {},
-  created() {},
-  methods: {
-    cancel() {
-      this.$emit('update:modelValue', false)
-    }
+<script setup lang="ts">
+import { defineProps, defineEmits } from 'vue'
+import FromBottomDialog from '../../../components/dialog/FromBottomDialog.vue'
+import { metaFollow } from '@/api/moguservice' // Replace with actual path
+
+import { MetaFollowMsg_FollowAction } from '@/api/gen/trans_pb' // Replace with actual path
+import { useBaseStore } from '@/store/pinia'
+const store = useBaseStore()
+const props = defineProps<{
+  blockedUserId: string
+  modelValue: boolean
+}>()
+
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: boolean): void
+}>()
+
+const cancel = () => {
+  emit('update:modelValue', false)
+}
+
+const handleConfirmBlock = async () => {
+  try {
+    await metaFollow(store.userinfo.uid, props.blockedUserId, MetaFollowMsg_FollowAction.BLACKLIST)
+  } catch (error) {
+    console.error('Error during block action:', error)
+  } finally {
+    cancel()
   }
 }
 </script>

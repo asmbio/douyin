@@ -4,6 +4,14 @@ package protos;
 
 option go_package = "douyinapi/protos/out";
 
+message SignWorksCommentMsg {
+  WorksCommentMsg msg = 1;
+  bytes sign = 2;
+}
+message SignWorksMsg {
+  Worksmsg msg = 1;
+  bytes sign = 2;
+}
 
 // 添加 Worksmsg 结构体
 message Worksmsg {
@@ -25,7 +33,7 @@ message Worksmsg {
   
 }
 // 添加 Workscommentmsg 结构体
-message Workscommentmsg {
+message WorksCommentMsg {
   
   string From = 2;
   string To = 3;

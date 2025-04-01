@@ -14,8 +14,14 @@ import {
 import { type UserInfo } from './gen/userinfo_pb'
 import { StringSchema } from './gen/string_pb'
 import { EmptySchema } from '@bufbuild/protobuf/wkt'
-import type { Worksmsg } from './gen/video2_pb'
+import type { Worksmsg } from './gen/trans_worksmsg_pb'
 import type { ChatMessage } from './gen/message_pb'
+import {
+  MetaFollowMsg_FollowAction,
+  MsgType,
+  type MessageBS,
+  type MetaFollowMsg
+} from './gen/trans_pb'
 
 // 创建全局的 transport 和 client 实例（单例模式）
 const transport = createGrpcWebTransport({
@@ -163,6 +169,36 @@ export async function getRecommendedVideos(start: number, size: number) {
     pageSize: size
   })
   return client.getRecommendedVideos(request)
+}
+
+export async function signAndPubMsg(msgbs: MessageBS) {
+  return client.signAndPubMsg(msgbs)
+}
+
+export async function metaFollow(
+  blockedUserId: string,
+  currentUserId: string,
+  afaction: MetaFollowMsg_FollowAction
+) {
+  const metaFollowMsg0 = {
+    from: currentUserId, // Replace with actual current user ID
+    to: blockedUserId,
+    tag: afaction,
+    feesRate: BigInt(0),
+    time: BigInt(Date.now()) * 1_000_000n
+  } as MetaFollowMsg
+
+  const messageBS = {
+    msgType: MsgType.SIGN_META_FOLLOW,
+    body: {
+      case: 'metaFollow',
+      value: {
+        msg: metaFollowMsg0
+      }
+    }
+  } as MessageBS
+
+  return signAndPubMsg(messageBS)
 }
 
 // // 使用示例

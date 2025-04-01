@@ -19,7 +19,7 @@
         () =>
           bus.emit(EVENT_KEY.NAV, {
             path: '/home/music',
-            query: { id: item.aweme_id }
+            query: { id: item.awemeId }
           })
       "
     />

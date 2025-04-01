@@ -33,7 +33,7 @@
       <template v-else>
         <div :style="{ opacity: state.isMove ? 0 : 1 }" class="normal">
           <template v-if="!state.commentVisible">
-            <ItemToolbar v-model:item="state.localItem" />
+            <ItemToolbar v-model:item="state.localItem" :isMy="isMy" />
             <ItemDesc v-model:item="state.localItem" />
           </template>
           <div v-if="isMy" class="comment-status">
@@ -82,7 +82,7 @@
 </template>
 
 <script setup lang="ts">
-import { _checkImgUrl, _duration, _stopPropagation } from '@/utils'
+import { _duration, _stopPropagation } from '@/utils'
 import Loading from '../Loading.vue'
 import ItemToolbar from './ItemToolbar.vue'
 import ItemDesc from './ItemDesc.vue'
@@ -92,43 +92,64 @@ import { computed, onBeforeUnmount, onMounted, onUnmounted, provide, reactive } 
 import { Icon } from '@iconify/vue'
 import { _css } from '@/utils/dom'
 
+import type { Video } from '@/api/gen/video_pb'
+
 defineOptions({
   name: 'BaseVideo'
 })
 
-const props = defineProps({
-  item: {
-    type: Object,
-    default: () => {
-      return {}
+const props = withDefaults(
+  defineProps<{
+    item: Video
+    isMy: boolean
+    isPlay: boolean
+    isLive: boolean
+    position: {
+      uniqueId: string
+      index: number
     }
-  },
-  position: {
-    type: Object,
-    default: () => {
-      return {}
-    }
-  },
-  //用于第一条数据，自动播放，如果都用事件去触发播放，有延迟
-  isPlay: {
-    type: Boolean,
-    default: () => {
-      return true
-    }
-  },
-  isMy: {
-    type: Boolean,
-    default: () => {
-      return false
-    }
-  },
-  isLive: {
-    type: Boolean,
-    default: () => {
-      return false
-    }
+  }>(),
+  {
+    isMy: false, // 默认值在这里设置
+    isplay: true, // isPlay 也可以在这里设置默认值
+    islive: false // isLive 也可以在这里设置默认值
+    // currentItem 如果是可选参数也需要在这里设置默认值
   }
-})
+)
+
+// const props = defineProps({
+//   item: {
+//     type: Object,
+//     default: () => {
+//       return {}
+//     }
+//   },
+//   position: {
+//     type: Object,
+//     default: () => {
+//       return {}
+//     }
+//   },
+//   //用于第一条数据，自动播放，如果都用事件去触发播放，有延迟
+//   isPlay: {
+//     type: Boolean,
+//     default: () => {
+//       return true
+//     }
+//   },
+//   isMy: {
+//     type: Boolean,
+//     default: () => {
+//       return false
+//     }
+//   },
+//   isLive: {
+//     type: Boolean,
+//     default: () => {
+//       return false
+//     }
+//   }
+// })
 
 provide(
   'isPlaying',
@@ -196,7 +217,7 @@ const progressClass = $computed(() => {
 })
 
 onMounted(() => {
-  // console.log('video', this.localItem.aweme_id)
+  // console.log('video', this.localItem.awemeId)
   // console.log(this.commentVisible)
   state.height = document.body.clientHeight
   state.width = document.body.clientWidth
@@ -225,7 +246,7 @@ onMounted(() => {
     videoEl.addEventListener(
       e,
       () => {
-        // console.log('eventTester', e, state.item.aweme_id)
+        // console.log('eventTester', e, state.item.awemeId)
         if (e === 'playing') state.loading = false
         if (e === 'waiting') {
           if (!state.paused && !state.ignoreWaiting) {
@@ -280,11 +301,11 @@ onMounted(() => {
 onBeforeUnmount(() => {
   // 更新观看时间
   // 发送播放数据
-  console.log('awemeId: %s,%s,%s ', props.item.aweme_id, state.hasEnded, state.currentTime)
+  console.log('awemeId: %s,%s,%s ', props.item.awemeId, state.hasEnded, state.currentTime)
   // bus.emit(EVENT_KEY.VIDEO_PLAYBACK_DATA, {
   //   hasEnded: state.hasEnded,
   //   currentTime: state.currentTime,
-  //   awemeId: props.item.aweme_id // 可选：传递视频ID用于关联
+  //   awemeId: props.item.awemeId // 可选：传递视频ID用于关联
   // })
 })
 onUnmounted(() => {
@@ -335,7 +356,7 @@ function onDialogEnd({ tag, isClose }) {
 }
 
 function onOpenComments(id) {
-  if (id === props.item.aweme_id) {
+  if (id === props.item.awemeId) {
     _css(videoEl, 'transition-duration', `300ms`)
     _css(videoEl, 'height', 'calc(var(--vh, 1vh) * 30)')
     state.commentVisible = true
@@ -357,7 +378,7 @@ function click({ uniqueId, index, type }) {
         pause()
         bus.emit(EVENT_KEY.NAV, {
           path: '/home/live',
-          query: { id: props.item.aweme_id }
+          query: { id: props.item.awemeId }
         })
       } else {
         if (state.status === SlideItemPlayStatus.Play) {
