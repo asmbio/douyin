@@ -7,18 +7,11 @@
     </BaseHeader>
     <div class="content">
       <div class="peoples">
-        <People
-          @follow="follow(index)"
-          @unfollow="unfollow(index)"
-          mode="normal-add-button"
-          :key="index"
-          v-for="(item, index) in data.list"
-          :people="item"
-        />
-        <div class="add-people" @click="nav('/message/share-to-friend')">
+        <People mode="normal" :key="data.friend.uid" :people="data.friend" />
+        <!-- <div class="add-people" @click="nav('/message/share-to-friend')">
           <img src="../../../assets/img/icon/message/chat/add.png" alt="" class="head-image" />
           <div class="name">多人聊天</div>
-        </div>
+        </div> -->
       </div>
       <div class="setting">
         <div class="row">
@@ -33,8 +26,8 @@
             <switches v-model="data.top" theme="bootstrap" color="success"></switches>
           </div>
         </div>
-        <div class="row" @click="nav('/set-remark')">
-          <div class="left">设备备注</div>
+        <div class="row">
+          <div class="left">查找聊天内容</div>
           <div class="right">
             <dy-back direction="right" scale=".7"></dy-back>
           </div>
@@ -53,7 +46,7 @@
         </div>
       </div>
     </div>
-    <BlockDialog v-model="data.blockDialog" />
+    <BlockDialog v-model="data.blockDialog" v-model:blockedUserId="data.uid" />
   </div>
 </template>
 <script setup lang="ts">
@@ -64,13 +57,19 @@ import CONST_VAR from '../../../utils/const_var'
 import { onMounted, reactive } from 'vue'
 import { useNav } from '@/utils/hooks/useNav'
 import { _showConfirmDialog } from '@/utils'
+import type { UserInfo } from '@/api/gen/userinfo_pb'
+import { useRoute } from 'vue-router'
+import { useBaseStore } from '@/store/pinia'
 
 defineOptions({
   name: 'ChatDetail'
 })
-
+const route = useRoute()
 const nav = useNav()
+const store = useBaseStore()
 const data = reactive({
+  uid: '',
+  friend: {} as UserInfo,
   noMessage: false,
   top: false,
   blockDialog: false,
@@ -97,7 +96,10 @@ const data = reactive({
   ]
 })
 
-onMounted(() => {})
+onMounted(() => {
+  data.uid = route.query.uid as string
+  data.friend = store.notifications.find((e) => e.uid === data.uid)
+})
 
 function follow(index) {
   if (data.list[index].type === CONST_VAR.RELATE_ENUM.FOLLOW_ME) {

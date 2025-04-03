@@ -21,7 +21,7 @@ export const useBaseStore = defineStore('base', {
       maskDialogMode: 'dark',
       version: '17.1.0',
       excludeNames: [],
-      includeNames: ['Home', 'Shop', 'Publish', 'Me', 'Message'],
+      includeNames: ['Home', 'Shop', 'Publish', 'Me', 'Message', 'UserPanelPage', 'Chat'],
       judgeValue: 20,
       homeRefresh: 60,
       loading: false,
@@ -125,7 +125,7 @@ export const useBaseStore = defineStore('base', {
           //   console.log('r.data', r);
           this.userinfo = r
           //   console.log('userinfo', this.userinfo);
-          const r2 = await getContacts('', 30, CONTACT_TAG.FRIEND)
+          const r2 = await getContacts('', 100, CONTACT_TAG.FRIEND)
           // console.log('r2.data', r2.userList);
           this.friends = r2
           // console.log('users', this.users);

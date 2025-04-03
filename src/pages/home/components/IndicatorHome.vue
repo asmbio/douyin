@@ -208,7 +208,7 @@ export default {
 
   .notice {
     opacity: 0;
-    top: 0;
+    top: 30rem;
     position: absolute;
     width: 100vw;
     height: 100%;

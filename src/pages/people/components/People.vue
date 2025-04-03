@@ -1,31 +1,31 @@
 <template>
   <div class="People">
-    <img :src="_checkImgUrl(people.avatar)" alt="" class="head-image pull-left" />
+    <img :src="_getavater(people)" alt="" class="head-image pull-left" />
     <div class="content">
       <template v-if="mode === 'normal'">
         <div class="left">
-          <div class="name">{{ people.name }}</div>
+          <div class="name">{{ people.displayname }}</div>
         </div>
       </template>
       <template v-if="mode === 'normal-add-button'">
         <div class="left">
-          <div class="name">{{ people.name }}</div>
+          <div class="name">{{ people.displayname }}</div>
         </div>
         <div class="right">
           <!--   他关注我   -->
-          <template v-if="people.type === RELATE_ENUM.FOLLOW_ME">
+          <template v-if="computedRelateEnum === RELATE_ENUM.FOLLOW_ME">
             <div class="l-button red" @click.stop="$emit('follow')">回关</div>
           </template>
           <!--   我关注他   -->
-          <template v-if="people.type === RELATE_ENUM.FOLLOW_HE">
+          <template v-if="computedRelateEnum === RELATE_ENUM.FOLLOW_HE">
             <div class="l-button" @click.stop="$emit('unfollow')">已关注</div>
           </template>
           <!--          相互关注-->
-          <template v-if="people.type === RELATE_ENUM.FOLLOW_EACH_OTHER">
+          <template v-if="computedRelateEnum === RELATE_ENUM.FOLLOW_EACH_OTHER">
             <div class="l-button" @click.stop="$emit('unfollow')">互相关注</div>
           </template>
           <!--         关注请求-->
-          <template v-if="people.type === RELATE_ENUM.REQUEST_FOLLOW">
+          <template v-if="computedRelateEnum === RELATE_ENUM.REQUEST_FOLLOW">
             <div class="l-button" @click.stop="$emit('ignore')">忽略</div>
             <div class="l-button red" @click.stop="$emit('agree')">通过</div>
           </template>
@@ -35,33 +35,33 @@
       <template v-if="mode === 'search'">
         <div class="left">
           <div class="name">
-            <span v-if="people.name.indexOf(searchKey) > -1"
-              >{{ people.name.substr(0, people.name.indexOf(searchKey))
+            <span v-if="people.displayname.indexOf(searchKey) > -1"
+              >{{ people.displayname.substr(0, people.displayname.indexOf(searchKey))
               }}<span style="color: yellow">{{ searchKey }}</span
-              >{{ people.name.substr(people.name.indexOf(searchKey) + searchKey.length) }}</span
+              >{{
+                people.displayname.substr(people.displayname.indexOf(searchKey) + searchKey.length)
+              }}</span
             >
-            <span v-else>{{ people.name }}</span>
+            <span v-else>{{ people.displayname }}</span>
           </div>
           <div class="name f12">
             抖音id:
 
-            <span v-if="people.account.indexOf(searchKey) > -1"
-              >{{ people.account.substr(0, people.account.indexOf(searchKey))
+            <span v-if="people.uid.indexOf(searchKey) > -1"
+              >{{ people.uid.substr(0, people.uid.indexOf(searchKey))
               }}<span style="color: yellow">{{ searchKey }}</span
-              >{{
-                people.account.substr(people.account.indexOf(searchKey) + searchKey.length)
-              }}</span
+              >{{ people.uid.substr(people.uid.indexOf(searchKey) + searchKey.length) }}</span
             >
-            <span v-else>{{ people.account }}</span>
+            <span v-else>{{ people.uid }}</span>
           </div>
         </div>
       </template>
 
       <template v-if="mode === 'fans'">
         <div class="left">
-          <div class="name">{{ people.name }}</div>
+          <div class="name">{{ people.displayname }}</div>
           <div class="name">
-            <template v-if="people.type === RELATE_ENUM.REQUEST_FOLLOW">
+            <template v-if="computedRelateEnum === RELATE_ENUM.REQUEST_FOLLOW">
               发来一个关注请求
             </template>
             <template v-else> 关注了你</template>
@@ -70,19 +70,19 @@
         </div>
         <div class="right">
           <!--   他关注我   -->
-          <template v-if="people.type === RELATE_ENUM.FOLLOW_ME">
+          <template v-if="computedRelateEnum === RELATE_ENUM.FOLLOW_ME">
             <div class="l-button red" @click.stop="$emit('follow')">回关</div>
           </template>
           <!--   我关注他   -->
-          <template v-if="people.type === RELATE_ENUM.FOLLOW_HE">
+          <template v-if="computedRelateEnum === RELATE_ENUM.FOLLOW_HE">
             <div class="l-button" @click.stop="$emit('unfollow')">已关注</div>
           </template>
           <!--          相互关注-->
-          <template v-if="people.type === RELATE_ENUM.FOLLOW_EACH_OTHER">
+          <template v-if="computedRelateEnum === RELATE_ENUM.FOLLOW_EACH_OTHER">
             <div class="l-button" @click.stop="$emit('unfollow')">互相关注</div>
           </template>
           <!--         关注请求-->
-          <template v-if="people.type === RELATE_ENUM.REQUEST_FOLLOW">
+          <template v-if="computedRelateEnum === RELATE_ENUM.REQUEST_FOLLOW">
             <div class="l-button" @click.stop="$emit('ignore')">忽略</div>
             <div class="l-button red" @click.stop="$emit('agree')">通过</div>
           </template>
@@ -91,19 +91,19 @@
 
       <template v-if="mode === 'recommend'">
         <div class="left">
-          <div class="name">{{ people.name }}</div>
+          <div class="name">{{ people.displayname }}</div>
           <div class="detail">可能认识的人</div>
         </div>
         <div class="right">
-          <template v-if="people.type === RELATE_ENUM.RECOMMEND_NO_REMOVE">
+          <template v-if="computedRelateEnum === RELATE_ENUM.RECOMMEND_NO_REMOVE">
             <div class="l-button red" @click.stop="$emit('follow')">关注</div>
           </template>
-          <template v-if="people.type === RELATE_ENUM.RECOMMEND">
+          <template v-if="computedRelateEnum === RELATE_ENUM.RECOMMEND">
             <div class="l-button" @click.stop="$emit('remove')">移除</div>
             <div class="l-button red" @click.stop="$emit('follow')">关注</div>
           </template>
           <!--   我关注他   -->
-          <template v-if="people.type === RELATE_ENUM.FOLLOW_HE">
+          <template v-if="computedRelateEnum === RELATE_ENUM.FOLLOW_HE">
             <div class="l-button" @click.stop="$emit('unfollow')">已关注</div>
           </template>
         </div>
@@ -111,7 +111,7 @@
 
       <template v-if="mode === 'friend'">
         <div class="left">
-          <div class="name">{{ people.name }}</div>
+          <div class="name">{{ people.displayname }}</div>
           <div class="detail">4小时之内在线</div>
         </div>
         <div class="right">
@@ -126,19 +126,19 @@
 
       <template v-if="mode === 'visitor'">
         <div class="left">
-          <div class="name">{{ people.name }}</div>
+          <div class="name">{{ people.displayname }}</div>
         </div>
         <div class="right">
           <!--   他关注我   -->
-          <template v-if="people.type === RELATE_ENUM.FOLLOW_ME">
+          <template v-if="computedRelateEnum === RELATE_ENUM.FOLLOW_ME">
             <div class="l-button red" @click.stop="$emit('follow')">关注</div>
           </template>
           <!--   我关注他   -->
-          <template v-if="people.type === RELATE_ENUM.FOLLOW_HE">
+          <template v-if="computedRelateEnum === RELATE_ENUM.FOLLOW_HE">
             <div class="l-button" @click.stop="$emit('unfollow')">已关注</div>
           </template>
           <!--          相互关注-->
-          <template v-if="people.type === RELATE_ENUM.FOLLOW_EACH_OTHER">
+          <template v-if="computedRelateEnum === RELATE_ENUM.FOLLOW_EACH_OTHER">
             <div class="l-button" @click.stop="$emit('unfollow')">互相关注</div>
           </template>
         </div>
@@ -146,7 +146,7 @@
     </div>
     <!--   TODO 点了不消失，内容也变了 -->
     <transition name="scale">
-      <div class="popover" v-if="people.type === 4 && showPopover">
+      <div class="popover" v-if="computedRelateEnum === 4 && showPopover">
         <div class="arrow"></div>
         <div class="item">
           <img src="../../../assets/img/icon/feedback-white.png" alt="" />
@@ -160,36 +160,57 @@
     </transition>
   </div>
 </template>
-<script>
-import { _checkImgUrl } from '@/utils'
+<script lang="ts" setup>
+import { ref, defineProps, defineEmits, reactive, computed } from 'vue'
+import { _checkImgUrl, _getavater } from '@/utils'
+import type { UserInfo } from '@/api/gen/userinfo_pb'
+const props = withDefaults(
+  defineProps<{
+    people: UserInfo
+    mode: string
+    searchKey?: string // Mark searchKey as optional
+  }>(),
+  {
+    searchKey: '' // Default value if not provided
+  }
+)
 
-export default {
-  name: 'People',
-  props: {
-    people: {
-      type: Object,
-      default() {
-        return {}
-      }
-    },
-    mode: {
-      type: String,
-      default: 'normal'
-    },
-    searchKey: {
-      type: String,
-      default: ''
-    }
-  },
-  data() {
-    return {
-      showPopover: false
-    }
-  },
-  computed: {},
-  created() {},
-  methods: { _checkImgUrl }
+const emit = defineEmits<{
+  (e: 'follow'): void
+  (e: 'unfollow'): void
+  (e: 'ignore'): void
+  (e: 'agree'): void
+  (e: 'remove'): void
+}>()
+
+const showPopover = ref(false)
+const data = reactive({
+  ptype: 0
+})
+
+const RELATE_ENUM = {
+  STRANGER: 0,
+  FOLLOW_ME: 1,
+  FOLLOW_HE: 2,
+  FOLLOW_EACH_OTHER: 3,
+  REQUEST_FOLLOW: 4,
+  RECOMMEND_NO_REMOVE: 5,
+  RECOMMEND: 6
 }
+
+const computedRelateEnum = computed(() => {
+  if (!props.people) return null
+
+  if (props.people.followStatus && props.people.followerStatus) {
+    return RELATE_ENUM.FOLLOW_EACH_OTHER
+  } else if (props.people.followStatus) {
+    return RELATE_ENUM.FOLLOW_HE
+  } else if (props.people.followerStatus) {
+    return RELATE_ENUM.FOLLOW_ME
+  } else {
+    return RELATE_ENUM.STRANGER
+  }
+})
 </script>
 
 <style scoped lang="less">

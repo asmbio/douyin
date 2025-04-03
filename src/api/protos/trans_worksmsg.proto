@@ -50,20 +50,22 @@ message WorksCommentMsg {
   }
   
 }
-
-  
 enum MEDIA_TYPE {  
   _UNSPECIFIED = 0;
   _LIKE = 1;
-  _DISLIKE = 2;
-  _COMMENT = 3;
+  _DISLIKE = 2;  
+  _FAVORITE = 3;
   _SHARE = 4;
-  _UNLIKE = 5; 
+  _UNLIKE = 21;
+  _UNDISLIKE = 22;
+  _UNFAVORITE = 23;
+  _UNSHARE = 24;
   _IMAGE = 256;
   _AUDIO = 257;
   _TEXT = 258;
   _VIDEO = 259;
-  _VIDEO_MIXED=260;
+  _VIDEO_MIXED = 260;
+  _VIDEO_LONG = 262;
 }
 
   
@@ -86,9 +88,10 @@ message IpfsFile {
     repeated Media_Video Videos = 1;    
     Media_Audio audio =2;    
   }
-  message Media_Video_Mixed{
+  message Media_Video_Mixed{  
     repeated IpfsFile Medias = 1;    
     Media_Audio audio =2;    
+    IpfsFile Poster  = 3;
   }
 
 

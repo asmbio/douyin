@@ -120,7 +120,7 @@
               </div>
             </div>
           </template>
-          <div class="btn-wrapper">
+          <div class="btn-wrapper" @click="createGroupChat">
             <div class="btn primary">发起群聊{{ selectFriends ? `(${selectFriends})` : '' }}</div>
           </div>
         </div>
@@ -265,9 +265,10 @@ defineOptions({
 // }
 // 消息列表
 import { throttle } from 'lodash-es'
-import { getContacts, getNoticeList } from '@/api/moguservice'
+import { createCommunity, getContacts, getNoticeList } from '@/api/moguservice'
 import { CONTACT_TAG } from '@/api/gen/moguervice_pb'
 import { Dftimg } from '@/utils/const_var'
+import type { MetaEx, MetaInfoMsg } from '@/api/gen/trans_pb'
 
 const lastTime = ref<bigint>(0n) // 初始时间戳设为0
 const loading = ref(false)
@@ -390,6 +391,19 @@ watch(
     }
   }
 )
+async function createGroupChat() {
+  const addr = await createCommunity({
+    metaEx: {
+      name: '群聊'
+    } as MetaEx,
+    feesRate: BigInt(0),
+    time: BigInt(Date.now()) * 1_000_000n
+  } as MetaInfoMsg)
+
+  nav('/message/chat', {
+    uid: addr.Value
+  })
+}
 
 function handleClick(item) {
   item.select = !item.select

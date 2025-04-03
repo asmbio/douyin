@@ -113,11 +113,11 @@
                 />
                 <span>一起看视频</span>
               </div>
-              <div class="option" @click.stop="closeShare($emit('dislike'))">
+              <div class="option" @click.stop="closeShare(dislike)">
                 <img class="small" src="../assets/img/icon/components/video/dislike.png" alt="" />
                 <span>不感兴趣</span>
               </div>
-              <div class="option" @click.stop="closeShare($emit('showDouyinCode'))">
+              <div class="option" @click.stop="closeShare(() => (state.showDouyinCode = true))">
                 <Icon icon="tabler:photo" />
                 <span>生成图片</span>
               </div>
@@ -125,13 +125,16 @@
                 <img class="small" src="../assets/img/icon/components/video/bizhi.webp" alt="" />
                 <span>动态壁纸</span>
               </div>
-              <div class="option" @click.stop="closeShare($emit('play-feedback'))">
+              <div class="option" @click.stop="closeShare(() => (state.showPlayFeedback = true))">
                 <img class="small" src="../assets/img/icon/components/video/feedback.webp" alt="" />
                 <span>播放反馈</span>
               </div>
             </template>
             <template v-if="mode === 'music'">
-              <div class="option" @click.stop="closeShare($emit('ShareToFriend'))">
+              <div
+                class="option"
+                @click.stop="closeShare(delayShowDialog(() => (state.shareToFriend = true)))"
+              >
                 <img class="small" src="../assets/img/icon/components/video/tofriend.webp" alt="" />
                 <span>私信朋友</span>
               </div>
@@ -155,17 +158,29 @@
       </div>
     </div>
   </from-bottom-dialog>
+  <PlayFeedback v-model="state.showPlayFeedback" />
+  <ShareToFriend v-model="state.shareToFriend" />
+
+  <DouyinCode :item="state.currentItem" v-model="state.showDouyinCode" />
 </template>
 
 <script setup>
 import FromBottomDialog from './dialog/FromBottomDialog'
 import { useBaseStore } from '@/store/pinia'
 import { _checkImgUrl, _copy, _hideLoading, _no, _notice, _showLoading, _sleep } from '@/utils'
+import PlayFeedback from '@/pages/home/components/PlayFeedback.vue'
+import ShareToFriend from '@/pages/home/components/ShareToFriend.vue'
+import DouyinCode from '@/components/DouyinCode.vue'
+import { reactive } from 'vue'
 
 defineOptions({
   name: 'Share'
 })
-
+const state = reactive({
+  showPlayFeedback: false,
+  shareToFriend: false,
+  showDouyinCode: false
+})
 const props = defineProps({
   modelValue: {
     type: Boolean,
@@ -203,7 +218,7 @@ const props = defineProps({
 })
 
 const store = useBaseStore()
-const emit = defineEmits(['update:item'])
+const emit = defineEmits(['update:modelValue', 'update:item', 'ShareToFriend', 'download'])
 
 async function copyLink() {
   closeShare()
@@ -214,7 +229,15 @@ async function copyLink() {
   //TODO 抖音样式改了
   _notice('复制成功')
 }
+function delayShowDialog(cb) {
+  setTimeout(cb, 400)
+}
 
+function dislike() {
+  // listRef.value.dislike(state.list[1])
+  // state.list[state.index] = state.list[1]
+  // _notice('操作成功，将减少此类视频的推荐')
+}
 function toggleCall(item) {
   item.select = !item.select
 }

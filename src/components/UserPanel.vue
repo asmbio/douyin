@@ -2,16 +2,7 @@
   <div id="UserPanel" @scroll="scroll" @dragstart="(e) => _stopPropagation(e)" ref="page">
     <div ref="float" class="float" :class="state.floatFixed ? 'fixed' : ''">
       <div class="left">
-        <Icon
-          @click="
-            () => {
-              console.log('Back clicked')
-              emit('back')
-            }
-          "
-          class="icon"
-          icon="eva:arrow-ios-back-fill"
-        />
+        <Icon @click.stop="handleBackClick" class="icon" icon="eva:arrow-ios-back-fill" />
         <transition name="fade">
           <div class="float-user" v-if="state.floatFixed">
             <img v-lazy="_getavater(props.currentItem.author)" class="avatar" />
@@ -154,7 +145,7 @@
             :class="props.currentItem.author.followStatus ? 'follow-wrapper-followed' : ''"
           >
             <!--            eslint-disable-next-line vue/no-mutating-props-->
-            <div class="no-follow" @click="props.currentItem.author.followStatus = 1">
+            <div class="no-follow" @click="followButton">
               <img src="@/assets/img/icon/add-white.png" alt="" />
               <span>关注</span>
             </div>
@@ -163,7 +154,10 @@
                 <span>已关注</span>
                 <Icon icon="bxs:down-arrow" class="arrow" />
               </div>
-              <div class="l-button" @click="$nav('/message/chat')">
+              <div
+                class="l-button"
+                @click="$nav('/message/chat', { uid: props.currentItem.author.uid })"
+              >
                 <span>私信</span>
               </div>
             </div>
@@ -249,16 +243,18 @@ import { unixNanoToAge } from '@/utils/date'
 import { metaFollow } from '@/api/moguservice'
 import { MetaFollowMsg_FollowAction } from '@/api/gen/trans_pb'
 import type { VideoList } from '@/api/gen/video_pb'
+import { useRouter } from 'vue-router'
 
 const $nav = useNav()
 const baseStore = useBaseStore()
+const router = useRouter()
 const emit = defineEmits<{
   'update:currentItem': [val: any]
   'update-follow': [val: number]
-  back: []
   showFollowSetting: []
   showFollowSetting2: []
 }>()
+
 // const props = defineProps<{
 // message: string;
 // count: number;
@@ -346,29 +342,29 @@ watch(
 function stop(e) {
   e.stopPropagation()
 }
-
+function handleBackClick() {
+  console.log('handleBackClick router.back()')
+  router.back()
+}
 async function followButton() {
-  if (props.currentItem.author.followStatus) {
-    $nav('/message/chat', { uid: props.currentItem.author.uid })
-  } else {
-    try {
-      await metaFollow(
-        baseStore.userinfo.uid,
-        props.currentItem.author.uid,
-        MetaFollowMsg_FollowAction.FOLLOW
-      )
-      emit('update-follow', 1) // 传递新值
-    } catch (error) {
-      console.log(error)
-    }
+  try {
+    console.log('followButton', props.currentItem.author.uid)
+    await metaFollow(
+      props.currentItem.author.uid,
+      baseStore.userinfo.uid,
+      MetaFollowMsg_FollowAction.FOLLOW
+    )
+    emit('update-follow', 1) // 传递新值
+  } catch (error) {
+    console.log(error)
   }
 }
 
 async function cancelFollow() {
   try {
     await metaFollow(
-      baseStore.userinfo.uid,
       props.currentItem.author.uid,
+      baseStore.userinfo.uid,
       MetaFollowMsg_FollowAction.UNFOLLOW
     )
     emit('update-follow', 0) // 传递新值

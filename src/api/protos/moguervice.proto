@@ -41,6 +41,14 @@ service MoguService {
 
    // blocks
     rpc SignAndPubMsg(MessageBS) returns (google.protobuf.Empty) {}
+
+    // group 
+
+    rpc CreateCommunity(MetaInfoMsg) returns (protos.String) {}
+    // rpc JoinCommunity(protos.String) returns (google.protobuf.Empty) {}    
+    // rpc ExitCommunity(protos.String) returns (google.protobuf.Empty) {}
+    // rpc GetCommunityList(google.protobuf.Empty) returns (Metainfomsglist) {}
+    // rpc GetCommunityMembers(Metainfomsg) returns (Userinfolist) {}
 //   rpc GetFollowingVideos(VideoRequest) returns (VideoListResponse) {}
 //   rpc GetPrivateVideos(VideoRequest) returns (VideoListResponse) {}
 //   rpc GetHistoryVideos(HistoryRequest) returns (VideoListResponse) {}

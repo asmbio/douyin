@@ -122,7 +122,7 @@ export function _time(time) {
 }
 
 export function _getavater(userinfo: UserInfo) {
-  console.log('_getavater', userinfo)
+  //console.log('_getavater', userinfo)
   // console.log(Dftimg.avatar)
   return userinfo?.avatar168x168?.urlList && userinfo?.avatar168x168?.urlList.length > 0
     ? userinfo.avatar168x168.urlList[0]

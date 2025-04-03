@@ -17,38 +17,40 @@ const router = createRouter({
 })
 
 // router.beforeEach((to, from) => {
-//   const baseStore = useBaseStore()
+//   console.log('[路由跳转]', `从 ${from.path} 到 ${to.path}`);
+
+//   //const baseStore = useBaseStore()
 //   // if (!baseStore.islogin&& to.path !=='/login') {
 //   //   baseStore.loadsession()
 //   //   //router.push('/login')
 //   // }
 //   //footer下面的5个按钮，对跳不要用动画
-//   const noAnimation = ['/', '/home', '/me', '/shop', '/message', '/publish', '/home/live', '/test']
-//   if (noAnimation.indexOf(from.path) !== -1 && noAnimation.indexOf(to.path) !== -1) {
-//     return true
-//   }
+//   // const noAnimation = ['/', '/home', '/me', '/shop', '/message', '/publish', '/home/live', '/test']
+//   // if (noAnimation.indexOf(from.path) !== -1 && noAnimation.indexOf(to.path) !== -1) {
+//   //   return true
+//   // }
 
-//   const toDepth = routes.findIndex((v) => v.path === to.path)
-//   const fromDepth = routes.findIndex((v) => v.path === from.path)
-//   // const fromDepth = routeDeep.indexOf(from.path)
-//   //console.log(router.hao)
-//   if (toDepth > fromDepth) {
+//   // const toDepth = routes.findIndex((v) => v.path === to.path)
+//   // const fromDepth = routes.findIndex((v) => v.path === from.path)
+//   // // const fromDepth = routeDeep.indexOf(from.path)
+//   // //console.log(router.hao)
+//   // if (toDepth > fromDepth) {
 
-//     if (to.matched && to.matched.length) {
-//       const toComponentName = to.matched[0].components?.default.name
-//       baseStore.updateExcludeNames({ type: 'remove', value: toComponentName })
-//       // console.log('前进')
-//       // console.log('删除', toComponentName)
-//     }
-//   } else {
-//     if (from.matched && from.matched.length) {
-//       const fromComponentName = from.matched[0].components?.default.name
-//       baseStore.updateExcludeNames({ type: 'add', value: fromComponentName })
+//   //   if (to.matched && to.matched.length) {
+//   //     const toComponentName = to.matched[0].components?.default.name
+//   //     baseStore.updateExcludeNames({ type: 'remove', value: toComponentName })
+//   //     // console.log('前进')
+//   //     // console.log('删除', toComponentName)
+//   //   }
+//   // } else {
+//   //   if (from.matched && from.matched.length) {
+//   //     const fromComponentName = from.matched[0].components?.default.name
+//   //     baseStore.updateExcludeNames({ type: 'add', value: fromComponentName })
 
-//       // console.log('后退')
-//       // console.log('添加', fromComponentName)
-//     }
-//   }
+//   //     // console.log('后退')
+//   //     // console.log('添加', fromComponentName)
+//   //   }
+//   // }
 //   return true
 // })
 

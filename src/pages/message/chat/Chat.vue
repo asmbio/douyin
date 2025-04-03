@@ -4,7 +4,12 @@
       <div class="header">
         <div class="left">
           <dy-back @click="back()"></dy-back>
-          <img :src="_getavater(data.friend)" alt="" style="border-radius: 50%" />
+          <img
+            :src="_getavater(data.friend)"
+            alt=""
+            style="border-radius: 50%"
+            @click.stop="handleUserInfoClick"
+          />
           <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{
             data.friend.displayname
           }}</span>
@@ -19,7 +24,7 @@
           <img
             src="../../../assets/img/icon/menu-white.png"
             alt=""
-            @click="nav('/message/chat/detail')"
+            @click="nav('/message/chat/detail', { uid: data.uid })"
           />
         </div>
       </div>
@@ -33,6 +38,7 @@
         <Loading v-else-if="data.loading" />
         <ChatMessage
           @itemClick="clickItem"
+          @userInfoClick="handleUserInfoClick"
           v-longpress="showTooltip"
           :message="item"
           :key="index"
@@ -224,7 +230,16 @@
 </template>
 <script setup lang="ts">
 import ChatMessage from '../components/ChatMessage.vue'
-import { computed, nextTick, onMounted, onUnmounted, reactive, ref } from 'vue'
+import {
+  computed,
+  nextTick,
+  onActivated,
+  onDeactivated,
+  onMounted,
+  onUnmounted,
+  reactive,
+  ref
+} from 'vue'
 import Loading from '@/components/Loading.vue'
 import { useBaseStore } from '@/store/pinia'
 import { _checkImgUrl, _getavater, _getcover, _no, _sleep } from '@/utils'
@@ -410,7 +425,21 @@ const handleScroll = throttle((e) => {
 //     }
 
 // }
+async function handleUserInfoClick() {
+  // bus.emit(EVENT_KEY.CURRENT_ITEM, {author: data.friend})
+  // bus.emit(EVENT_KEY.GO_USERINFO)
 
+  await nav(
+    '/home/userpanel',
+    {},
+    {
+      currentItem: {
+        author: data.friend,
+        aweme_list: {}
+      }
+    }
+  )
+}
 async function loadmoremessages() {
   console.log('loadmoremessages', data.lasttime, data.hasMoredata, msgWrapper.value.scrollTop)
   if (data.loading || !data.hasMoredata) return
@@ -453,9 +482,8 @@ const handlePopState = () => {
   router.back()
 }
 //const { init } = useChatStream()
-
-onMounted(async () => {
-  console.log('chat onMounted')
+onActivated(async () => {
+  console.log('chat onactivated')
   // 加载message 列表
   try {
     data.uid = route.query.uid as string
@@ -481,12 +509,11 @@ onMounted(async () => {
     .querySelectorAll('img')
     .forEach((item) => item.addEventListener('load', scrollBottom))
   scrollBottom()
-  // 新增键盘事件监听
   window.addEventListener('keydown', handleKeyDown)
   window.addEventListener('popstate', handlePopState)
 })
-
-onBeforeUnmount(() => {
+onDeactivated(() => {
+  console.log('chat ondeactivated')
   if (msgWrapper.value) {
     msgWrapper.value
       .querySelectorAll('img')
@@ -499,6 +526,38 @@ onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleKeyDown)
   window.removeEventListener('popstate', handlePopState)
 })
+onMounted(async () => {
+  console.log('chat onMounted')
+  // // 加载message 列表
+  // try {
+  //   data.uid = route.query.uid as string
+  //   data.friend = store.notifications.find((e) => e.uid === data.uid)
+  //   if (data.friend == null) {
+  //     data.friend = await getUserInfo(data.uid)
+  //     store.addOrUpdateNotification(data.friend)
+  //     console.log('getUserInfo', data.friend)
+  //   }
+  //   store.activeConversasion(data.uid, (msg: cMessage) => {
+  //     data.messages.push(msg)
+  //     nextTick(scrollBottom)
+  //   })
+  //   //data.messages=store.conversasions.get(data.uid).msgList
+
+  //   await loadmoremessages()
+  //   nextTick(scrollBottom)
+  //   // useChatStream()
+  // } catch (error) {
+  //   console.log(error)
+  // }
+  // msgWrapper.value
+  //   .querySelectorAll('img')
+  //   .forEach((item) => item.addEventListener('load', scrollBottom))
+  // scrollBottom()
+
+  // 新增键盘事件监听
+})
+
+onBeforeUnmount(() => {})
 onUnmounted(() => {})
 
 const isExpand = computed(() => {

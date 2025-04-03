@@ -131,18 +131,6 @@
           style="position: absolute"
         />
       </SlideItem>
-      <SlideItem>
-        <UserPanel
-          ref="uploader"
-          v-model:currentItem="state.currentItem"
-          :active="state.baseIndex === 2"
-          @toggleCanMove="(e) => (state.canMove = e)"
-          @back="state.baseIndex = 1"
-          @showFollowSetting="state.showFollowSetting = true"
-          @showFollowSetting2="state.showFollowSetting2 = true"
-          @update-follow="handleUpdateFollow"
-        />
-      </SlideItem>
     </SlideHorizontal>
 
     <Comment
@@ -156,19 +144,11 @@
       v-model="state.isSharing"
       ref="share"
       page-id="home-index"
-      @dislike="dislike"
       :item="state.currentItem"
       :videoId="state.recommendList[state.itemIndex]?.id"
       :canDownload="state.recommendList[state.itemIndex]?.canDownload"
-      @play-feedback="state.showPlayFeedback = true"
-      @shareToFriend="delayShowDialog(() => (state.shareToFriend = true))"
-      @showDouyinCode="state.showDouyinCode = true"
       @download="state.shareType = 9"
     />
-
-    <PlayFeedback v-model="state.showPlayFeedback" />
-
-    <DouyinCode :item="state.currentItem" v-model="state.showDouyinCode" />
 
     <ShareTo
       v-model:type="state.shareType"
@@ -176,32 +156,7 @@
       :canDownload="state.recommendList[state.itemIndex]?.canDownload"
     />
 
-    <FollowSetting
-      v-model:currentItem="state.currentItem"
-      @showChangeNote="delayShowDialog((e) => (state.showChangeNote = true))"
-      @showBlockDialog="delayShowDialog((e) => (state.showBlockDialog = true))"
-      @showShare="delayShowDialog((e) => (state.isSharing = true))"
-      v-model="state.showFollowSetting"
-    />
-
-    <FollowSetting2
-      v-model:currentItem="state.currentItem"
-      @cancelFollow="uploader.cancelFollow()"
-      v-model="state.showFollowSetting2"
-    />
-
-    <BlockDialog
-      v-model="state.showBlockDialog"
-      v-model:blockedUserId="state.currentItem.author.uid"
-    />
-
-    <ConfirmDialog title="设置备注名" ok-text="确认" v-model:visible="state.showChangeNote">
-      <Search mode="light" v-model="state.test" :isShowSearchIcon="false" />
-    </ConfirmDialog>
-
-    <ShareToFriend v-model="state.shareToFriend" />
-
-    <BaseMask v-if="!isMobile" @click="isMobile = true" />
+    <!-- <BaseMask v-if="!isMobile" @click="isMobile = true" />
     <div v-if="!isMobile" class="guide">
       <Icon class="danger" icon="mynaui:danger-triangle" />
       <Icon class="close" icon="simple-line-icons:close" @click="isMobile = true" />
@@ -211,7 +166,7 @@
         <h3>2. 按 Ctrl+Shift+M，或点击下面图标</h3>
       </div>
       <img src="@/assets/img/guide.png" alt="" />
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -221,19 +176,12 @@ import SlideItem from '@/components/slide/SlideItem.vue'
 import Comment from '../../components/Comment.vue'
 import Share from '../../components/Share.vue'
 import IndicatorHome from './components/IndicatorHome.vue'
-import { onActivated, onDeactivated, onMounted, onUnmounted, reactive, ref } from 'vue'
+import { onActivated, onDeactivated, onMounted, onUnmounted, reactive } from 'vue'
 import bus, { EVENT_KEY } from '../../utils/bus'
 import { useNav } from '@/utils/hooks/useNav'
-import PlayFeedback from '@/pages/home/components/PlayFeedback.vue'
+
 import ShareTo from '@/pages/home/components/ShareTo.vue'
-import DouyinCode from '../../components/DouyinCode.vue'
-import FollowSetting from '@/pages/home/components/FollowSetting.vue'
-import BlockDialog from '../message/components/BlockDialog.vue'
-import Search from '../../components/Search.vue'
-import ConfirmDialog from '../../components/dialog/ConfirmDialog.vue'
-import FollowSetting2 from '@/pages/home/components/FollowSetting2.vue'
-import ShareToFriend from '@/pages/home/components/ShareToFriend.vue'
-import UserPanel from '@/components/UserPanel.vue'
+
 import Community from '@/pages/home/slide/Community.vue'
 import Slide0 from '@/pages/home/slide/Slide0.vue'
 import Slide2 from '@/pages/home/slide/Slide2.vue'
@@ -250,8 +198,8 @@ defineOptions({
 })
 const nav = useNav()
 const baseStore = useBaseStore()
-const uploader = ref()
-const isMobile = ref(/Mobi|Android|iPhone/i.test(navigator.userAgent))
+
+//const isMobile = ref(/Mobi|Android|iPhone/i.test(navigator.userAgent))
 
 const state = reactive({
   active: true,
@@ -263,16 +211,15 @@ const state = reactive({
   isSharing: false,
   canMove: true,
   shareType: -1,
-  showPlayFeedback: false,
+
   showShareDuoshan: false,
   showShareDialog: false,
   showShare2WeChatZone: false,
-  showDouyinCode: false,
+
   showFollowSetting: false,
   showFollowSetting2: false,
   showBlockDialog: false,
   showChangeNote: false,
-  shareToFriend: false,
 
   commentVisible: false,
   fullScreen: false,
@@ -294,9 +241,9 @@ function delayShowDialog(cb: Function) {
 }
 
 function setCurrentItem(item) {
-  if (!state.active) return
-  // console.log('sss',item,state.baseIndex)
-  if (state.baseIndex !== 1) return
+  // if (!state.active) return
+  console.log('setCurrentItem', item, state.baseIndex)
+  //if (state.baseIndex !== 1) return
   if (state.currentItem.author?.uid !== item.author?.uid) {
     state.currentItem = {
       ...item,
@@ -338,6 +285,16 @@ onMounted(() => {
   bus.on(EVENT_KEY.GO_USERINFO, () => {
     if (!state.active) return
     state.baseIndex = 2
+    nav(
+      '/home/userpanel',
+      {},
+      {
+        currentItem: {
+          author: state.currentItem.author,
+          aweme_list: state.currentItem.aweme_list
+        }
+      }
+    )
   })
   bus.on(EVENT_KEY.CURRENT_ITEM, setCurrentItem)
   //bus.on(EVENT_KEY.CURRENT_ITEM, setCurrentItem)
@@ -348,25 +305,19 @@ onUnmounted(() => {
 })
 
 onActivated(() => {
-  console.log('index onactivated')
   state.active = true
   bus.emit(EVENT_KEY.TOGGLE_CURRENT_VIDEO)
 })
 
 onDeactivated(() => {
-  console.log('index onDeactivated')
+  console.log('index onDeactivated', baseStore.routeData)
+
   state.active = false
   bus.emit(EVENT_KEY.TOGGLE_CURRENT_VIDEO)
 })
 
 function closeComments() {
   bus.emit(EVENT_KEY.CLOSE_COMMENTS)
-}
-
-function dislike() {
-  // listRef.value.dislike(state.list[1])
-  // state.list[state.index] = state.list[1]
-  // _notice('操作成功，将减少此类视频的推荐')
 }
 </script>
 

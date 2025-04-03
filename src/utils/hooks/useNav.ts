@@ -8,7 +8,7 @@ export function useNav() {
 
   return (path, query = {}, data?: any) => {
     if (data) {
-      store.routeData = cloneDeep(data)
+      store.routeData = data
     }
     router.push({ path, query })
   }

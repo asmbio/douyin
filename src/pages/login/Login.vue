@@ -86,6 +86,7 @@ import { _no } from '@/utils'
 import { useBaseStore } from '@/store/pinia'
 import LoginInput from './components/LoginInput.vue'
 import { getDftAddr, startCore } from '@/api/moguservice'
+import Check from '@/components/Check.vue'
 
 defineOptions({
   name: 'login'

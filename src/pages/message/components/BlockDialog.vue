@@ -40,7 +40,7 @@ const cancel = () => {
 
 const handleConfirmBlock = async () => {
   try {
-    await metaFollow(store.userinfo.uid, props.blockedUserId, MetaFollowMsg_FollowAction.BLACKLIST)
+    await metaFollow(props.blockedUserId, store.userinfo.uid, MetaFollowMsg_FollowAction.BLACKLIST)
   } catch (error) {
     console.error('Error during block action:', error)
   } finally {

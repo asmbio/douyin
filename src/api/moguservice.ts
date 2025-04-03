@@ -20,7 +20,8 @@ import {
   MetaFollowMsg_FollowAction,
   MsgType,
   type MessageBS,
-  type MetaFollowMsg
+  type MetaFollowMsg,
+  type MetaInfoMsg
 } from './gen/trans_pb'
 
 // 创建全局的 transport 和 client 实例（单例模式）
@@ -175,6 +176,9 @@ export async function signAndPubMsg(msgbs: MessageBS) {
   return client.signAndPubMsg(msgbs)
 }
 
+export async function createCommunity(msg: MetaInfoMsg) {
+  return client.createCommunity(msg)
+}
 export async function metaFollow(
   blockedUserId: string,
   currentUserId: string,
@@ -199,6 +203,14 @@ export async function metaFollow(
   } as MessageBS
 
   return signAndPubMsg(messageBS)
+}
+
+export async function joinCommunity(blockedUserId: string, currentUserId: string) {
+  return metaFollow(blockedUserId, currentUserId, MetaFollowMsg_FollowAction.FOLLOW)
+}
+
+export async function exitCommunity(blockedUserId: string, currentUserId: string) {
+  return metaFollow(blockedUserId, currentUserId, MetaFollowMsg_FollowAction.UNFOLLOW)
 }
 
 // // 使用示例
