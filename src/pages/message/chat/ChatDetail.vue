@@ -14,6 +14,21 @@
         </div> -->
       </div>
       <div class="setting">
+        <div v-if="data.friend.isgroup === true">
+          <div class="row" @click="() => (data.showChangeNote = true)">
+            <div class="left">群名称: {{ data.friend.displayname }}</div>
+            <div class="right">
+              <img src="../../../assets/img/icon/components/follow/write.png" alt="" />
+            </div>
+          </div>
+          <div class="row" @click="() => (data.showChangeSignature = true)">
+            <div class="left">简介: {{ data.friend.signature }}</div>
+            <div class="right">
+              <img src="../../../assets/img/icon/components/follow/write.png" alt="" />
+            </div>
+          </div>
+        </div>
+
         <div class="row">
           <div class="left">消息免打扰</div>
           <div class="right">
@@ -47,6 +62,46 @@
       </div>
     </div>
     <BlockDialog v-model="data.blockDialog" v-model:blockedUserId="data.uid" />
+
+    <ConfirmDialog
+      title="名称"
+      ok-text="确认"
+      v-model:visible="data.showChangeNote"
+      @ok="saveUserinfo"
+    >
+      <Search
+        mode="light"
+        :placeholder="data.friend.nickname"
+        :modelValue="data.friend.nickname"
+        :isShowSearchIcon="false"
+        @update:modelValue="
+          (value) => {
+            console.log(data.friend.nickname)
+            data.friend.nickname = value
+            data.friend.displayname = value
+          }
+        "
+      />
+    </ConfirmDialog>
+    <ConfirmDialog
+      title="简介"
+      ok-text="确认"
+      v-model:visible="data.showChangeSignature"
+      @ok="saveUserinfo"
+    >
+      <Search
+        mode="light"
+        :placeholder="data.friend.signature"
+        v-model="data.friend.signature"
+        :isShowSearchIcon="false"
+        @update:modelValue="
+          (value) => {
+            console.log(value)
+            // data.friend.signature = value;
+          }
+        "
+      />
+    </ConfirmDialog>
   </div>
 </template>
 <script setup lang="ts">
@@ -56,10 +111,13 @@ import BlockDialog from '../components/BlockDialog.vue'
 import CONST_VAR from '../../../utils/const_var'
 import { onMounted, reactive } from 'vue'
 import { useNav } from '@/utils/hooks/useNav'
-import { _showConfirmDialog } from '@/utils'
+import { _notice, _showConfirmDialog } from '@/utils'
 import type { UserInfo } from '@/api/gen/userinfo_pb'
 import { useRoute } from 'vue-router'
 import { useBaseStore } from '@/store/pinia'
+import ConfirmDialog from '@/components/dialog/ConfirmDialog.vue'
+import Search from '@/components/Search.vue'
+import { editUserInfo } from '@/api/moguservice'
 
 defineOptions({
   name: 'ChatDetail'
@@ -93,7 +151,9 @@ const data = reactive({
       select: false,
       type: CONST_VAR.RELATE_ENUM.FOLLOW_EACH_OTHER
     }
-  ]
+  ],
+  showChangeNote: false,
+  showChangeSignature: false
 })
 
 onMounted(() => {
@@ -101,6 +161,18 @@ onMounted(() => {
   data.friend = store.notifications.find((e) => e.uid === data.uid)
 })
 
+async function saveUserinfo() {
+  console.log('saveUserinfo')
+
+  try {
+    data.friend.isgroup = true
+    await editUserInfo(data.friend)
+    _notice('保存成功')
+  } catch (error) {
+    _notice(error)
+    console.log(error)
+  }
+}
 function follow(index) {
   if (data.list[index].type === CONST_VAR.RELATE_ENUM.FOLLOW_ME) {
     data.list[index].type = CONST_VAR.RELATE_ENUM.FOLLOW_EACH_OTHER

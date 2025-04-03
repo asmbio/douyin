@@ -29,59 +29,54 @@
   </div>
 </template>
 
-<script>
-//TODO 背景颜色不对
-export default {
-  name: 'Search',
-  props: {
-    placeholder: {
-      type: String,
-      default: '搜索'
-    },
-    modelValue: {
-      type: String,
-      default: ''
-    },
-    rightTextColor: {
-      type: String,
-      default: 'red'
-    },
-    isShowRightText: {
-      type: Boolean,
-      default: false
-    },
-    isShowSearchIcon: {
-      type: Boolean,
-      default: true
-    },
-    rightText: {
-      type: String,
-      default: '搜索'
-    },
-    mode: {
-      type: String,
-      default: 'dark'
-    }
+<script setup>
+import { computed } from 'vue'
+
+const props = defineProps({
+  placeholder: {
+    type: String,
+    default: '搜索'
   },
-  methods: {
-    clear() {
-      this.value = ''
-    }
+  modelValue: {
+    type: String,
+    default: ''
   },
-  mounted() {},
-  computed: {
-    value: {
-      get() {
-        return this.modelValue
-      },
-      set(val) {
-        this.$emit('update:modelValue', val)
-        if (!val) {
-          this.$emit('clear')
-        }
-      }
+  rightTextColor: {
+    type: String,
+    default: 'red'
+  },
+  isShowRightText: {
+    type: Boolean,
+    default: false
+  },
+  isShowSearchIcon: {
+    type: Boolean,
+    default: true
+  },
+  rightText: {
+    type: String,
+    default: '搜索'
+  },
+  mode: {
+    type: String,
+    default: 'dark'
+  }
+})
+
+const emit = defineEmits(['update:modelValue', 'clear', 'notice'])
+
+const value = computed({
+  get: () => props.modelValue,
+  set: (val) => {
+    emit('update:modelValue', val)
+    if (!val) {
+      emit('clear')
     }
   }
+})
+
+const clear = () => {
+  value.value = ''
 }
 </script>
 

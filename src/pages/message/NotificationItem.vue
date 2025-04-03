@@ -1,5 +1,13 @@
 <template>
-  <div class="message" @click="handleClick">
+  <div
+    class="message"
+    @touchstart.prevent="handleTouchStart"
+    @touchend.prevent="handleTouchEnd"
+    @touchcancel="cancelPress"
+    @mousedown="handleTouchStart"
+    @mouseleave="cancelPress"
+    @mouseup="handleTouchEnd"
+  >
     <div class="avatar" :class="{ 'on-line': data.isConnect }">
       <img
         :src="getImgSrcByMessageId(data.uid) || data.avatar168x168?.urlList[0] || Dftimg.avatar"
@@ -36,13 +44,58 @@ import { useRouter } from 'vue-router'
 import { unixNanoToYYYYMMDD } from '@/utils/date'
 import { setRead } from '@/api/moguservice'
 import { Dftimg } from '@/utils/const_var'
-
+import { _showSelectDialog } from '@/utils'
+import { useBaseStore } from '@/store/pinia'
+const messageActionList = [
+  { id: 99, name: '其他操作' },
+  { id: 1, name: '删除' }
+]
 const router = useRouter()
-
+const store = useBaseStore()
 const props = defineProps({
   data: Object as () => UserInfo
 })
+let timer = null
 
+function handleTouchStart() {
+  // 清除之前的定时器
+  if (timer) clearTimeout(timer)
+  // 设置新的定时器
+  timer = setTimeout(() => {
+    // 执行长按后的逻辑
+    console.log('长按事件被触发')
+    // 清除定时器
+    timer = null
+    handleLongPress()
+  }, 600) // 600毫秒后触发长按事件
+}
+function handleTouchEnd() {
+  // 如果定时器还存在，说明触摸时间不足以触发长按事件
+  if (timer) {
+    clearTimeout(timer)
+    timer = null
+    // 执行单击事件的逻辑
+    console.log('单击事件被触发')
+    handleClick()
+  }
+}
+
+const cancelPress = () => {
+  clearTimeout(timer)
+  timer = null
+}
+
+function handleLongPress() {
+  _showSelectDialog(messageActionList, (e) => {
+    switch (e.id) {
+      case 1:
+        store.removeNotification(props.data.uid)
+        break
+      case 99:
+        break
+    }
+  })
+}
 const handleClick = () => {
   let rt = getRouteByMessageId(props.data.uid) || '/message/chat'
   // props.data.unread=0

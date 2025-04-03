@@ -1,9 +1,15 @@
 import { defineStore } from 'pinia'
 import { _sleep } from '@/utils'
 import { type AvatarImage, type UserInfo, type Userinfolist } from '@/api/gen/userinfo_pb'
-import { getChatStream, getContacts, getPanel, myVideo } from '@/api/moguservice'
+import {
+  deleteConversation,
+  getChatStream,
+  getContacts,
+  getPanel,
+  myVideo
+} from '@/api/moguservice'
 import { CONTACT_TAG } from '@/api/gen/moguervice_pb'
-import type { Video } from '@/api/gen/video_pb'
+
 import { MessagelistSchema, type ChatMessage, type Messagelist } from '@/api/gen/message_pb'
 import { create } from '@bufbuild/protobuf'
 //let user: UserInfo
@@ -21,7 +27,7 @@ export const useBaseStore = defineStore('base', {
       maskDialogMode: 'dark',
       version: '17.1.0',
       excludeNames: [],
-      includeNames: ['Home', 'Shop', 'Publish', 'Me', 'Message', 'UserPanelPage', 'Chat'],
+      includeNames: ['Home', 'Shop', 'Publish', 'Me', 'Message', 'UserPanelPage'],
       judgeValue: 20,
       homeRefresh: 60,
       loading: false,
@@ -195,6 +201,17 @@ export const useBaseStore = defineStore('base', {
         }
       } catch (error) {
         console.log(error)
+      }
+    },
+    removeNotification(uid: string) {
+      const index = this.notifications.findIndex((n) => n.uid === uid)
+      if (index > -1) {
+        this.notifications.splice(index, 1)
+        try {
+          deleteConversation(uid)
+        } catch (error) {
+          console.log(error)
+        }
       }
     },
     addOrUpdateNotification(payload: UserInfo) {

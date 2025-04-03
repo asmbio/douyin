@@ -274,87 +274,7 @@ const data = reactive({
   previewImg: new URL('../../../assets/img/poster/3.jpg', import.meta.url).href,
   videoCall: [],
   MESSAGE_TYPE,
-  messages: [
-    // {
-    //   type: MESSAGE_TYPE.TIME,
-    //   time: BigInt(Date.UTC(2021, 1, 2, 21, 21)) * 1_000_000n,
-    //   user: {
-    //     id: '2739632844317827',
-    //     avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
-    //   },
-    //   content: {
-    //     case: 'timeContent',
-    //     value: {} // TimeContent 是空消息
-    //   }
-    // },
-    // {
-    //   type: MESSAGE_TYPE.MEME,
-    //   time: BigInt(Date.UTC(2021, 1, 2, 21, 21)) * 1_000_000n,
-    //   user: {
-    //     id: '2739632844317827',
-    //     avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
-    //   },
-    //   content: {
-    //     case: 'memeContent',
-    //     value: {
-    //       imageurl: new URL('../../../assets/img/poster/1.jpg', import.meta.url).href,
-    //       state: AUDIO_STATE.AUDIO_NORMAL,
-    //       loved: [
-    //         { id: '2', avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png' },
-    //         { id: '2', avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png' }
-    //       ]
-    //     }
-    //   }
-    // },
-    // {
-    //   type: MESSAGE_TYPE.IMAGE,
-    //   time: BigInt(Date.UTC(2021, 1, 2, 21, 21)) * 1_000_000n,
-    //   user: {
-    //     id: '1',
-    //     avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
-    //   },
-    //   content: {
-    //     case: 'imageContent',
-    //     value: {
-    //       imageurl: new URL('../../../assets/img/poster/1.jpg', import.meta.url).href,
-    //       state: AUDIO_STATE.AUDIO_NORMAL
-    //     }
-    //   }
-    // },
-    // // 其他消息类型类似处理...
-    // {
-    //   type: MESSAGE_TYPE.TEXT,
-    //   time: BigInt(Date.UTC(2021, 1, 2, 21, 21)) * 1_000_000n,
-    //   user: {
-    //     id: '2739632844317827',
-    //     avatar: 'http://localhost:3000/src/assets/img/icon/avatar/2.png'
-    //   },
-    //   content: {
-    //     case: 'textContent',
-    //     value: {
-    //       text: '我昨天@你那个视频发给我下'
-    //     }
-    //   }
-    // },
-    // // 红包消息示例
-    // {
-    //   type: MESSAGE_TYPE.RED_PACKET,
-    //   time: BigInt(Date.UTC(2021, 1, 2, 21, 21)) * 1_000_000n,
-    //   user: {
-    //     id: '2739632844317827',
-    //     avatar: new URL('../../../assets/img/icon/avatar/2.png', import.meta.url).href
-    //   },
-    //   content: {
-    //     case: 'redPacketContent',
-    //     value: {
-    //       mode: RED_PACKET_MODE.RED_PACKET_MULTIPLE,
-    //       money: 5.11,
-    //       title: '大吉大利',
-    //       state: '未领取'
-    //     }
-    //   }
-    // }
-  ] as cMessage[],
+  messages: [] as cMessage[],
   typing: false,
   loading: false,
   opening: false,
@@ -485,6 +405,9 @@ const handlePopState = () => {
 onActivated(async () => {
   console.log('chat onactivated')
   // 加载message 列表
+})
+onMounted(async () => {
+  console.log('chat onMounted')
   try {
     data.uid = route.query.uid as string
     data.friend = store.notifications.find((e) => e.uid === data.uid)
@@ -514,6 +437,9 @@ onActivated(async () => {
 })
 onDeactivated(() => {
   console.log('chat ondeactivated')
+})
+
+onBeforeUnmount(() => {
   if (msgWrapper.value) {
     msgWrapper.value
       .querySelectorAll('img')
@@ -526,38 +452,6 @@ onDeactivated(() => {
   window.removeEventListener('keydown', handleKeyDown)
   window.removeEventListener('popstate', handlePopState)
 })
-onMounted(async () => {
-  console.log('chat onMounted')
-  // // 加载message 列表
-  // try {
-  //   data.uid = route.query.uid as string
-  //   data.friend = store.notifications.find((e) => e.uid === data.uid)
-  //   if (data.friend == null) {
-  //     data.friend = await getUserInfo(data.uid)
-  //     store.addOrUpdateNotification(data.friend)
-  //     console.log('getUserInfo', data.friend)
-  //   }
-  //   store.activeConversasion(data.uid, (msg: cMessage) => {
-  //     data.messages.push(msg)
-  //     nextTick(scrollBottom)
-  //   })
-  //   //data.messages=store.conversasions.get(data.uid).msgList
-
-  //   await loadmoremessages()
-  //   nextTick(scrollBottom)
-  //   // useChatStream()
-  // } catch (error) {
-  //   console.log(error)
-  // }
-  // msgWrapper.value
-  //   .querySelectorAll('img')
-  //   .forEach((item) => item.addEventListener('load', scrollBottom))
-  // scrollBottom()
-
-  // 新增键盘事件监听
-})
-
-onBeforeUnmount(() => {})
 onUnmounted(() => {})
 
 const isExpand = computed(() => {
@@ -724,17 +618,22 @@ async function handleSend() {
     data.keyboardHeight = 0
   })
 }
-async function sendMsg(cmsg: cMessage) {
-  try {
-    // 添加到消息列表
-    data.messages.push(cmsg)
-    const state = await sendMessage(cmsg)
 
-    cmsg.state = state.status
-    // nextTick(() => scrollBottom()) // 再次确保界面更新后滚动到底部
+async function sendMsg(cmsg: cMessage) {
+  const reactiveMsg = reactive({ ...cmsg })
+  try {
+    // 将消息对象转为响应式后再添加到数组
+
+    data.messages.push(reactiveMsg)
+
+    const state = await sendMessage(cmsg)
+    reactiveMsg.state = state.status // 响应式更新
+
+    // 确保在 DOM 更新后滚动
+    // nextTick(() => scrollBottom());
   } catch (error) {
     console.log(error)
-    cmsg.state = STATUS.FAILED
+    reactiveMsg.state = STATUS.FAILED // 响应式更新失败状态
   }
 }
 function handleClick() {

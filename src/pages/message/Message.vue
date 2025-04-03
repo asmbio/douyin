@@ -241,12 +241,11 @@ import People from '../people/components/Peoples.vue'
 import Scroll from '../../components/Scroll.vue'
 import { useBaseStore } from '@/store/pinia'
 
-import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useNav } from '@/utils/hooks/useNav.js'
-import { _checkImgUrl, _notice, _sleep, cloneDeep } from '@/utils'
+import { _notice, _sleep, cloneDeep } from '@/utils'
 import { useScroll } from '@/utils/hooks/useScroll'
 import NotificationItem from './NotificationItem.vue'
-import { type AvatarImage, type UserInfo } from '@/api/gen/userinfo_pb'
 
 defineOptions({
   name: 'Message'
