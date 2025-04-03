@@ -43,7 +43,6 @@
         >
           <template v-if="isMe">
             <div class="duration">{{ formattedDuration }}</div>
-
             <img
               src="../../../assets/img/icon/message/chat/rss2.png"
               alt="Audio"
@@ -126,6 +125,12 @@
             class="love-avatar"
           />
         </div>
+        <div class="loves" v-if="message.state === STATUS.FAILED">
+          <img src="../../../assets/img/icon/message/chat/fasongshibai.png" alt="" />
+        </div>
+        <div class="loves" v-if="message.state === STATUS.GOING">
+          <img src="../../../assets/img/icon/message/chat/fasongzhong.png" alt="" />
+        </div>
       </div>
       <img v-if="isMe" :src="message.user.avatar || Dftimg.avatar" alt="" class="avatar" />
     </template>
@@ -135,7 +140,7 @@
 <script>
 import { mapState } from 'pinia'
 import { useBaseStore } from '@/store/pinia'
-import { CALL_STATE, MESSAGE_TYPE, RED_PACKET_MODE } from '@/api/gen/message_pb'
+import { CALL_STATE, MESSAGE_TYPE, RED_PACKET_MODE, STATUS } from '@/api/gen/message_pb'
 import { unixNanoToYYYYMMDD } from '@/utils/date'
 import { Dftimg } from '@/utils/const_var'
 
@@ -155,6 +160,7 @@ export default {
       currentDuration: 0,
       MESSAGE_TYPE,
       CALL_STATE,
+      STATUS,
       RED_PACKET_MODE,
       Dftimg: Dftimg
     }

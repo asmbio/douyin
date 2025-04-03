@@ -729,7 +729,9 @@ async function sendMsg(cmsg: cMessage) {
     // 添加到消息列表
     data.messages.push(cmsg)
     const state = await sendMessage(cmsg)
+
     cmsg.state = state.status
+    // nextTick(() => scrollBottom()) // 再次确保界面更新后滚动到底部
   } catch (error) {
     console.log(error)
     cmsg.state = STATUS.FAILED
