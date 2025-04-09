@@ -21,7 +21,7 @@
             <img src="../../../assets/img/icon/live.webp" class="tab2-img" />
           </div>
           <div class="tab" :class="{ active: index === 3 }" @click.stop="change(3)">
-            <span>经验</span>
+            <span>发现</span>
           </div>
           <div class="tab" :class="{ active: index === 4 }" @click.stop="change(4)">
             <span>推荐</span>

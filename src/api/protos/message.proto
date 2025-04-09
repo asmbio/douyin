@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package protos;
 
+import "userinfo.proto";
+import "video.proto";
 option go_package = "douyinapi/protos/out";
 
 enum MESSAGE_TYPE {
@@ -15,6 +17,10 @@ enum MESSAGE_TYPE {
   DOUYIN_VIDEO = 7;
   VIDEO = 8;
   RED_PACKET = 9;
+  BUSINESS_CARD = 10;
+  GROUP_CARD = 11;
+  VIDEO_CARD = 12;
+  
 }
 
 enum AUDIO_STATE {
@@ -89,6 +95,14 @@ message DouyinVideoContent {
   
 }
 
+message BusinessCartContent {  
+  UserInfo userCart = 1;
+}
+
+message VideoCardContent {
+  Video video = 1;    
+}
+
 message VideoContent {
   string poster = 1;
   VIDEO_STATE state = 2;
@@ -127,10 +141,12 @@ message ChatMessage {
     DouyinVideoContent douyin_video_content = 11;
     VideoContent video_content = 12;
     RedPacketContent red_packet_content = 13;
+    BusinessCartContent business_cart_content = 14;
+    VideoCardContent video_card_content = 15;
   }
-  STATUS state = 14;
+  STATUS state = 16;
   //string text_content0 = 15;
-  string Receiver = 15;
+  string Receiver = 17;
 }
 
 

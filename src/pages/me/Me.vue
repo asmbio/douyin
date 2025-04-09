@@ -78,19 +78,19 @@
               <div class="head">
                 <div class="heat">
                   <div class="text" @click="isShowStarCount = true">
-                    <span class="num">{{ _formatNumber(userinfo?.aweme_count) }}</span>
+                    <span class="num">{{ _formatNumber(userinfo?.awemeCount) }}</span>
                     <span>获赞</span>
                   </div>
                   <div class="text" @click="$nav('/people/follow-and-fans', { type: 0 })">
-                    <span class="num">{{ _formatNumber(userinfo?.following_count) }}</span>
+                    <span class="num">{{ _formatNumber(userinfo?.friendsCount) }}</span>
                     <span>朋友</span>
                   </div>
                   <div class="text" @click="$nav('/people/follow-and-fans', { type: 0 })">
-                    <span class="num">{{ _formatNumber(userinfo?.following_count) }}</span>
+                    <span class="num">{{ _formatNumber(userinfo?.followingCount) }}</span>
                     <span>关注</span>
                   </div>
                   <div class="text" @click="$nav('/people/follow-and-fans', { type: 1 })">
-                    <span class="num">{{ _formatNumber(userinfo?.follower_count) }}</span>
+                    <span class="num">{{ _formatNumber(userinfo?.followerCount) }}</span>
                     <span>粉丝</span>
                   </div>
                 </div>
@@ -131,7 +131,7 @@
                   <Icon icon="iconamoon:music-2-light" />
                   <span>我的音乐</span>
                 </div>
-                <div class="item" @click="_no">
+                <div class="item" @click="$nav('/me/my-group-chat')">
                   <Icon icon="streamline:chat-two-bubbles-oval" />
                   <span>我的群聊</span>
                 </div>

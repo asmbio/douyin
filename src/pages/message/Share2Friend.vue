@@ -4,14 +4,25 @@
       <template v-slot:center>
         <span class="f16">私信给</span>
       </template>
+      <template v-slot:right>
+        <div>
+          <span
+            class="f16"
+            :class="data.selectFriends.length ? 'save-yes' : 'save-no'"
+            @click="save"
+          >
+            完成{{ data.selectFriends.length ? `(${data.selectFriends.length})` : '' }}
+          </span>
+        </div>
+      </template>
       <template v-slot:bottom>
         <div class="search">
-          <div class="search-select-friends" v-if="data.selectFriends.length">
+          <div class="search-select-friends" v-if="store.friends.all.length">
             <div class="wrapper">
               <img
-                :src="_checkImgUrl(item.avatar)"
+                :src="_getavater(item)"
                 :key="i"
-                v-for="(item, i) in data.selectFriends"
+                v-for="(item, i) in store.friends.all"
                 @click="toggleSelect(item)"
               />
             </div>
@@ -94,19 +105,19 @@
           @click="toggleSelect(item)"
         >
           <Check mode="red" v-model="item.select" />
-          <img :src="_checkImgUrl(item.avatar)" alt="" />
-          <span>{{ item.name }}</span>
+          <img :src="_getavater(item)" alt="" />
+          <span>{{ item.displayname }}</span>
         </div>
         <div class="title">互关好友</div>
         <div
           class="local-row"
           :key="i"
-          v-for="(item, i) of data.friends.eachOther"
+          v-for="(item, i) of store.friends.all"
           @click="toggleSelect(item)"
         >
           <Check mode="red" v-model="item.select" />
-          <img :src="_checkImgUrl(item.avatar)" alt="" />
-          <span>{{ item.name }}</span>
+          <img :src="_getavater(item)" alt="" />
+          <span>{{ item.displayname }}</span>
         </div>
         <div class="title">全部</div>
         <div :key="name" v-for="(value, name) of data.friendsSort">
@@ -115,8 +126,8 @@
           </div>
           <div class="local-row" :key="i" v-for="(item, i) of value" @click="toggleSelect(item)">
             <Check mode="red" v-model="item.select" />
-            <img :src="_checkImgUrl(item.avatar)" alt="" />
-            <span>{{ item.name }}</span>
+            <img :src="_getavater(item)" alt="" />
+            <span>{{ item.displayname }}</span>
           </div>
         </div>
       </div>
@@ -183,13 +194,18 @@ import Check from '../../components/Check.vue'
 import { friends } from '@/api/user'
 import { onMounted, reactive, ref, watch } from 'vue'
 import { useNav } from '@/utils/hooks/useNav'
-import { _checkImgUrl, cloneDeep } from '@/utils'
+import { _checkImgUrl, _getavater } from '@/utils'
 
+import { debounce } from 'lodash-es'
+import { useBaseStore, idMappings } from '@/store/pinia'
+import type { UserInfo } from '@/api/gen/userinfo_pb'
+import { useRouter } from 'vue-router'
 defineOptions({
   name: 'Share2Friend'
 })
-
+const store = useBaseStore()
 const nav = useNav()
+const router = useRouter()
 const data = reactive({
   isCreateChat: false,
   searchKey: '',
@@ -197,25 +213,39 @@ const data = reactive({
   currentFixedIndicator: '',
   currentFixedIndicatorTop: '0px',
   friends: {
-    all: {},
-    recent: [],
-    eachOther: []
+    recent: [] as UserInfo[]
   },
-  selectFriends: [],
-  friendsSort: {},
+  selectFriends: [] as UserInfo[],
+  friendsSort: {} as Record<string, UserInfo[]>,
   searchResult: []
 })
 
+// 防抖处理滚动事件
+const handleScroll = debounce(() => {
+  const scrollContainer = document.documentElement || document.body
+  const { scrollTop, scrollHeight, clientHeight } = scrollContainer
+
+  // 滚动到底部 100px 时触发加载（可根据需要调整阈值）
+  const reachBottom = scrollTop + clientHeight >= scrollHeight - 100
+
+  if (reachBottom && !store.loading && store.hasMorefriends) {
+    store.loadMoreFriends()
+  }
+}, 200)
+
 onMounted(() => {
-  getFriends()
+  data.friends.recent = store.notifications
+    .filter((notification) => !idMappings.has(notification.uid))
+    .slice(0, 20)
+
   let indexs = document.querySelectorAll('.index')
   indexs.forEach((v) => {
-    data.indexOffsetTop[v.children[0].innerText] = v.offsetTop
+    data.indexOffsetTop[(v.children[0] as HTMLElement).innerText] = (v as HTMLElement).offsetTop
   })
-  let items = document.querySelectorAll('.item')
+  let items = document.querySelectorAll('.item') as NodeListOf<HTMLElement>
   let item = document.querySelector(`.item:nth-child(2)`)
   let itemHeight = item.clientHeight
-  let ul = document.querySelector('.indicator')
+  let ul = document.querySelector('.indicator') as HTMLElement
   let ulOffsetTop = ul.offsetTop
   let resetColor = 'rgb(143, 143, 158)'
   ul.addEventListener('touchstart', (e) => {
@@ -240,7 +270,7 @@ onMounted(() => {
   })
   let render = (currentIndex) => {
     items.forEach((el) => {
-      el.style.color = resetColor
+      ;(el as HTMLElement).style.color = resetColor
     })
     items[currentIndex].style.color = '#fff'
     data.currentFixedIndicator = items[currentIndex].innerText
@@ -251,15 +281,20 @@ onMounted(() => {
 watch(
   () => data.searchKey,
   (newVal) => {
-    let temp = cloneDeep(data.friends.all)
-    temp.map((v) => {
-      if (data.selectFriends.find((w) => w.id === v.id)) v.select = true
+    store.friends.all.map((v) => {
+      if (data.selectFriends.find((w) => w.uid === v.uid)) v.select = true
     })
-    data.searchResult = temp.filter((v) => {
-      return v.name.includes(newVal) || v.account.includes(newVal)
+    data.searchResult = store.friends.all.filter((v) => {
+      return v.displayname.includes(newVal) || v.nickname.includes(newVal)
     })
   }
 )
+async function save() {
+  if (!data.selectFriends.length) return
+
+  //TODO 这里需要发送私信
+  //await sendMessage
+}
 
 function handleClick(item) {
   toggleSelect(item)
@@ -271,19 +306,19 @@ function clear() {
   data.searchKey = ''
 }
 
-function toggleSelect(item) {
+function toggleSelect(item: UserInfo) {
   //减少判断次数，找到了就跳出循环
   for (let i = 0; i < data.friends.recent.length; i++) {
     let v = data.friends.recent[i]
-    if (v.name === item.name) {
+    if (v.displayname === item.displayname) {
       v.select = !v.select
       break
     }
   }
 
-  for (let i = 0; i < data.friends.eachOther.length; i++) {
-    let v = data.friends.eachOther[i]
-    if (v.name === item.name) {
+  for (let i = 0; i < store.friends.all.length; i++) {
+    let v = store.friends.all[i]
+    if (v.displayname === item.displayname) {
       v.select = !v.select
       break
     }
@@ -295,7 +330,7 @@ function toggleSelect(item) {
     let k = keys[i]
     for (let j = 0; j < data.friendsSort[k].length; j++) {
       let value = data.friendsSort[k][j]
-      if (value.name === item.name) {
+      if (value.displayname === item.displayname) {
         value.select = !value.select
         find = true
         break
@@ -304,7 +339,7 @@ function toggleSelect(item) {
     if (find) break
   }
 
-  let resIndex = data.selectFriends.findIndex((v) => v.name === item.name)
+  let resIndex = data.selectFriends.findIndex((v) => v.displayname === item.displayname)
   if (resIndex !== -1) {
     item.select = false
     data.selectFriends.splice(resIndex, 1)
@@ -316,23 +351,14 @@ function toggleSelect(item) {
 
 async function getFriends() {
   //TODO 这里的数据不对
-  let res = await friends()
-  console.log('getFriends', res)
-  if (res.success) {
-    data.friends = res.data
-    data.friends.all = data.friends.all.sort((a, b) => {
-      if (a.pinyin < b.pinyin) return -1
-      if (a.pinyin > b.pinyin) return 1
-      return 0
-    })
-    data.friends.all.map((v) => {
-      if (data.friendsSort[v.pinyin]) {
-        data.friendsSort[v.pinyin].push(v)
-      } else {
-        data.friendsSort[v.pinyin] = [v]
-      }
-    })
-  }
+
+  store.friends.all.map((v) => {
+    if (data.friendsSort[v.displaynamePy]) {
+      data.friendsSort[v.displaynamePy].push(v)
+    } else {
+      data.friendsSort[v.displaynamePy] = [v]
+    }
+  })
 }
 
 const list = ref()
@@ -345,7 +371,10 @@ function goto(el) {
     py = el.innerText
   }
   if (document.querySelector(`.${py}`)) {
-    list.value.scrollTop = document.querySelector(`.${py}`).offsetTop - 100
+    const targetElement = document.querySelector(`.${py}`) as HTMLElement
+    if (targetElement) {
+      list.value.scrollTop = targetElement.offsetTop - 100
+    }
   }
 }
 
@@ -381,7 +410,13 @@ function scroll(e) {
   overflow: auto;
   color: white;
   font-size: 14rem;
+  .save-yes {
+    color: var(--primary-btn-color);
+  }
 
+  .save-no {
+    color: var(--disable-primary-btn-color);
+  }
   .search {
     border-bottom: 1px solid #cccccc11;
     font-size: 14rem;

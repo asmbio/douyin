@@ -191,7 +191,7 @@ import LongVideo from '@/pages/home/slide/LongVideo.vue'
 import { useBaseStore } from '@/store/pinia'
 import BaseMask from '@/components/BaseMask.vue'
 import type { UserInfo } from '@/api/gen/userinfo_pb'
-import type { VideoList } from '@/api/gen/video_pb'
+import type { VideoInfo, VideoList, Video as pVideo } from '@/api/gen/video_pb'
 
 defineOptions({
   name: 'Home'
@@ -223,12 +223,8 @@ const state = reactive({
 
   commentVisible: false,
   fullScreen: false,
-  currentItem: {
-    awemeId: '',
-    author: {} as UserInfo,
-    isRequest: false,
-    aweme_list: {} as VideoList
-  }
+  currentItem: {} as pVideo,
+  aweme_list: {} as VideoList
 })
 function handleUpdateFollow(newStatus) {
   // 直接修改父组件的数据（假设 currentItem 是父组件的响应式对象）
@@ -246,9 +242,7 @@ function setCurrentItem(item) {
   //if (state.baseIndex !== 1) return
   if (state.currentItem.author?.uid !== item.author?.uid) {
     state.currentItem = {
-      ...item,
-      isRequest: false,
-      aweme_list: {}
+      ...item
     }
   }
   // console.log('item', item)
@@ -291,13 +285,12 @@ onMounted(() => {
       {
         currentItem: {
           author: state.currentItem.author,
-          aweme_list: state.currentItem.aweme_list
+          aweme_list: state.aweme_list
         }
       }
     )
   })
   bus.on(EVENT_KEY.CURRENT_ITEM, setCurrentItem)
-  //bus.on(EVENT_KEY.CURRENT_ITEM, setCurrentItem)
 })
 
 onUnmounted(() => {

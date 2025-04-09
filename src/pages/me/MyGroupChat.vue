@@ -2,18 +2,10 @@
   <div class="Share2Friend">
     <BaseHeader backMode="light" backImg="back" style="z-index: 7">
       <template v-slot:center>
-        <span class="f16">已加入的群聊</span>
+        <span class="f16">我的群聊</span>
       </template>
       <template v-slot:right>
-        <div>
-          <span
-            class="f16"
-            :class="data.selectFriends.length ? 'save-yes' : 'save-no'"
-            @click="save"
-          >
-            完成{{ data.selectFriends.length ? `(${data.selectFriends.length})` : '' }}
-          </span>
-        </div>
+        <div></div>
       </template>
     </BaseHeader>
     <div class="content">
@@ -22,9 +14,8 @@
           class="local-row"
           :key="i"
           v-for="(item, i) of data.friends.all"
-          @click="toggleSelect(item)"
+          @click="nav('/message/chat', { uid: item.uid })"
         >
-          <Check mode="red" v-model="item.select" />
           <img :src="_getavater(item)" alt="" />
           <div class="desc">
             <span class="name">{{
@@ -41,18 +32,18 @@
   </div>
 </template>
 <script setup lang="ts">
-import Check from '../../components/Check.vue'
 import { onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { _getavater } from '@/utils'
 import type { Userinfolist } from '@/api/gen/userinfo_pb'
 import { getContacts } from '@/api/moguservice'
 import { CONTACT_TAG } from '@/api/gen/moguervice_pb'
+import { useNav } from '@/utils/hooks/useNav'
 
 defineOptions({
-  name: 'JoinedGroupChat'
+  name: 'MyGroupChat'
 })
-
+const nav = useNav()
 const router = useRouter()
 const data = reactive({
   friends: {} as Userinfolist,
@@ -70,20 +61,9 @@ function save() {
   router.back()
 }
 
-function toggleSelect(item) {
-  let resIndex = data.selectFriends.findIndex((v) => v.name === item.name)
-  if (resIndex !== -1) {
-    item.select = false
-    data.selectFriends.splice(resIndex, 1)
-  } else {
-    item.select = true
-    data.selectFriends.push(item)
-  }
-}
-
 async function getFriends() {
   try {
-    let res = await getContacts('', 100, CONTACT_TAG.GROUP)
+    let res = await getContacts('', 100, CONTACT_TAG.MYGROUP)
     data.friends = res
   } catch (error) {
     console.log(error)

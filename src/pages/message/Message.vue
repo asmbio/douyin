@@ -314,7 +314,7 @@ const handleScroll = throttle(() => {
 async function loadstranger() {
   try {
     let res = await getContacts('', 100, CONTACT_TAG.STRANGER)
-    console.log(res)
+    console.log('loadstranger', res)
     store.stranger.push(...res.all)
   } catch (error) {
     console.log(error)
@@ -352,7 +352,7 @@ onMounted(async () => {
       store.notifications.unshift(...notices.all)
     }
 
-    await loadstranger()
+    //await loadstranger()
     data.recommend = cloneDeep(store.friends.all)
     data.recommend.map((v) => {
       v.type = -2

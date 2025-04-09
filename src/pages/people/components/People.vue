@@ -1,7 +1,12 @@
 <template>
   <div class="People">
-    <img :src="_getavater(people)" alt="" class="head-image pull-left" />
-    <div class="content">
+    <img
+      :src="_getavater(people)"
+      alt=""
+      class="head-image pull-left"
+      @click="nav('/home/userpanel', {}, { currentItem: { author: people, aweme_list: {} } })"
+    />
+    <div class="content" @click="canchat && nav('/message/chat', { uid: people.uid })">
       <template v-if="mode === 'normal'">
         <div class="left">
           <div class="name">{{ people.displayname }}</div>
@@ -164,14 +169,19 @@
 import { ref, defineProps, defineEmits, reactive, computed } from 'vue'
 import { _checkImgUrl, _getavater } from '@/utils'
 import type { UserInfo } from '@/api/gen/userinfo_pb'
+import { useNav } from '@/utils/hooks/useNav'
+const nav = useNav()
 const props = withDefaults(
   defineProps<{
     people: UserInfo
-    mode: string
+    mode?: string
     searchKey?: string // Mark searchKey as optional
+    canchat?: boolean
   }>(),
   {
-    searchKey: '' // Default value if not provided
+    searchKey: '', // Default value if not provided
+    mode: 'normal',
+    canchat: false
   }
 )
 

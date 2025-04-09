@@ -17,22 +17,32 @@
       />
       <div class="chat-wrapper" @click="$emit('itemClick', message)">
         <div class="chat-text" v-if="message.type === MESSAGE_TYPE.TEXT">
-          {{ message.content.value.text }}
+          {{ (message.content.value as TextContent).text }}
         </div>
 
         <div class="douyin_video" v-if="message.type === MESSAGE_TYPE.DOUYIN_VIDEO">
-          <img class="poster" :src="message.content.value.poster" alt="" />
-          <div class="title">{{ message.content.value.title }}</div>
+          <img
+            class="poster"
+            :src="(message.content.value as DouyinVideoContent).video.poster"
+            alt=""
+          />
+          <div class="title">{{ (message.content.value as DouyinVideoContent).video.title }}</div>
           <img src="../../../assets/img/icon/play-white.png" class="pause" />
           <div class="author">
-            <img class="video-avatar" :src="message.content.value.author.avatar" alt="" />
-            <span class="name">{{ message.content.value.author.name }}</span>
+            <img
+              class="video-avatar"
+              :src="(message.content.value as DouyinVideoContent).author.avatar"
+              alt=""
+            />
+            <span class="name">{{
+              (message.content.value as DouyinVideoContent).author.displayname
+            }}</span>
           </div>
         </div>
 
         <div class="douyin_video" v-if="message.type === MESSAGE_TYPE.VIDEO">
           <!-- <video class="poster" ></video> -->
-          <img class="poster" :src="message.content.value.poster" alt="" />
+          <img class="poster" :src="(message.content.value as VideoContent).poster" alt="" />
           <img src="../../../assets/img/icon/play-white.png" class="pause" />
         </div>
 
@@ -67,64 +77,116 @@
             style="display: none"
           ></audio>
         </div>
-        <div
-          class="call"
-          v-if="
-            message.type === MESSAGE_TYPE.VIDEO_CALL || message.type === MESSAGE_TYPE.AUDIO_CALL
-          "
-        >
-          <div class="resolve" v-if="message.state === CALL_STATE.RESOLVE">
+        <div class="call" v-if="message.type === MESSAGE_TYPE.VIDEO_CALL">
+          <div
+            class="resolve"
+            v-if="(message.content.value as VideoCallContent).state === CALL_STATE.CALL_RESOLVE"
+          >
             <img class="icon" src="../../../assets/img/icon/message/chat/video.png" alt="" />
             <span>通话时长 05:32</span>
           </div>
           <div
             class="reject"
-            v-if="message.state === CALL_STATE.REJECT || message.state === CALL_STATE.NONE"
+            v-if="
+              (message.content.value as VideoCallContent).state === CALL_STATE.CALL_REJECT ||
+              (message.content.value as VideoCallContent).state === CALL_STATE.CALL_NONE
+            "
           >
             <img class="icon" src="../../../assets/img/icon/message/chat/video.png" alt="" />
             <div class="notice">
-              <span class="state" v-if="message.state === CALL_STATE.REJECT">对方已拒绝</span>
-              <span class="state" v-if="message.state === CALL_STATE.NONE">对方未接通</span>
+              <span
+                class="state"
+                v-if="(message.content.value as VideoCallContent).state === CALL_STATE.CALL_REJECT"
+                >对方已拒绝</span
+              >
+              <span
+                class="state"
+                v-if="(message.content.value as VideoCallContent).state === CALL_STATE.CALL_RESOLVE"
+                >对方未接通</span
+              >
+              <span>点击呼叫</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="call" v-if="message.type === MESSAGE_TYPE.AUDIO_CALL">
+          <div
+            class="resolve"
+            v-if="(message.content.value as AudioCallContent).state === CALL_STATE.CALL_RESOLVE"
+          >
+            <img class="icon" src="../../../assets/img/icon/message/chat/video.png" alt="" />
+            <span>通话时长 05:32</span>
+          </div>
+          <div
+            class="reject"
+            v-if="
+              (message.content.value as AudioCallContent).state === CALL_STATE.CALL_REJECT ||
+              (message.content.value as AudioCallContent).state === CALL_STATE.CALL_NONE
+            "
+          >
+            <img class="icon" src="../../../assets/img/icon/message/chat/video.png" alt="" />
+            <div class="notice">
+              <span
+                class="state"
+                v-if="(message.content.value as AudioCallContent).state === CALL_STATE.CALL_REJECT"
+                >对方已拒绝</span
+              >
+              <span
+                class="state"
+                v-if="(message.content.value as AudioCallContent).state === CALL_STATE.CALL_RESOLVE"
+                >对方未接通</span
+              >
               <span>点击呼叫</span>
             </div>
           </div>
         </div>
 
         <div class="image" v-if="message.type === MESSAGE_TYPE.IMAGE">
-          <img :src="message.content.value.imageurl" alt="" />
+          <img :src="(message.content.value as ImageContent).imageUrl" alt="" />
         </div>
 
         <div class="meme" v-if="message.type === MESSAGE_TYPE.MEME">
-          <img :src="message.content.value.imageurl" alt="" />
+          <img :src="(message.content.value as MemeContent).imageUrl" alt="" />
+          <div class="loves" v-if="(message.content.value as MemeContent).loved?.length">
+            <img src="../../../assets/img/icon/loved.svg" alt="" />
+            <img
+              :key="user.id"
+              v-for="user in (message.content.value as MemeContent).loved"
+              src="../../../assets/img/icon/head-image.jpeg"
+              alt=""
+              class="love-avatar"
+            />
+          </div>
         </div>
 
         <div
           class="red_packet"
-          :class="message.content.value.state !== '未领取' ? 'invalid' : ''"
           v-if="message.type === MESSAGE_TYPE.RED_PACKET"
+          :class="(message.content.value as RedPacketContent).state !== '未领取' ? 'invalid' : ''"
         >
           <div class="top">
             <img src="../../../assets/img/icon/message/chat/redpack-logo.webp" alt="" />
             <div class="right">
-              <div class="title">{{ message.content.value.title }}</div>
-              <div v-if="message.content.value.state !== '未领取'" class="state">
-                {{ message.content.value.state }}
+              <div class="title">{{ (message.content.value as RedPacketContent).title }}</div>
+              <div
+                v-if="(message.content.value as RedPacketContent).state !== '未领取'"
+                class="state"
+              >
+                {{ (message.content.value as RedPacketContent).state }}
               </div>
             </div>
           </div>
           <span class="bottom">抖音红包</span>
         </div>
 
-        <div class="loves" v-if="message.content.value.loved?.length">
-          <img src="../../../assets/img/icon/loved.svg" alt="" />
-          <img
-            :key="user"
-            v-for="user in message.content.value.loved"
-            src="../../../assets/img/icon/head-image.jpeg"
-            alt=""
-            class="love-avatar"
+        <div class="cart" v-if="message.type === MESSAGE_TYPE.BUSINESS_CARD">
+          <People
+            mode="normal-add-button"
+            :key="(message.content.value as BusinessCartContent).userCart.uid"
+            :people="(message.content.value as BusinessCartContent).userCart"
           />
         </div>
+
         <div class="loves" v-if="message.state === STATUS.FAILED">
           <img src="../../../assets/img/icon/message/chat/fasongshibai.png" alt="" />
         </div>
@@ -137,8 +199,91 @@
   </div>
 </template>
 
-<script>
-import { mapState } from 'pinia'
+<script lang="ts" setup>
+import { ref, computed } from 'vue'
+import { useBaseStore } from '@/store/pinia'
+import {
+  CALL_STATE,
+  MESSAGE_TYPE,
+  RED_PACKET_MODE,
+  STATUS,
+  type AudioCallContent,
+  type AudioContent,
+  type BusinessCartContent,
+  type ChatMessage as cMessage,
+  type DouyinVideoContent,
+  type ImageContent,
+  type MemeContent,
+  type RedPacketContent,
+  type TextContent,
+  type VideoCallContent,
+  type VideoContent
+} from '@/api/gen/message_pb'
+
+import { unixNanoToYYYYMMDD } from '@/utils/date'
+import { Dftimg } from '@/utils/const_var'
+import People from '@/pages/people/components/People.vue'
+
+const props = withDefaults(
+  defineProps<{
+    message: cMessage
+  }>(),
+  {}
+)
+
+const store = useBaseStore()
+const userinfo = computed(() => store.userinfo)
+
+const isAudioPlaying = ref(false)
+const currentDuration = ref(0)
+
+const formattedDuration = computed(() => {
+  const duration =
+    currentDuration.value || (props.message.content.value as AudioContent).duration || 0
+  const minutes = Math.floor(duration / 60)
+  const seconds = Math.floor(duration % 60)
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`
+})
+
+const validAudioSrc = computed(() => {
+  const contentValue = props.message.content.value as AudioContent
+  return contentValue.src ? contentValue.src : ''
+})
+
+const isMe = computed(() => userinfo.value.uid === props.message.user.id)
+
+const audioPlayer = ref<HTMLAudioElement | null>(null)
+
+function toggleAudioPlayback() {
+  if (!audioPlayer.value) return
+
+  if (audioPlayer.value.paused) {
+    audioPlayer.value
+      .play()
+      .then(() => {
+        isAudioPlaying.value = true
+      })
+      .catch((error) => {
+        console.error('音频播放失败:', error)
+        isAudioPlaying.value = false
+      })
+  } else {
+    audioPlayer.value.pause()
+    isAudioPlaying.value = false
+  }
+}
+
+function handleAudioEnd() {
+  isAudioPlaying.value = false
+  currentDuration.value = 0
+  if (audioPlayer.value) audioPlayer.value.currentTime = 0
+}
+
+function handleTimeUpdate() {
+  if (audioPlayer.value) currentDuration.value = Math.floor(audioPlayer.value.currentTime)
+}
+</script>
+<!-- 
 import { useBaseStore } from '@/store/pinia'
 import { CALL_STATE, MESSAGE_TYPE, RED_PACKET_MODE, STATUS } from '@/api/gen/message_pb'
 import { unixNanoToYYYYMMDD } from '@/utils/date'
@@ -218,7 +363,7 @@ export default {
     }
   }
 }
-</script>
+</script> -->
 
 <style scoped lang="less">
 @import '../../../assets/less/index';

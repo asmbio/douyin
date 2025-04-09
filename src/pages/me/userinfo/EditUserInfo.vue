@@ -154,6 +154,7 @@ function showSexDialog() {
 }
 async function save() {
   try {
+    store.userinfo.isgroup = false
     await editUserInfo(store.userinfo)
     _notice('保存成功')
   } catch (error) {

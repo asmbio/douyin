@@ -7,21 +7,29 @@
     </BaseHeader>
     <div class="content">
       <div class="peoples">
-        <People mode="normal" :key="data.friend.uid" :people="data.friend" />
+        <People mode="normal" :key="data.friend?.uid" :people="data.friend" />
         <!-- <div class="add-people" @click="nav('/message/share-to-friend')">
           <img src="../../../assets/img/icon/message/chat/add.png" alt="" class="head-image" />
           <div class="name">多人聊天</div>
         </div> -->
       </div>
       <div class="setting">
-        <div v-if="data.friend.isgroup === true">
-          <div class="row" @click="() => (data.showChangeNote = true)">
+        <div v-if="data.friend?.isgroup === true">
+          <div
+            class="row"
+            :class="{ clickable: data.friend.isMyGroup }"
+            @click="data.friend.isMyGroup && (data.showChangeNote = true)"
+          >
             <div class="left">群名称: {{ data.friend.displayname }}</div>
             <div class="right">
               <img src="../../../assets/img/icon/components/follow/write.png" alt="" />
             </div>
           </div>
-          <div class="row" @click="() => (data.showChangeSignature = true)">
+          <div
+            class="row"
+            :class="{ clickable: data.friend.isMyGroup }"
+            @click="data.friend.isMyGroup && (data.showChangeSignature = true)"
+          >
             <div class="left">简介: {{ data.friend.signature }}</div>
             <div class="right">
               <img src="../../../assets/img/icon/components/follow/write.png" alt="" />
@@ -159,6 +167,10 @@ const data = reactive({
 onMounted(() => {
   data.uid = route.query.uid as string
   data.friend = store.notifications.find((e) => e.uid === data.uid)
+  if (!data.friend) {
+    _notice('没有找到该用户')
+    console.log('没有找到该用户')
+  }
 })
 
 async function saveUserinfo() {

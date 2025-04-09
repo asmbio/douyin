@@ -20,23 +20,23 @@
           <div
             class="option"
             :key="i"
-            v-for="(item, i) in store.friends"
+            v-for="(item, i) in store.friends.all"
             @click.stop="toggleCall(item)"
           >
             <img
               :style="item.select ? 'opacity: .5;' : ''"
               class="avatar"
-              :src="_checkImgUrl(item.avatar)"
+              :src="_getavater(item)"
               alt=""
             />
-            <span>{{ item.name }}</span>
+            <span>{{ item.displayname }}</span>
             <img
               v-if="item.select"
               class="checked"
               src="../assets/img/icon/components/check/check-red-share.png"
             />
           </div>
-          <div class="option" @click.stop="closeShare($router.push('/message/share-to-friend'))">
+          <div class="option" @click.stop="closeShare((state.shareToFriend = true))">
             <dy-back class="more" mode="light" direction="right"></dy-back>
             <span>更多朋友</span>
           </div>
@@ -88,7 +88,10 @@
                 <img class="small" src="../assets/img/icon/components/video/dou.webp" alt="" />
                 <span>帮上热门</span>
               </div>
-              <div class="option" @click.stop="$router.push('/home/report', { mode: this.mode })">
+              <div
+                class="option"
+                @click.stop="$router.push({ path: '/home/report', query: { mode: props.mode } })"
+              >
                 <img class="small" src="../assets/img/icon/components/video/warring.png" alt="" />
                 <span>举报</span>
               </div>
@@ -138,7 +141,10 @@
                 <img class="small" src="../assets/img/icon/components/video/tofriend.webp" alt="" />
                 <span>私信朋友</span>
               </div>
-              <div class="option" @click.stop="$router.push('/home/report', { mode: this.mode })">
+              <div
+                class="option"
+                @click.stop="$router.push({ path: '/home/report', query: { mode: props.mode } })"
+              >
                 <img class="small" src="../assets/img/icon/components/video/warring.png" alt="" />
                 <span>举报音乐</span>
               </div>
@@ -159,19 +165,21 @@
     </div>
   </from-bottom-dialog>
   <PlayFeedback v-model="state.showPlayFeedback" />
-  <ShareToFriend v-model="state.shareToFriend" />
+  <ShareToFriend v-model="state.shareToFriend" :item="props.item" :page-id="'userPanel'" />
 
-  <DouyinCode :item="state.currentItem" v-model="state.showDouyinCode" />
+  <DouyinCode :item="props.item" v-model="state.showDouyinCode" />
 </template>
 
-<script setup>
-import FromBottomDialog from './dialog/FromBottomDialog'
+<script setup lang="ts">
+import FromBottomDialog from '@/components/dialog/FromBottomDialog.vue'
 import { useBaseStore } from '@/store/pinia'
-import { _checkImgUrl, _copy, _hideLoading, _no, _notice, _showLoading, _sleep } from '@/utils'
+import { _copy, _getavater, _hideLoading, _no, _notice, _showLoading, _sleep } from '@/utils'
 import PlayFeedback from '@/pages/home/components/PlayFeedback.vue'
 import ShareToFriend from '@/pages/home/components/ShareToFriend.vue'
 import DouyinCode from '@/components/DouyinCode.vue'
 import { reactive } from 'vue'
+
+import { type Video as pVideo } from '@/api/gen/video_pb'
 
 defineOptions({
   name: 'Share'
@@ -181,41 +189,23 @@ const state = reactive({
   shareToFriend: false,
   showDouyinCode: false
 })
-const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    default() {
-      return false
-    }
-  },
-  item: {},
-  videoId: {
-    type: String,
-    default() {
-      return null
-    }
-  },
-  pageId: {
-    type: String,
-    default() {
-      return 'home-index'
-    }
-  },
-  canDownload: {
-    type: Boolean,
-    default() {
-      return true
-    }
-  },
-  mode: {
-    type: String,
-    default() {
-      return 'video'
-      //music
-      //qrcode
-    }
+const props = withDefaults(
+  defineProps<{
+    modelValue: boolean
+    item: pVideo
+    videoId?: string
+    pageId?: string
+    canDownload?: boolean
+    mode?: string
+  }>(),
+  {
+    modelValue: false,
+    videoId: null,
+    pageId: 'home-index',
+    canDownload: true,
+    mode: 'video'
   }
-})
+)
 
 const store = useBaseStore()
 const emit = defineEmits(['update:modelValue', 'update:item', 'ShareToFriend', 'download'])
@@ -225,7 +215,7 @@ async function copyLink() {
   _showLoading()
   await _sleep(500)
   _hideLoading()
-  _copy(props.item.share_info.share_link_desc + props.item.share_info.share_url)
+  _copy(props.item.shareUrl)
   //TODO 抖音样式改了
   _notice('复制成功')
 }
@@ -242,7 +232,7 @@ function toggleCall(item) {
   item.select = !item.select
 }
 
-function closeShare() {
+function closeShare(e?: any) {
   store.friends.all = store.friends.all.map((v) => {
     v.select = false
     return v

@@ -37,9 +37,8 @@
     <Share
       v-model="state.isSharing"
       ref="share"
-      page-id="home-index"
-      :item="state.currentItem"
-      :mode="'user'"
+      page-id="userPanel"
+      :item="transformToVideo(state.currentItem)"
     />
   </div>
 </template>
@@ -103,6 +102,13 @@ function handleUpdateFollow(newStatus) {
 
 function delayShowDialog(cb: Function) {
   setTimeout(cb, 400)
+}
+function transformToVideo(item) {
+  return {
+    ...item,
+    $typeName: 'protos.Video',
+    $unknown: item.$unknown || []
+  }
 }
 </script>
 

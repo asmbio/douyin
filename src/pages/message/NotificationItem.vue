@@ -45,7 +45,7 @@ import { unixNanoToYYYYMMDD } from '@/utils/date'
 import { setRead } from '@/api/moguservice'
 import { Dftimg } from '@/utils/const_var'
 import { _showSelectDialog } from '@/utils'
-import { useBaseStore } from '@/store/pinia'
+import { idMappings, useBaseStore } from '@/store/pinia'
 const messageActionList = [
   { id: 99, name: '其他操作' },
   { id: 1, name: '删除' }
@@ -106,90 +106,6 @@ const handleClick = () => {
     //state: { objurl: JSON.stringify() }
   })
 }
-
-const idMappings = new Map([
-  [
-    '2KXH9n6tG2g1D8VbYc7qLZ',
-    {
-      route: '/message/fans',
-      img: new URL('../../assets/img/icon/msg-icon1.png', import.meta.url).href,
-      name: '新朋友',
-      tag: ''
-    }
-  ],
-  [
-    '3VnYJ8cQmRq9sLpWfT4hBx',
-    {
-      route: '/message/all',
-      img: new URL('../../assets/img/icon/msg-icon2.png', import.meta.url).href,
-      name: '互动消息',
-      tag: ''
-    }
-  ],
-  [
-    '5qMv7dFgHjK3nRtPwS4zL9',
-    {
-      route: '/message/chat',
-      img: new URL('../../assets/img/icon/avatar/2.png', import.meta.url).href,
-      name: '测试用户',
-      tag: ''
-    }
-  ],
-  [
-    '8rTbYcNqXm6JkLpV9sFwG2',
-    {
-      route: '/message/douyin-helper',
-      img: new URL('../../assets/img/icon/msg-icon5.webp', import.meta.url).href,
-      name: '抖音小助手',
-      tag: '官方'
-    }
-  ],
-  [
-    '7sZq4dFvT9jK3mRnPwXhL6',
-    {
-      route: '/message/system-notice',
-      img: new URL('../../assets/img/icon/msg-icon4.png', import.meta.url).href,
-      name: '系统通知',
-      tag: '官方'
-    }
-  ],
-  [
-    '9LpWfT4hBx3VnYJ8cQmRqS',
-    {
-      route: '/me/request-update',
-      img: new URL('../../assets/img/icon/msg-icon7.webp', import.meta.url).href,
-      name: '求更新',
-      tag: '官方'
-    }
-  ],
-  [
-    'HjK3nRtPwS4zL95qMv7dFg',
-    {
-      route: '/message/task-notice',
-      img: new URL('../../assets/img/icon/msg-icon6.webp', import.meta.url).href,
-      name: '任务通知',
-      tag: '官方'
-    }
-  ],
-  [
-    'D8VbYc7qLZ2KXH9n6tG2g1',
-    {
-      route: '/message/live-notice',
-      img: new URL('../../assets/img/icon/msg-icon8.webp', import.meta.url).href,
-      name: '直播通知',
-      tag: '官方'
-    }
-  ],
-  [
-    'cQmRq9sLpWfT4hBx3VnYJ8',
-    {
-      route: '/message/money-notice',
-      img: new URL('../../assets/img/icon/msg-icon9.webp', import.meta.url).href,
-      name: '钱包通知',
-      tag: '官方'
-    }
-  ]
-])
 
 // 获取消息路由
 function getRouteByMessageId(messageId) {

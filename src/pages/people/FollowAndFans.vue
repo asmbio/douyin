@@ -35,7 +35,12 @@
           />
           <div class="is-search" v-if="data.searchKey">
             <div class="search-result" v-if="data.searchFriends.length">
-              <People :key="i" v-for="(item, i) in data.searchFriends" :people="item"></People>
+              <People
+                :key="i"
+                v-for="(item, i) in data.searchFriends"
+                :people="item"
+                :canchat="true"
+              ></People>
             </div>
             <div class="no-result" v-else>
               <img src="../../assets/img/icon/no-result.png" alt="" />
@@ -44,13 +49,41 @@
             </div>
           </div>
           <div class="no-search" v-else>
-            <div class="title">我的关注</div>
-            <People :key="i" v-for="(item, i) in store.friends.all" :people="item"></People>
+            <!-- <div class="title">我的关注</div> -->
+            <People
+              :key="i"
+              v-for="(item, i) in data.following"
+              :people="item"
+              :canchat="true"
+            ></People>
           </div>
+          <NoMore v-if="data.hasMorefollowing" />
         </SlideItem>
-        <SlideItem class="tab2">
-          <People :key="i" v-for="(item, i) in store.friends.all" :people="item"></People>
-          <NoMore />
+        <SlideItem class="tab1">
+          <Search
+            v-model="data.searchKey"
+            placeholder="搜索用户备注或名字"
+            :is-show-right-text="false"
+          />
+          <div class="is-search" v-if="data.searchKey">
+            <div class="search-result" v-if="data.searchFriends.length">
+              <People
+                :key="i"
+                v-for="(item, i) in data.searchFriends"
+                :people="item"
+                :canchat="true"
+              ></People>
+            </div>
+            <div class="no-result" v-else>
+              <img src="../../assets/img/icon/no-result.png" alt="" />
+              <span class="n1">搜索结果为空</span>
+              <span class="n2">没有搜索到相关内容</span>
+            </div>
+          </div>
+          <div class="no-search" v-else>
+            <People :key="i" v-for="(item, i) in data.fans" :people="item" :canchat="true"></People>
+          </div>
+          <NoMore v-if="data.hasMore" />
         </SlideItem>
       </SlideHorizontal>
     </div>
@@ -61,10 +94,17 @@ import People from './components/People.vue'
 import Search from '../../components/Search.vue'
 import Indicator from '../../components/slide/Indicator.vue'
 import { useBaseStore } from '@/store/pinia'
-import { onMounted, reactive, watch } from 'vue'
+import { onMounted, onUnmounted, reactive, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useNav } from '@/utils/hooks/useNav'
+import type { UserInfo } from '@/api/gen/userinfo_pb'
+import { getContacts } from '@/api/moguservice'
+import { CONTACT_TAG } from '@/api/gen/moguervice_pb'
+import { debounce } from 'lodash-es'
 
+// "mogud qunliaocp2xhd4vrwy7sneb8pdnsegrcgu"
+// "mogude qunliaocp2xhd4vrwy7sneb8pdnsegrcgu"
+// "qunliaocp2xhd4vrwy7sneb8pdnsegrcgu"
 defineOptions({
   name: 'FindAcquaintance'
 })
@@ -75,23 +115,102 @@ const store = useBaseStore()
 const data = reactive({
   isSearch: false,
   searchKey: '',
-
   slideIndex: 0,
-  searchFriends: []
+  searchFriends: [] as UserInfo[],
+  following: [] as UserInfo[],
+  fans: [] as UserInfo[],
+  isLoading: false,
+  hasMore: true,
+  hasMorefollowing: true
 })
 
-onMounted(() => {
+// 防抖处理滚动事件
+const handleScroll = debounce(() => {
+  const scrollContainer = document.documentElement || document.body
+  const { scrollTop, scrollHeight, clientHeight } = scrollContainer
+
+  // 滚动到底部 100px 时触发加载（可根据需要调整阈值）
+  const reachBottom = scrollTop + clientHeight >= scrollHeight - 100
+
+  if (reachBottom && !data.isLoading && data.hasMore) {
+    loadmore()
+  }
+}, 200)
+
+onMounted(async () => {
   data.slideIndex = ~~route.query.type
+  loadmore()
+  window.addEventListener('scroll', handleScroll)
 })
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
+async function loadmore() {
+  if (data.slideIndex === 0) {
+    await load0()
+  } else if (data.slideIndex === 1) {
+    await load1()
+  }
+}
+
+async function load1() {
+  if (data.isLoading || !data.hasMore) return
+  try {
+    data.isLoading = true
+    const lastUid = data.fans.length > 0 ? data.fans[data.fans.length - 1].uid : ''
+    const r2 = await getContacts(lastUid, 30, CONTACT_TAG.FOLLOWED)
+
+    // 处理新数据
+    if (r2.all.length > 0) {
+      data.fans.push(...r2.all)
+      if (r2.all.length < 30) {
+        data.hasMore = false
+      } else {
+        data.hasMore = true
+      }
+    }
+  } catch (error) {
+    console.error('Error loading more:', error)
+  } finally {
+    data.isLoading = false
+  }
+}
+
+async function load0() {
+  if (data.isLoading || !data.hasMorefollowing) return
+  try {
+    data.isLoading = true
+    const lastUid = data.following.length > 0 ? data.fans[data.following.length - 1].uid : ''
+    const r2 = await getContacts(lastUid, 30, CONTACT_TAG.FOLLOW)
+    console.log('r2', r2)
+    // 处理新数据
+    if (r2.all.length > 0) {
+      data.following.push(...r2.all)
+      if (r2.all.length < 30) {
+        data.hasMorefollowing = false
+      } else {
+        data.hasMorefollowing = true
+      }
+    }
+  } catch (error) {
+    console.error('Error loading more:', error)
+  } finally {
+    data.isLoading = false
+  }
+}
 
 watch(
   () => data.searchKey,
   (newVal) => {
     if (newVal) {
+      var friends = data.following
+      if (data.slideIndex === 1) {
+        friends = data.fans
+      }
       //TODO 搜索时仅仅判断是否包含了对应字符串，抖音做了拼音判断的
-      data.searchFriends = store.friends.all.filter((v) => {
-        if (v.name.includes(newVal)) return true
-        return v.account.includes(newVal)
+      data.searchFriends = friends.filter((v) => {
+        if (v.displayname.includes(newVal)) return true
+        return v.nickname.includes(newVal)
       })
     } else {
       data.searchFriends = []

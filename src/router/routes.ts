@@ -104,7 +104,10 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/me/collect/VideoCollect.vue')
   },
   { path: '/me/my-music', component: () => import('@/pages/me/MyMusic.vue') },
-
+  {
+    path: '/me/my-group-chat',
+    component: () => import('@/pages/me/MyGroupChat.vue')
+  },
   // {path: '/message', component: Message},
   { path: '/message', component: () => import('@/pages/message/Message.vue') },
   {

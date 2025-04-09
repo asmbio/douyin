@@ -1,11 +1,21 @@
 package com.asmbio.p2psosial;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import com.getcapacitor.BridgeActivity;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 
 public class MainActivity extends BridgeActivity {
@@ -16,7 +26,13 @@ public class MainActivity extends BridgeActivity {
 
         registerPlugin(MoguPlugin.class);
         super.onCreate(savedInstanceState);
+        var  filesDir= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        File appDataDir = new File(filesDir, "mogu");
 
+        Thread.setDefaultUncaughtExceptionHandler(new CrashHandler(
+                Thread.getDefaultUncaughtExceptionHandler(),
+                appDataDir.getAbsolutePath()+ "/crash_logs"
+        ));
         // 初始化 Bridge
        // init(savedInstanceState, new ArrayList<>());
 
@@ -51,6 +67,67 @@ public class MainActivity extends BridgeActivity {
 
     }
 
+    // 自定义崩溃处理类
+    class CrashHandler implements Thread.UncaughtExceptionHandler {
+        private final Thread.UncaughtExceptionHandler defaultHandler;
+        private final String logPath;
+
+        public CrashHandler(Thread.UncaughtExceptionHandler defaultHandler, String logPath) {
+            this.defaultHandler = defaultHandler;
+            this.logPath = logPath;
+        }
+
+        @Override
+        public void uncaughtException(Thread thread, Throwable ex) {
+            // 保存日志文件
+            saveCrashLog(ex);
+
+            // 调用系统默认处理程序
+            if (defaultHandler != null) {
+                defaultHandler.uncaughtException(thread, ex);
+            } else {
+                android.os.Process.killProcess(android.os.Process.myPid());
+                System.exit(10);
+            }
+        }
+
+        private void saveCrashLog(Throwable ex) {
+            String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+            String fileName = "crash_" + time + ".log";
+
+            // 创建日志目录
+            File dir = new File(logPath);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            // 写入文件
+            File file = new File(dir, fileName);
+            try {
+                FileWriter fw = new FileWriter(file);
+                PrintWriter pw = new PrintWriter(fw);
+
+                // 记录崩溃时间
+                pw.println("Crash Time: " + time);
+
+                // 记录设备信息
+                pw.println("\nDevice Info:");
+                pw.println("Model: " + Build.MODEL);
+                pw.println("SDK Version: " + Build.VERSION.SDK_INT);
+
+                // 记录异常信息
+                pw.println("\nStack Trace:");
+                ex.printStackTrace(pw);
+
+                // 关闭流
+                pw.flush();
+                pw.close();
+                fw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
     // 自定义方法：转换缓存模式为可读名称
     private String getCacheModeName(int mode) {
         switch (mode) {

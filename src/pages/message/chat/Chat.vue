@@ -8,10 +8,10 @@
             :src="_getavater(data.friend)"
             alt=""
             style="border-radius: 50%"
-            @click.stop="handleUserInfoClick"
+            @click.stop="nav('/message/chat/detail', { uid: data.uid })"
           />
           <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{
-            data.friend.displayname
+            data.friend?.displayname
           }}</span>
         </div>
         <div class="right">
@@ -34,16 +34,16 @@
         :class="isExpand ? 'expand' : ''"
         @scroll="handleScroll"
       >
-        <NoMore v-if="!data.hasMoredata" />
-        <Loading v-else-if="data.loading" />
         <ChatMessage
           @itemClick="clickItem"
           @userInfoClick="handleUserInfoClick"
           v-longpress="showTooltip"
-          :message="item"
+          :message="item as cMessage"
           :key="index"
           v-for="(item, index) in data.messages"
         ></ChatMessage>
+        <NoMore v-if="!data.hasMoredata" />
+        <Loading v-else-if="data.loading" />
       </div>
       <!-- 在message-wrapper下方添加录音界面 -->
       <div class="recording-indicator" v-if="data.mediaRecorder">
@@ -257,7 +257,7 @@ import {
   STATUS,
   type ChatMessage as cMessage
 } from '@/api/gen/message_pb'
-import { throttle } from 'lodash-es'
+import { debounce } from 'lodash-es'
 import type { UserInfo } from '@/api/gen/userinfo_pb'
 
 defineOptions({
@@ -314,16 +314,23 @@ const data = reactive({
 //   }
 
 // 滚动处理函数（带节流）
-const handleScroll = throttle((e) => {
-  // console.log(e)
-  //const {  scrollTop } = document.documentElement
+const handleScroll = debounce((e) => {
   const scrollTop = e.target.scrollTop
-  const bottomOffset = 10 // 距离底部100px触发加载
-  console.log('scrollTop', scrollTop)
-  if (scrollTop < bottomOffset) {
+  const bottomOffset = 100 // 距离100px触发加载
+  console.log(
+    'scrollTop',
+    scrollTop,
+    'clientHeight:',
+    e.target.clientHeight,
+    'scrollHeight:',
+    e.target.scrollHeight,
+    e
+  )
+  if (data.loading) return
+  if (scrollTop + e.target.scrollHeight - e.target.clientHeight < bottomOffset) {
     loadmoremessages()
   }
-}, 1000)
+}, 100)
 
 // // 使用Composition API实现
 // async function useChatStream() {
@@ -346,9 +353,6 @@ const handleScroll = throttle((e) => {
 
 // }
 async function handleUserInfoClick() {
-  // bus.emit(EVENT_KEY.CURRENT_ITEM, {author: data.friend})
-  // bus.emit(EVENT_KEY.GO_USERINFO)
-
   await nav(
     '/home/userpanel',
     {},
@@ -381,7 +385,7 @@ async function loadmoremessages() {
     } else {
       data.hasMoredata = false
     }
-    data.messages.unshift(...res.msgList.reverse())
+    data.messages.push(...res.msgList)
   } catch (error) {
     console.log(error)
   } finally {
@@ -412,12 +416,13 @@ onMounted(async () => {
     data.uid = route.query.uid as string
     data.friend = store.notifications.find((e) => e.uid === data.uid)
     if (data.friend == null) {
-      data.friend = await getUserInfo(data.uid)
-      store.addOrUpdateNotification(data.friend)
+      var ret = await getUserInfo(data.uid)
+      store.addOrUpdateNotification(ret)
+      data.friend = ret
       console.log('getUserInfo', data.friend)
     }
     store.activeConversasion(data.uid, (msg: cMessage) => {
-      data.messages.push(msg)
+      data.messages.unshift(msg)
       nextTick(scrollBottom)
     })
     //data.messages=store.conversasions.get(data.uid).msgList
@@ -624,8 +629,8 @@ async function sendMsg(cmsg: cMessage) {
   try {
     // 将消息对象转为响应式后再添加到数组
 
-    data.messages.push(reactiveMsg)
-
+    data.messages.unshift(reactiveMsg)
+    store.updateLastContent(cmsg)
     const state = await sendMessage(cmsg)
     reactiveMsg.state = state.status // 响应式更新
 
@@ -827,6 +832,8 @@ function showTooltip(e) {
     .message-wrapper {
       height: calc(var(--vh, 1vh) * 100 - 125rem);
       overflow: auto;
+      display: flex;
+      flex-direction: column-reverse; /* 反向排列 */
 
       &.expand {
         height: calc(var(--vh, 1vh) * 100 - (125rem + var(--vh, 1vh) * 30));

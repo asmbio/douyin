@@ -10,14 +10,106 @@ import {
 } from '@/api/moguservice'
 import { CONTACT_TAG } from '@/api/gen/moguervice_pb'
 
-import { MessagelistSchema, type ChatMessage, type Messagelist } from '@/api/gen/message_pb'
+import {
+  MESSAGE_TYPE,
+  MessagelistSchema,
+  type ChatMessage,
+  type Messagelist,
+  type TextContent
+} from '@/api/gen/message_pb'
 import { create } from '@bufbuild/protobuf'
+import { h } from 'vue'
 //let user: UserInfo
 
 // type Conversion = {
 //   user: UserInfo,
 //   conversion:Messagelist
 // };
+
+export const idMappings = new Map([
+  [
+    '2KXH9n6tG2g1D8VbYc7qLZ',
+    {
+      route: '/message/fans',
+      img: new URL('../assets/img/icon/msg-icon1.png', import.meta.url).href,
+      name: '新朋友',
+      tag: ''
+    }
+  ],
+  [
+    '3VnYJ8cQmRq9sLpWfT4hBx',
+    {
+      route: '/message/all',
+      img: new URL('../assets/img/icon/msg-icon2.png', import.meta.url).href,
+      name: '互动消息',
+      tag: ''
+    }
+  ],
+  [
+    '5qMv7dFgHjK3nRtPwS4zL9',
+    {
+      route: '/message/chat',
+      img: new URL('../assets/img/icon/avatar/2.png', import.meta.url).href,
+      name: '测试用户',
+      tag: ''
+    }
+  ],
+  [
+    '8rTbYcNqXm6JkLpV9sFwG2',
+    {
+      route: '/message/douyin-helper',
+      img: new URL('../assets/img/icon/msg-icon5.webp', import.meta.url).href,
+      name: '抖音小助手',
+      tag: '官方'
+    }
+  ],
+  [
+    '7sZq4dFvT9jK3mRnPwXhL6',
+    {
+      route: '/message/system-notice',
+      img: new URL('../assets/img/icon/msg-icon4.png', import.meta.url).href,
+      name: '系统通知',
+      tag: '官方'
+    }
+  ],
+  [
+    '9LpWfT4hBx3VnYJ8cQmRqS',
+    {
+      route: '/me/request-update',
+      img: new URL('../assets/img/icon/msg-icon7.webp', import.meta.url).href,
+      name: '求更新',
+      tag: '官方'
+    }
+  ],
+  [
+    'HjK3nRtPwS4zL95qMv7dFg',
+    {
+      route: '/message/task-notice',
+      img: new URL('../assets/img/icon/msg-icon6.webp', import.meta.url).href,
+      name: '任务通知',
+      tag: '官方'
+    }
+  ],
+  [
+    'D8VbYc7qLZ2KXH9n6tG2g1',
+    {
+      route: '/message/live-notice',
+      img: new URL('../assets/img/icon/msg-icon8.webp', import.meta.url).href,
+      name: '直播通知',
+      tag: '官方'
+    }
+  ],
+  [
+    'cQmRq9sLpWfT4hBx3VnYJ8',
+    {
+      route: '/message/money-notice',
+      img: new URL('../assets/img/icon/msg-icon9.webp', import.meta.url).href,
+      name: '钱包通知',
+      tag: '官方'
+    }
+  ]
+])
+
 export const useBaseStore = defineStore('base', {
   state: () => {
     return {
@@ -77,6 +169,7 @@ export const useBaseStore = defineStore('base', {
       users: [],
       userinfo: {} as UserInfo, // Initialized with an empty object
       friends: {} as Userinfolist,
+      hasMorefriends: true,
       videos: {
         my: {
           list: [],
@@ -134,6 +227,11 @@ export const useBaseStore = defineStore('base', {
           const r2 = await getContacts('', 100, CONTACT_TAG.FRIEND)
           // console.log('r2.data', r2.userList);
           this.friends = r2
+
+          const st = await getContacts('', 100, CONTACT_TAG.STRANGER)
+          console.log('loadstranger', st)
+          this.stranger.push(...st.all)
+
           // console.log('users', this.users);
           // let stm =await getNoticeStream()
           //  try {
@@ -162,6 +260,29 @@ export const useBaseStore = defineStore('base', {
 
       return true
     },
+    async loadMoreFriends() {
+      if (this.loading || !this.hasMorefriends) return
+      try {
+        this.loading = true
+        const lastUid =
+          this.friends.all.length > 0 ? this.friends.all[this.friends.all.length - 1].uid : ''
+        const r2 = await getContacts(lastUid, 30, CONTACT_TAG.FRIEND)
+
+        // 处理新数据
+        if (r2.all.length > 0) {
+          this.friends.all.push(...r2.all)
+          if (r2.all.length < 30) {
+            this.hasMorefriends = false
+          } else {
+            this.hasMorefriends = true
+          }
+        }
+      } catch (error) {
+        console.error('Error loading more:', error)
+      } finally {
+        this.loading = false
+      }
+    },
     async initChatStream() {
       console.log('initChatStream init')
       const stm = await getChatStream('')
@@ -170,6 +291,7 @@ export const useBaseStore = defineStore('base', {
           this.conversasions.get(this.getConversasionId(message)).msgList.push(message)
         }
         if (this.activatedConversasionId === this.getConversasionId(message)) {
+          this.updateLastContent(message)
           this.activatedCallback(message)
         }
         // 如果activeted 滚动
@@ -203,6 +325,36 @@ export const useBaseStore = defineStore('base', {
         console.log(error)
       }
     },
+    updateLastContent(msg: ChatMessage) {
+      const uid = this.getConversasionId(msg)
+      let content = ''
+      if (msg.type === MESSAGE_TYPE.TEXT) {
+        content = (msg.content.value as TextContent).text
+      } else if (msg.type === MESSAGE_TYPE.IMAGE) {
+        content = '[图片]'
+      } else if (msg.type === MESSAGE_TYPE.VIDEO) {
+        content = '[视频]'
+      } else if (msg.type === MESSAGE_TYPE.AUDIO) {
+        content = '[语音]'
+      } else {
+        content = '[媒体消息]'
+      }
+      const notificationIndex = this.notifications.findIndex((n) => n.uid === uid)
+      if (notificationIndex > -1) {
+        this.notifications[notificationIndex].lastcontent = content
+        this.notifications[notificationIndex].lastsendtime = msg.time
+        const [notification] = this.notifications.splice(notificationIndex, 1)
+        this.notifications.unshift(notification)
+      } else {
+        // const strangerIndex = this.stranger.findIndex((s) => s.uid === uid)
+        // if (strangerIndex > -1) {
+        //   this.stranger[strangerIndex].lastcontent = content
+        //   this.stranger[strangerIndex].lastsendtime =  msg.time
+        // } else {
+        //   console.warn(`User with uid ${uid} not found in notifications or stranger list.`)
+        // }
+      }
+    },
     removeNotification(uid: string) {
       const index = this.notifications.findIndex((n) => n.uid === uid)
       if (index > -1) {
@@ -215,6 +367,12 @@ export const useBaseStore = defineStore('base', {
       }
     },
     addOrUpdateNotification(payload: UserInfo) {
+      console.log('addOrUpdateNotification', payload)
+      if (payload.uid === this.userinfo.uid) {
+        console.log('addOrUpdateNotification self', payload)
+        this.userinfo = payload
+        return
+      }
       const index = this.notifications.findIndex((n) => n.uid === payload.uid)
       if (index > -1) {
         // 保留原有未读计数逻辑，合并新内容
@@ -225,18 +383,18 @@ export const useBaseStore = defineStore('base', {
         //   unread: this.notifications[index].unread + 1
         // }
       } else {
+        this.notifications.unshift(payload)
+        console.log('addOrUpdateNotification unshift', payload)
         // 判断是否是陌生人
         // 新通知添加到最前面
         if (payload.followStatus == 0) {
           //
-          if (payload.isConnect) {
-            this.stranger.push(payload)
-          } else {
-            const delindex = this.stranger.findIndex((e) => e.uid === payload.uid)
-            this.stranger.splice(delindex, 1)
-          }
-        } else {
-          this.notifications.unshift(payload)
+          // if (payload.isConnect) {
+          //   this.stranger.push(payload)
+          // } else {
+          //   const delindex = this.stranger.findIndex((e) => e.uid === payload.uid)
+          //   this.stranger.splice(delindex, 1)
+          // }
         }
       }
     },

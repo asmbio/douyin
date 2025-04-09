@@ -32,7 +32,7 @@ service MoguService {
   rpc SendMessage(ChatMessage) returns (SendMessageResponse) {}
   rpc GetChatStream(protos.String) returns (stream ChatMessage){}
   rpc DeleteConversation(protos.String) returns (google.protobuf.Empty) {}
-
+  rpc ClearAllConversations(google.protobuf.Empty) returns (google.protobuf.Empty){}
   //   // 视频获取
    rpc MyVideo(MyVideoRequest)returns (VideoList){}
    rpc GetRecommendedVideos(VideoRequest) returns (VideoList) {}
@@ -97,6 +97,8 @@ enum CONTACT_TAG {
   FOLLOWED = 2;
   FRIEND = 3;
   BLACK = 4;
+  GROUP=5;
+  MYGROUP=6;
 }
 
 

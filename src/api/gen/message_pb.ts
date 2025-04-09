@@ -4,6 +4,10 @@
 
 import type { GenEnum, GenFile, GenMessage } from '@bufbuild/protobuf/codegenv1'
 import { enumDesc, fileDesc, messageDesc } from '@bufbuild/protobuf/codegenv1'
+import type { UserInfo } from './userinfo_pb'
+import { file_userinfo } from './userinfo_pb'
+import type { Video } from './video_pb'
+import { file_video } from './video_pb'
 import type { Message } from '@bufbuild/protobuf'
 
 /**
@@ -12,7 +16,8 @@ import type { Message } from '@bufbuild/protobuf'
 export const file_message: GenFile =
   /*@__PURE__*/
   fileDesc(
-    'Cg1tZXNzYWdlLnByb3RvEgZwcm90b3MiNwoEVXNlchIKCgJpZBgBIAEoCRIOCgZhdmF0YXIYAiABKAkSEwoLZGlzcGxheW5hbWUYAyABKAkiDQoLVGltZUNvbnRlbnQicAoLTWVtZUNvbnRlbnQSEQoJaW1hZ2VfdXJsGAEgASgJEiIKBXN0YXRlGAIgASgOMhMucHJvdG9zLkFVRElPX1NUQVRFEhsKBWxvdmVkGAMgAygLMgwucHJvdG9zLlVzZXISDQoFaXNjaWQYBCABKAgifAoMSW1hZ2VDb250ZW50EhEKCWltYWdlX3VybBgBIAEoCRIiCgVzdGF0ZRgCIAEoDjITLnByb3Rvcy5BVURJT19TVEFURRImCgpyZWFkX3N0YXRlGAMgASgOMhIucHJvdG9zLlJFQURfU1RBVEUSDQoFaXNjaWQYBCABKAgiSAoQVmlkZW9DYWxsQ29udGVudBIRCgljYWxsX3RpbWUYASABKAkSIQoFc3RhdGUYAiABKA4yEi5wcm90b3MuQ0FMTF9TVEFURSJIChBBdWRpb0NhbGxDb250ZW50EhEKCWNhbGxfdGltZRgBIAEoCRIhCgVzdGF0ZRgCIAEoDjISLnByb3Rvcy5DQUxMX1NUQVRFImAKDEF1ZGlvQ29udGVudBIQCghkdXJhdGlvbhgBIAEoDRILCgNzcmMYAiABKAkSIgoFc3RhdGUYAyABKA4yEy5wcm90b3MuQVVESU9fU1RBVEUSDQoFaXNjaWQYBCABKAgiGwoLVGV4dENvbnRlbnQSDAoEdGV4dBgBIAEoCSJXChJEb3V5aW5WaWRlb0NvbnRlbnQSIwoFdmlkZW8YASABKAsyFC5wcm90b3MuVmlkZW9Db250ZW50EhwKBmF1dGhvchgCIAEoCzIMLnByb3Rvcy5Vc2VyIn8KDFZpZGVvQ29udGVudBIOCgZwb3N0ZXIYASABKAkSIgoFc3RhdGUYAiABKA4yEy5wcm90b3MuVklERU9fU1RBVEUSCwoDc3JjGAMgASgJEg0KBWlzY2lkGAQgASgIEhAKCGR1cmF0aW9uGAUgASgNEg0KBXRpdGxlGAYgASgJImYKEFJlZFBhY2tldENvbnRlbnQSJQoEbW9kZRgBIAEoDjIXLnByb3Rvcy5SRURfUEFDS0VUX01PREUSDQoFbW9uZXkYAiABKAESDQoFdGl0bGUYAyABKAkSDQoFc3RhdGUYBCABKAkijwUKC0NoYXRNZXNzYWdlEiIKBHR5cGUYASABKA4yFC5wcm90b3MuTUVTU0FHRV9UWVBFEgwKBHRpbWUYAiABKAQSGgoEdXNlchgDIAEoCzIMLnByb3Rvcy5Vc2VyEisKDHRpbWVfY29udGVudBgEIAEoCzITLnByb3Rvcy5UaW1lQ29udGVudEgAEisKDG1lbWVfY29udGVudBgFIAEoCzITLnByb3Rvcy5NZW1lQ29udGVudEgAEi0KDWltYWdlX2NvbnRlbnQYBiABKAsyFC5wcm90b3MuSW1hZ2VDb250ZW50SAASNgoSdmlkZW9fY2FsbF9jb250ZW50GAcgASgLMhgucHJvdG9zLlZpZGVvQ2FsbENvbnRlbnRIABI2ChJhdWRpb19jYWxsX2NvbnRlbnQYCCABKAsyGC5wcm90b3MuQXVkaW9DYWxsQ29udGVudEgAEi0KDWF1ZGlvX2NvbnRlbnQYCSABKAsyFC5wcm90b3MuQXVkaW9Db250ZW50SAASKwoMdGV4dF9jb250ZW50GAogASgLMhMucHJvdG9zLlRleHRDb250ZW50SAASOgoUZG91eWluX3ZpZGVvX2NvbnRlbnQYCyABKAsyGi5wcm90b3MuRG91eWluVmlkZW9Db250ZW50SAASLQoNdmlkZW9fY29udGVudBgMIAEoCzIULnByb3Rvcy5WaWRlb0NvbnRlbnRIABI2ChJyZWRfcGFja2V0X2NvbnRlbnQYDSABKAsyGC5wcm90b3MuUmVkUGFja2V0Q29udGVudEgAEh0KBXN0YXRlGA4gASgOMg4ucHJvdG9zLlNUQVRVUxIQCghSZWNlaXZlchgPIAEoCUIJCgdjb250ZW50IjQKC01lc3NhZ2VsaXN0EiUKCG1zZ19saXN0GAEgAygLMhMucHJvdG9zLkNoYXRNZXNzYWdlKo8BCgxNRVNTQUdFX1RZUEUSCAoEVElNRRAAEggKBE1FTUUQARIJCgVJTUFHRRACEg4KClZJREVPX0NBTEwQAxIOCgpBVURJT19DQUxMEAQSCQoFQVVESU8QBRIICgRURVhUEAYSEAoMRE9VWUlOX1ZJREVPEAcSCQoFVklERU8QCBIOCgpSRURfUEFDS0VUEAkqHwoLQVVESU9fU1RBVEUSEAoMQVVESU9fTk9STUFMEAAqPgoKQ0FMTF9TVEFURRIPCgtDQUxMX1JFSkVDVBAAEhAKDENBTExfUkVTT0xWRRABEg0KCUNBTExfTk9ORRACKh4KC1ZJREVPX1NUQVRFEg8KC1ZJREVPX1ZBTElEEAAqHgoKUkVBRF9TVEFURRIQCgxSRUFEX0FSUklWRUQQACpBCg9SRURfUEFDS0VUX01PREUSFQoRUkVEX1BBQ0tFVF9TSU5HTEUQABIXChNSRURfUEFDS0VUX01VTFRJUExFEAEqLAoGU1RBVFVTEgsKB1NVQ0NFRUQQABIKCgZGQUlMRUQQARIJCgVHT0lORxACQhZaFGRvdXlpbmFwaS9wcm90b3Mvb3V0YgZwcm90bzM'
+    'Cg1tZXNzYWdlLnByb3RvEgZwcm90b3MiNwoEVXNlchIKCgJpZBgBIAEoCRIOCgZhdmF0YXIYAiABKAkSEwoLZGlzcGxheW5hbWUYAyABKAkiDQoLVGltZUNvbnRlbnQicAoLTWVtZUNvbnRlbnQSEQoJaW1hZ2VfdXJsGAEgASgJEiIKBXN0YXRlGAIgASgOMhMucHJvdG9zLkFVRElPX1NUQVRFEhsKBWxvdmVkGAMgAygLMgwucHJvdG9zLlVzZXISDQoFaXNjaWQYBCABKAgifAoMSW1hZ2VDb250ZW50EhEKCWltYWdlX3VybBgBIAEoCRIiCgVzdGF0ZRgCIAEoDjITLnByb3Rvcy5BVURJT19TVEFURRImCgpyZWFkX3N0YXRlGAMgASgOMhIucHJvdG9zLlJFQURfU1RBVEUSDQoFaXNjaWQYBCABKAgiSAoQVmlkZW9DYWxsQ29udGVudBIRCgljYWxsX3RpbWUYASABKAkSIQoFc3RhdGUYAiABKA4yEi5wcm90b3MuQ0FMTF9TVEFURSJIChBBdWRpb0NhbGxDb250ZW50EhEKCWNhbGxfdGltZRgBIAEoCRIhCgVzdGF0ZRgCIAEoDjISLnByb3Rvcy5DQUxMX1NUQVRFImAKDEF1ZGlvQ29udGVudBIQCghkdXJhdGlvbhgBIAEoDRILCgNzcmMYAiABKAkSIgoFc3RhdGUYAyABKA4yEy5wcm90b3MuQVVESU9fU1RBVEUSDQoFaXNjaWQYBCABKAgiGwoLVGV4dENvbnRlbnQSDAoEdGV4dBgBIAEoCSJXChJEb3V5aW5WaWRlb0NvbnRlbnQSIwoFdmlkZW8YASABKAsyFC5wcm90b3MuVmlkZW9Db250ZW50EhwKBmF1dGhvchgCIAEoCzIMLnByb3Rvcy5Vc2VyIjkKE0J1c2luZXNzQ2FydENvbnRlbnQSIgoIdXNlckNhcnQYASABKAsyEC5wcm90b3MuVXNlckluZm8iMAoQVmlkZW9DYXJkQ29udGVudBIcCgV2aWRlbxgBIAEoCzINLnByb3Rvcy5WaWRlbyJ/CgxWaWRlb0NvbnRlbnQSDgoGcG9zdGVyGAEgASgJEiIKBXN0YXRlGAIgASgOMhMucHJvdG9zLlZJREVPX1NUQVRFEgsKA3NyYxgDIAEoCRINCgVpc2NpZBgEIAEoCBIQCghkdXJhdGlvbhgFIAEoDRINCgV0aXRsZRgGIAEoCSJmChBSZWRQYWNrZXRDb250ZW50EiUKBG1vZGUYASABKA4yFy5wcm90b3MuUkVEX1BBQ0tFVF9NT0RFEg0KBW1vbmV5GAIgASgBEg0KBXRpdGxlGAMgASgJEg0KBXN0YXRlGAQgASgJIoUGCgtDaGF0TWVzc2FnZRIiCgR0eXBlGAEgASgOMhQucHJvdG9zLk1FU1NBR0VfVFlQRRIMCgR0aW1lGAIgASgEEhoKBHVzZXIYAyABKAsyDC5wcm90b3MuVXNlchIrCgx0aW1lX2NvbnRlbnQYBCABKAsyEy5wcm90b3MuVGltZUNvbnRlbnRIABIrCgxtZW1lX2NvbnRlbnQYBSABKAsyEy5wcm90b3MuTWVtZUNvbnRlbnRIABItCg1pbWFnZV9jb250ZW50GAYgASgLMhQucHJvdG9zLkltYWdlQ29udGVudEgAEjYKEnZpZGVvX2NhbGxfY29udGVudBgHIAEoCzIYLnByb3Rvcy5WaWRlb0NhbGxDb250ZW50SAASNgoSYXVkaW9fY2FsbF9jb250ZW50GAggASgLMhgucHJvdG9zLkF1ZGlvQ2FsbENvbnRlbnRIABItCg1hdWRpb19jb250ZW50GAkgASgLMhQucHJvdG9zLkF1ZGlvQ29udGVudEgAEisKDHRleHRfY29udGVudBgKIAEoCzITLnByb3Rvcy5UZXh0Q29udGVudEgAEjoKFGRvdXlpbl92aWRlb19jb250ZW50GAsgASgLMhoucHJvdG9zLkRvdXlpblZpZGVvQ29udGVudEgAEi0KDXZpZGVvX2NvbnRlbnQYDCABKAsyFC5wcm90b3MuVmlkZW9Db250ZW50SAASNgoScmVkX3BhY2tldF9jb250ZW50GA0gASgLMhgucHJvdG9zLlJlZFBhY2tldENvbnRlbnRIABI8ChVidXNpbmVzc19jYXJ0X2NvbnRlbnQYDiABKAsyGy5wcm90b3MuQnVzaW5lc3NDYXJ0Q29udGVudEgAEjYKEnZpZGVvX2NhcmRfY29udGVudBgPIAEoCzIYLnByb3Rvcy5WaWRlb0NhcmRDb250ZW50SAASHQoFc3RhdGUYECABKA4yDi5wcm90b3MuU1RBVFVTEhAKCFJlY2VpdmVyGBEgASgJQgkKB2NvbnRlbnQiNAoLTWVzc2FnZWxpc3QSJQoIbXNnX2xpc3QYASADKAsyEy5wcm90b3MuQ2hhdE1lc3NhZ2UqwgEKDE1FU1NBR0VfVFlQRRIICgRUSU1FEAASCAoETUVNRRABEgkKBUlNQUdFEAISDgoKVklERU9fQ0FMTBADEg4KCkFVRElPX0NBTEwQBBIJCgVBVURJTxAFEggKBFRFWFQQBhIQCgxET1VZSU5fVklERU8QBxIJCgVWSURFTxAIEg4KClJFRF9QQUNLRVQQCRIRCg1CVVNJTkVTU19DQVJEEAoSDgoKR1JPVVBfQ0FSRBALEg4KClZJREVPX0NBUkQQDCofCgtBVURJT19TVEFURRIQCgxBVURJT19OT1JNQUwQACo+CgpDQUxMX1NUQVRFEg8KC0NBTExfUkVKRUNUEAASEAoMQ0FMTF9SRVNPTFZFEAESDQoJQ0FMTF9OT05FEAIqHgoLVklERU9fU1RBVEUSDwoLVklERU9fVkFMSUQQACoeCgpSRUFEX1NUQVRFEhAKDFJFQURfQVJSSVZFRBAAKkEKD1JFRF9QQUNLRVRfTU9ERRIVChFSRURfUEFDS0VUX1NJTkdMRRAAEhcKE1JFRF9QQUNLRVRfTVVMVElQTEUQASosCgZTVEFUVVMSCwoHU1VDQ0VFRBAAEgoKBkZBSUxFRBABEgkKBUdPSU5HEAJCFloUZG91eWluYXBpL3Byb3Rvcy9vdXRiBnByb3RvMw',
+    [file_userinfo, file_video]
   )
 
 /**
@@ -235,6 +240,42 @@ export const DouyinVideoContentSchema: GenMessage<DouyinVideoContent> =
   messageDesc(file_message, 8)
 
 /**
+ * @generated from message protos.BusinessCartContent
+ */
+export type BusinessCartContent = Message<'protos.BusinessCartContent'> & {
+  /**
+   * @generated from field: protos.UserInfo userCart = 1;
+   */
+  userCart?: UserInfo
+}
+
+/**
+ * Describes the message protos.BusinessCartContent.
+ * Use `create(BusinessCartContentSchema)` to create a new message.
+ */
+export const BusinessCartContentSchema: GenMessage<BusinessCartContent> =
+  /*@__PURE__*/
+  messageDesc(file_message, 9)
+
+/**
+ * @generated from message protos.VideoCardContent
+ */
+export type VideoCardContent = Message<'protos.VideoCardContent'> & {
+  /**
+   * @generated from field: protos.Video video = 1;
+   */
+  video?: Video
+}
+
+/**
+ * Describes the message protos.VideoCardContent.
+ * Use `create(VideoCardContentSchema)` to create a new message.
+ */
+export const VideoCardContentSchema: GenMessage<VideoCardContent> =
+  /*@__PURE__*/
+  messageDesc(file_message, 10)
+
+/**
  * @generated from message protos.VideoContent
  */
 export type VideoContent = Message<'protos.VideoContent'> & {
@@ -275,7 +316,7 @@ export type VideoContent = Message<'protos.VideoContent'> & {
  */
 export const VideoContentSchema: GenMessage<VideoContent> =
   /*@__PURE__*/
-  messageDesc(file_message, 9)
+  messageDesc(file_message, 11)
 
 /**
  * @generated from message protos.RedPacketContent
@@ -308,7 +349,7 @@ export type RedPacketContent = Message<'protos.RedPacketContent'> & {
  */
 export const RedPacketContentSchema: GenMessage<RedPacketContent> =
   /*@__PURE__*/
-  messageDesc(file_message, 10)
+  messageDesc(file_message, 12)
 
 /**
  * @generated from message protos.ChatMessage
@@ -403,17 +444,31 @@ export type ChatMessage = Message<'protos.ChatMessage'> & {
         value: RedPacketContent
         case: 'redPacketContent'
       }
+    | {
+        /**
+         * @generated from field: protos.BusinessCartContent business_cart_content = 14;
+         */
+        value: BusinessCartContent
+        case: 'businessCartContent'
+      }
+    | {
+        /**
+         * @generated from field: protos.VideoCardContent video_card_content = 15;
+         */
+        value: VideoCardContent
+        case: 'videoCardContent'
+      }
     | { case: undefined; value?: undefined }
 
   /**
-   * @generated from field: protos.STATUS state = 14;
+   * @generated from field: protos.STATUS state = 16;
    */
   state: STATUS
 
   /**
    * string text_content0 = 15;
    *
-   * @generated from field: string Receiver = 15;
+   * @generated from field: string Receiver = 17;
    */
   Receiver: string
 }
@@ -424,7 +479,7 @@ export type ChatMessage = Message<'protos.ChatMessage'> & {
  */
 export const ChatMessageSchema: GenMessage<ChatMessage> =
   /*@__PURE__*/
-  messageDesc(file_message, 11)
+  messageDesc(file_message, 13)
 
 /**
  * @generated from message protos.Messagelist
@@ -442,7 +497,7 @@ export type Messagelist = Message<'protos.Messagelist'> & {
  */
 export const MessagelistSchema: GenMessage<Messagelist> =
   /*@__PURE__*/
-  messageDesc(file_message, 12)
+  messageDesc(file_message, 14)
 
 /**
  * @generated from enum protos.MESSAGE_TYPE
@@ -496,7 +551,22 @@ export enum MESSAGE_TYPE {
   /**
    * @generated from enum value: RED_PACKET = 9;
    */
-  RED_PACKET = 9
+  RED_PACKET = 9,
+
+  /**
+   * @generated from enum value: BUSINESS_CARD = 10;
+   */
+  BUSINESS_CARD = 10,
+
+  /**
+   * @generated from enum value: GROUP_CARD = 11;
+   */
+  GROUP_CARD = 11,
+
+  /**
+   * @generated from enum value: VIDEO_CARD = 12;
+   */
+  VIDEO_CARD = 12
 }
 
 /**

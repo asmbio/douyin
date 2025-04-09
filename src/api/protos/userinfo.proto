@@ -101,7 +101,7 @@ message UserInfo {
   //  附加信息联系人
   string displayname_py=30;
   string displayname=31;
-  bool isgroup=32;
+  bool isgroup=32;  
   bool isnotice=33;
   bool istop=34;
   bool is_connect=35;
@@ -114,6 +114,9 @@ message UserInfo {
   repeated CardEntry card_entries = 40;
 
   bool select =41;  
+  bool isMyGroup =42;
+  int64 friends_count = 43;
+  bool shared=  44;
 }
 
 message Userinfolist {

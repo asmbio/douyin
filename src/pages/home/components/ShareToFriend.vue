@@ -26,19 +26,23 @@
               v-for="(item, i) in searchResult"
               @click="handleClick2(item)"
             >
-              <img class="left" v-lazy="_checkImgUrl(item.avatar)" alt="" />
+              <img class="left" v-lazy="_getavater(item)" alt="" />
               <div class="right">
-                <div class="info">
+                <div class="info" @click="nav('/message/chat', { uid: item.uid })">
                   <span class="name">
-                    <span v-if="item.name.indexOf(searchKey) > -1">
-                      {{ item.name.substr(0, item.name.indexOf(searchKey))
+                    <span v-if="item.displayname.indexOf(searchKey) > -1">
+                      {{ item.displayname.substr(0, item.displayname.indexOf(searchKey))
                       }}<span style="color: #fc2f56">{{ searchKey }}</span
-                      >{{ item.name.substr(item.name.indexOf(searchKey) + searchKey.length) }}
+                      >{{
+                        item.displayname.substr(
+                          item.displayname.indexOf(searchKey) + searchKey.length
+                        )
+                      }}
                     </span>
-                    <span v-else>{{ item.name }}</span>
+                    <span v-else>{{ item.displayname }}</span>
                   </span>
                 </div>
-                <dy-button :type="item.shared ? 'dark' : 'primary'" @click="item.shared = true">
+                <dy-button :type="item.shared ? 'dark' : 'primary'" @click="handleClickShare(item)">
                   {{ item.shared ? '已' : '' }}分享
                 </dy-button>
               </div>
@@ -59,11 +63,11 @@
           </div>
           <div class="friend-list">
             <div class="index">所有朋友</div>
-            <div class="friend-item" :key="i" v-for="(item, i) in localFriends">
-              <img class="left" v-lazy="_checkImgUrl(item.avatar)" alt="" />
+            <div class="friend-item" :key="i" v-for="(item, i) in baseStore.friends.all">
+              <img class="left" v-lazy="_getavater(item)" alt="" />
               <div class="right">
-                <span>{{ item.name }}</span>
-                <dy-button :type="item.shared ? 'dark' : 'primary'" @click="item.shared = true">
+                <span>{{ item.displayname }}</span>
+                <dy-button :type="item.shared ? 'dark' : 'primary'" @click="handleClickShare(item)">
                   {{ item.shared ? '已' : '' }}分享
                 </dy-button>
               </div>
@@ -78,15 +82,15 @@
           <span>&nbsp;</span>
         </div>
 
-        <div class="chat-list">
-          <div class="chat-item" :key="i" v-for="(item, i) in localFriends">
-            <img class="left" v-lazy="_checkImgUrl(item.avatar)" alt="" />
+        <div class="friend-list">
+          <div class="friend-item" :key="i" v-for="(item, i) in jionedGroups">
+            <img class="left" v-lazy="_getavater(item)" alt="" />
             <div class="right">
-              <div class="title">
-                <div class="name">{{ text }}</div>
-                <div class="num">(3)</div>
+              <div class="title" @click="nav('/message/chat', { uid: item.uid })">
+                <div class="name">{{ item.displayname }}</div>
+                <div class="num">({{ item.followerCount }})</div>
               </div>
-              <dy-button :type="item.shared ? 'dark' : 'primary'" @click="item.shared = true">
+              <dy-button :type="item.shared ? 'dark' : 'primary'" @click="handleClickShare(item)">
                 {{ item.shared ? '已' : '' }}分享
               </dy-button>
             </div>
@@ -96,93 +100,145 @@
     </div>
   </from-bottom-dialog>
 </template>
-<script>
-import FromBottomDialog from '../../../components/dialog/FromBottomDialog'
-import { mapState } from 'pinia'
-import Search from '../../../components/Search'
+<script lang="ts" setup>
+import { ref, computed, watch, onMounted } from 'vue'
 import { useBaseStore } from '@/store/pinia'
-import { _checkImgUrl, cloneDeep } from '@/utils'
+import { _checkImgUrl, _getavater, cloneDeep } from '@/utils'
+import FromBottomDialog from '@/components/dialog/FromBottomDialog.vue'
+import Search from '@/components/Search.vue'
+import { getContacts, sendMessage } from '@/api/moguservice'
+import { CONTACT_TAG } from '@/api/gen/moguervice_pb'
+import type { UserInfo } from '@/api/gen/userinfo_pb'
+import type { Video } from '@/api/gen/video_pb'
+import {
+  MESSAGE_TYPE,
+  type BusinessCartContent,
+  type ChatMessage as cMessage,
+  type User,
+  type VideoCardContent
+} from '@/api/gen/message_pb'
+import { useNav } from '@/utils/hooks/useNav'
+
 /*
 分享给朋友
-* */
-export default {
-  name: 'ShareTo',
-  components: {
-    FromBottomDialog,
-    Search
-  },
-  props: {
-    modelValue: {
-      type: Boolean,
-      default() {
-        return false
-      }
-    },
-    pageId: {
-      type: String,
-      default: 'home-index'
+*/
+const props = withDefaults(
+  defineProps<{
+    modelValue?: boolean
+    pageId?: string
+    item: Video
+  }>(),
+  {
+    modelValue: false,
+    pageId: 'home-index'
+  }
+)
+
+const emit = defineEmits(['update:modelValue'])
+
+const height = ref('70vh')
+const showJoinedChat = ref(false)
+const isShowRightText = ref(false)
+
+const jionedGroups = ref<UserInfo[]>([])
+
+const searchResult = ref<UserInfo[]>([])
+const searchKey = ref('')
+
+const baseStore = useBaseStore()
+const nav = useNav()
+
+// const selectFriends = computed(() => {
+//   return localFriends.value.filter((v) => v.shared)
+// })
+
+watch(searchKey, (newVal) => {
+  if (newVal) {
+    searchResult.value = jionedGroups.value.filter((v) => {
+      return v.displayname.includes(newVal) || v.nickname.includes(newVal)
+    })
+  } else {
+    searchResult.value = []
+  }
+})
+
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    if (newVal) {
+      console.log(newVal)
+    } else {
+      searchKey.value = ''
+      height.value = '70vh'
+      isShowRightText.value = false
+      showJoinedChat.value = false
     }
-  },
-  data() {
-    return {
-      height: '70vh',
-      showJoinedChat: false,
-      isShowRightText: false,
-      text: 'AAAAAAA、BBBBBBBB、CCCCCCCCCCCCC',
-      localFriends: [],
-      searchResult: [],
-      searchKey: ''
+  }
+)
+onMounted(() => {
+  getGroups()
+})
+async function getGroups() {
+  try {
+    let res = await getContacts('', 100, CONTACT_TAG.GROUP)
+    jionedGroups.value = res.all
+  } catch (error) {
+    console.log(error)
+  }
+}
+function handleClick() {
+  isShowRightText.value = true
+  height.value = 'calc(var(--vh, 1vh) * 100)'
+}
+
+function handleClick2(item: any) {
+  item.select = !item.select
+  searchKey.value = ''
+}
+
+function onNotice() {
+  isShowRightText.value = false
+  searchKey.value = ''
+  height.value = '70vh'
+}
+
+function cancel() {
+  height.value = '70vh'
+  emit('update:modelValue', false)
+}
+
+async function handleClickShare(item: UserInfo) {
+  item.shared = !item.shared
+
+  if (item.shared) {
+    // 创建消息对象
+    const newMsg = {
+      type: MESSAGE_TYPE.BUSINESS_CARD,
+      content: {
+        case: 'businessCartContent'
+      },
+      time: BigInt(Date.now()) * 1_000_000n,
+      user: {
+        id: baseStore.userinfo.uid,
+        avatar: baseStore.userinfo.avatar168x168?.urlList[0]
+      },
+      Receiver: item.uid
+    } as cMessage
+    if (props.pageId === 'home-index') {
+      newMsg.content.value = { video: props.item } as VideoCardContent
+    } else if (props.pageId === 'userPanel') {
+      newMsg.content.value = {
+        userCart: props.item.author
+      } as BusinessCartContent
     }
-  },
-  watch: {
-    searchKey(newVal) {
-      if (newVal) {
-        let temp = cloneDeep(this.localFriends)
-        this.searchResult = temp.filter((v) => {
-          // return v.name.includes(newVal) || v.account.includes(newVal);
-          return v.name.includes(newVal)
-        })
-      } else {
-        this.searchResult = []
-      }
-    },
-    modelValue(newVal) {
-      if (newVal) {
-        this.localFriends = cloneDeep(this.friends.all)
-        this.localFriends.map((v) => (v.shared = false))
-      } else {
-        this.searchKey = ''
-        this.height = '70vh'
-        this.isShowRightText = false
-        this.showJoinedChat = false
-      }
-    }
-  },
-  computed: {
-    ...mapState(useBaseStore, ['friends']),
-    selectFriends() {
-      return this.localFriends.filter((v) => v.shared)
-    }
-  },
-  created() {},
-  methods: {
-    _checkImgUrl,
-    handleClick() {
-      this.isShowRightText = true
-      this.height = 'calc(var(--vh, 1vh) * 100)'
-    },
-    handleClick2(item) {
-      item.select = !item.select
-      this.searchKey = ''
-    },
-    onNotice() {
-      this.isShowRightText = false
-      this.searchKey = ''
-      this.height = '70vh'
-    },
-    cancel() {
-      this.height = '70vh'
-      this.$emit('update:modelValue', false)
+    try {
+      console.log(newMsg)
+      baseStore.addOrUpdateNotification(props.item.author) // 添加到通知列表
+      baseStore.updateLastContent(newMsg)
+      // 发送消息
+      var ret = await sendMessage(newMsg)
+    } catch (error) {
+      console.log(error)
     }
   }
 }
@@ -219,6 +275,7 @@ export default {
     }
 
     .left {
+      flex: 0;
       width: @avatar-width;
       height: @avatar-width;
       border-radius: 50%;
@@ -231,7 +288,21 @@ export default {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      .title {
+        display: flex;
+        align-items: center;
 
+        .name {
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+        }
+
+        .num {
+          margin-left: 5rem;
+          color: var(--second-text-color);
+        }
+      }
       img {
         height: 20rem;
       }
@@ -338,6 +409,7 @@ export default {
         align-items: center;
         position: relative;
         overflow: hidden;
+        justify-content: space-between;
 
         &:nth-last-child(1) {
           margin-bottom: 0;
