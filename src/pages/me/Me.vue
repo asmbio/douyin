@@ -471,10 +471,19 @@ export default {
       this.initSlideHeight = this.bodyHeight - 50 - this.refs.descHeight - 50
       this.canTransformY = this.refs.descHeight - this.floatHeight
       this.changeIndex(0, null)
+
+      // 添加滚轮事件监听
+      this.$refs.scroll.addEventListener('wheel', this.handleWheel, { passive: false })
     })
     this.videoItemHeight = (this.bodyWidth / 3) * 1.2 + 2
     bus.on('baseSlide-moved', () => (this.canScroll = false))
     bus.on('baseSlide-end', () => (this.canScroll = true))
+  },
+  beforeUnmount() {
+    // 清理事件监听
+    if (this.$refs.scroll) {
+      this.$refs.scroll.removeEventListener('wheel', this.handleWheel)
+    }
   },
   methods: {
     _no,
@@ -916,6 +925,54 @@ export default {
     filterAge(age) {
       let date = new Date(age)
       return new Date().getFullYear() - date.getFullYear()
+    },
+    // 添加滚轮处理方法
+    async handleWheel(e) {
+      if (!this.canScroll) {
+        e.preventDefault()
+        return
+      }
+
+      e.preventDefault()
+      const deltaY = e.deltaY
+
+      if (this.isScroll) {
+        let SlideItems = document.querySelectorAll('.SlideItem')
+        let SlideItem = SlideItems[this.contentIndex]
+        SlideItem.scrollTop += deltaY
+
+        if (SlideItem.scrollTop === 0 && deltaY < 0) {
+          this.tempScroll = this.isScroll = false
+          this.lastMoveYDistance = -this.canTransformY
+        }
+
+        if (SlideItem.scrollHeight - SlideItem.clientHeight < SlideItem.scrollTop + 60) {
+          this.loadMoreData()
+        }
+      } else {
+        const currentTransform = this.getTransform(this.$refs.scroll)
+        let newTransform = currentTransform - deltaY
+
+        if (deltaY < 0) {
+          // 向上滚动
+          if (newTransform > 0) {
+            newTransform = 0
+          }
+        } else {
+          // 向下滚动
+          if (Math.abs(newTransform) > this.canTransformY) {
+            this.isScroll = true
+            this.floatFixed = true
+            this.floatShowName = true
+            newTransform = -this.canTransformY
+          }
+        }
+
+        this.floatFixed = Math.abs(newTransform) > 100
+        this.floatShowName = Math.abs(newTransform) > 150
+        this.$refs.scroll.style.transform = `translate3d(0,${newTransform}px,0)`
+        this.lastMoveYDistance = newTransform
+      }
     }
   }
 }

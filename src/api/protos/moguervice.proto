@@ -37,7 +37,9 @@ service MoguService {
    rpc MyVideo(MyVideoRequest)returns (VideoList){}
    rpc GetRecommendedVideos(VideoRequest) returns (VideoList) {}
    rpc PushVideo(Worksmsg) returns (google.protobuf.Empty){}
-
+   rpc PushVideoComment(WorksCommentMsg) returns (google.protobuf.Empty){}
+   rpc GetVideoComments(VideoCommentsRequest) returns (CommentList){}   
+   rpc UpdateVideoViewStatus(UpdateVideoViewRequest) returns (UpdateVideoViewResponse){}
 
    // blocks
     rpc SignAndPubMsg(MessageBS) returns (google.protobuf.Empty) {}
@@ -70,6 +72,23 @@ service MoguService {
 
   
 }
+
+message VideoCommentsRequest{
+  string addr =1;
+  string videoId=2;
+  string subCommentId= 3;
+  string fromkey =4;
+  int32 size =5;
+}
+
+message SubCommentsRequest{
+  string addr =1;
+  string videoId=2;
+  string subCommentId= 3;
+  string fromkey =4;
+  int32 size =5;
+}
+
 message SendMessageResponse{
   STATUS status=1; // 发送状态
 }

@@ -230,6 +230,42 @@ message Pagination {
 }
 
 
+// 评论详情
+message Comment {
+  string comment_id = 1;       // 评论ID
+  int64 create_time = 2;       // 创建时间
+  string ip_location = 3;      // IP地理位置
+  string aweme_id = 4;         // 视频ID
+  string content = 5;          // 评论内容
+  bool is_author_digged = 6;   // 是否被作者点赞
+  bool is_folded = 7;          // 是否折叠
+  bool is_hot = 8;             // 是否热评
+  bool user_buried = 9;        // 用户是否埋藏
+  bool user_digged = 10;      // 用户是否点赞
+  int64 digg_count = 11;      // 点赞数量
+  UserInfo user =12;
+  int64 sub_comment_count = 19; // 子评论数量
+  int64 last_modify_ts = 20;    // 最后修改时间戳
+}
+
+// 评论列表
+message CommentList {
+  repeated Comment comments = 1; // 评论列表
+}
+
+
+
+message UpdateVideoViewRequest {
+  string video_id = 1;        // The ID of the video (aweme_id)
+  int64 watch_duration = 2;   // Duration watched in seconds
+  bool completed = 3;         // Whether the video was watched completely
+  string position = 4;        // Position in video (in seconds) where user stopped watching
+}
+
+message UpdateVideoViewResponse {
+  bool success = 1;           // Whether the update was successful
+  string message = 2;         // Optional message (error message if not successful)
+}
 
 // {
 //   "aweme_id": "6727250369396608264",

@@ -1,7 +1,8 @@
 <template>
   <div class="publish-confirm">
     <div class="header">
-      <Icon icon="mingcute:close-line" @click="router.back()" />
+      <Icon icon="mingcute:close-line" class="close-icon" @click="router.back()" />
+      <div class="title">编辑封面</div>
     </div>
 
     <div class="content" :class="{ 'input-focused': isInputFocused }">
@@ -32,53 +33,58 @@
           class="custom-textarea"
         ></textarea>
 
-        <div class="section">
-          <input type="text" placeholder="# 话题 @ 朋友" class="hashtag-input" />
+        <div class="section topic-section">
+          <input type="text" placeholder="#话题 @朋友" class="topic-input" />
           <div class="tags">
-            <span class="tag">#每天必打开的软件</span>
-            <span class="tag">#一起撸羊毛</span>
-            <span class="tag">#软件分享</span>
+            <span class="tag"># 每天必打开的软件</span>
+            <span class="tag"># 一起撸羊毛</span>
+            <span class="tag"># 软件分享</span>
           </div>
         </div>
 
         <div class="section location-section">
-          <Icon icon="mdi:map-marker-outline" class="location-icon" />
-          <input type="text" v-model="location" placeholder="你在哪里" class="location-input" />
+          <div class="location-input-wrapper">
+            <Icon icon="mdi:map-marker-outline" class="location-icon" />
+            <input type="text" v-model="location" placeholder="你在哪里" class="location-input" />
+          </div>
           <div class="location-options">
             <span class="option">门景区</span>
-            <span class="option">友谊公园</span>
+            <span class="option">中越人民友谊公园</span>
             <span class="option">A+酒吧</span>
-            <span class="option">友谊广场</span>
+            <span class="option">中越友谊广场</span>
           </div>
         </div>
 
-        <div class="section">
+        <div class="section tag-section">
           <div class="tag-selector">
-            <Icon icon="mdi:tag-outline" />
-            <input type="text" placeholder="📌 添加标签" v-model="newTag" />
+            <Icon icon="mdi:tag-outline" class="tag-icon" />
+            <input type="text" placeholder="📌 添加标签" v-model="newTag" class="tag-input" />
           </div>
           <div class="selected-tags">
             <span v-for="(tag, index) in tags" :key="index" class="tag">
               {{ tag }}
-              <Icon icon="mdi:close" @click="removeTag(index)" />
+              <Icon icon="mdi:close" @click="removeTag(index)" class="remove-tag" />
             </span>
           </div>
         </div>
 
         <div class="settings">
           <div class="setting-item">
-            <span>🔍 公开·所有人可见</span>
-            <Icon icon="material-symbols:arrow-forward-ios-rounded" />
+            <span class="setting-text">🔒 公开·所有人可见</span>
+            <Icon icon="material-symbols:arrow-forward-ios-rounded" class="forward-icon" />
           </div>
           <div class="setting-item">
-            <span>💡 高级设置</span>
-            <Icon icon="material-symbols:arrow-forward-ios-rounded" />
+            <span class="setting-text">⚙️ 高级设置</span>
+            <Icon icon="material-symbols:arrow-forward-ios-rounded" class="forward-icon" />
           </div>
         </div>
       </div>
 
-      <!-- 右下角发布按钮 -->
-      <button class="publish-btn" @click="handlePublish">发布</button>
+      <!-- 发布按钮 -->
+      <div class="bottom-area">
+        <div class="draft-btn">存草稿</div>
+        <button class="publish-btn" @click="handlePublish">发作品</button>
+      </div>
     </div>
   </div>
 </template>
@@ -112,9 +118,9 @@ const isInputFocused = ref(false)
 const obj = create(WorksmsgSchema, {
   From: store.userinfo.uid,
   Feesrate: BigInt(0),
-  Title: 'My Video Title',
-  Topic: ['topic1', 'topic2'],
-  AtUsers: ['user789', 'user101'],
+  Title: '',
+  Topic: [],
+  AtUsers: [],
   Desc: '',
   MediaType: MEDIA_TYPE._VIDEO_MIXED,
   Time: BigInt(Date.now() * 1_000_000),
@@ -315,11 +321,17 @@ const handlePublish = async () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: white;
+  background: #f8f8f8;
   display: flex;
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
 
   .header {
     position: sticky;
@@ -331,9 +343,16 @@ const handlePublish = async () => {
     z-index: 10;
     box-shadow: 0 2rem 10rem rgba(0, 0, 0, 0.05);
 
-    .icon {
+    .close-icon {
       font-size: 24rem;
       cursor: pointer;
+    }
+
+    .title {
+      flex: 1;
+      text-align: center;
+      font-size: 18rem;
+      font-weight: 500;
     }
   }
 
@@ -341,153 +360,189 @@ const handlePublish = async () => {
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: auto;
-    padding: 0 20rem 80rem;
-    transition: all 0.3s ease;
-
-    &.input-focused {
-      .preview-area {
-        height: 50vh !important;
-      }
-    }
+    padding: 15rem 15rem calc(80rem + env(safe-area-inset-bottom)); // 增加底部padding以显示完整内容
 
     .preview-area {
-      width: 100%;
-      max-width: 400rem;
-      margin: 0 auto;
-      height: 60vh;
-      border-radius: 8rem;
+      width: min(360rem, 90%); // 调整最大宽度
+      margin: 0 auto 15rem;
+      aspect-ratio: 9/16;
+      height: auto;
+      max-height: 65vh; // 调整最大高度
+      border-radius: 12rem;
       overflow: hidden;
-      background: #000;
-      transition: height 0.3s ease;
+      background: #f0f0f0;
+      box-shadow: 0 2rem 8rem rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
       .single-preview {
         width: 100%;
         height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
         img,
         video {
           width: 100%;
           height: 100%;
           object-fit: contain;
-          background: white;
         }
-      }
-
-      .preview-placeholder {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        color: #999;
-        font-size: 16rem;
-        background: #f5f5f5;
       }
     }
 
     .form {
-      width: 100%;
-      max-width: 600rem;
-      margin: 20rem auto 0;
-      display: flex;
-      flex-direction: column;
-      gap: 15rem;
+      background: white;
+      border-radius: 12rem;
+      overflow: hidden;
 
       .custom-textarea {
         width: 100%;
-        min-height: 40rem !important;
+        min-height: 40rem; // 设置最小高度
+        height: 40rem;
+        max-height: 150rem; // 设置最大高度
         padding: 15rem;
         border: none;
-        border-radius: 8rem;
-        background: white;
-        font-size: 14rem;
+        font-size: 16rem;
         resize: none;
-        transition: height 0.3s ease;
+        background: transparent;
 
+        &::placeholder {
+          color: #999;
+        }
         &:focus {
-          outline: none !important;
-          border: none !important;
-          box-shadow: none !important;
+          outline: none;
         }
       }
 
-      input {
-        &:focus {
-          outline: none !important;
-          border: none !important;
-          box-shadow: none !important;
-        }
-      }
-
-      .section {
+      .topic-section {
         padding: 15rem;
-        background: white;
-        border-radius: 8rem;
+        border-top: 1px solid #f0f0f0;
 
-        &.location-section {
-          position: relative;
-          padding: 15rem 15rem 40rem 15rem;
+        .topic-input {
+          width: 100%;
+          padding: 10rem 0;
+          border: none;
+          font-size: 16rem;
+          background: transparent;
 
-          .location-icon {
-            position: absolute;
-            left: 15rem;
-            top: 18rem;
-            font-size: 20rem;
+          &::placeholder {
+            color: #999;
           }
-
-          .location-input {
-            width: 100%;
-            padding-left: 30rem;
-            border: none;
-            background: transparent;
-            font-size: 14rem;
-          }
-
-          .location-options {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10rem;
-            margin-top: 15rem;
-
-            .option {
-              padding: 5rem 10rem;
-              background: white;
-              border-radius: 15rem;
-              font-size: 12rem;
-            }
+          &:focus {
+            outline: none;
           }
         }
 
         .tags {
           display: flex;
+          flex-wrap: wrap;
           gap: 10rem;
           margin-top: 10rem;
 
           .tag {
-            padding: 5rem 10rem;
-            background: var(--primary-light);
-            color: var(--primary-color);
-            border-radius: 15rem;
-            font-size: 12rem;
+            padding: 6rem 12rem;
+            background: #f8f8f8;
+            border-radius: 20rem;
+            color: #666;
+            font-size: 14rem;
+          }
+        }
+      }
+
+      .location-section {
+        padding: 15rem;
+        border-top: 1px solid #f0f0f0;
+
+        .location-input-wrapper {
+          display: flex;
+          align-items: center;
+          gap: 10rem;
+
+          .location-icon {
+            font-size: 20rem;
+            color: #666;
+          }
+
+          .location-input {
+            flex: 1;
+            border: none;
+            font-size: 16rem;
+            background: transparent;
+
+            &::placeholder {
+              color: #999;
+            }
+            &:focus {
+              outline: none;
+            }
+          }
+        }
+
+        .location-options {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10rem;
+          margin-top: 15rem;
+
+          .option {
+            padding: 6rem 12rem;
+            background: #f8f8f8;
+            border-radius: 20rem;
+            color: #666;
+            font-size: 14rem;
+          }
+        }
+      }
+
+      .tag-section {
+        padding: 15rem;
+        border-top: 1px solid #f0f0f0;
+
+        .tag-selector {
+          display: flex;
+          align-items: center;
+          gap: 10rem;
+
+          .tag-icon {
+            font-size: 20rem;
+            color: #666;
+          }
+
+          .tag-input {
+            flex: 1;
+            border: none;
+            font-size: 16rem;
+            background: transparent;
+
+            &::placeholder {
+              color: #999;
+            }
+            &:focus {
+              outline: none;
+            }
           }
         }
 
         .selected-tags {
           display: flex;
           flex-wrap: wrap;
-          gap: 8rem;
+          gap: 10rem;
           margin-top: 10rem;
 
           .tag {
-            padding: 5rem 10rem;
-            background: var(--primary-light);
-            border-radius: 15rem;
-            font-size: 12rem;
             display: flex;
             align-items: center;
             gap: 5rem;
+            padding: 6rem 12rem;
+            background: #f8f8f8;
+            border-radius: 20rem;
+            color: #666;
+            font-size: 14rem;
 
-            .icon {
-              font-size: 14rem;
+            .remove-tag {
+              font-size: 16rem;
               cursor: pointer;
             }
           }
@@ -495,35 +550,61 @@ const handlePublish = async () => {
       }
 
       .settings {
-        margin-top: 20rem;
+        padding: 0 15rem;
 
         .setting-item {
           display: flex;
           justify-content: space-between;
           align-items: center;
           padding: 15rem 0;
-          border-bottom: 1rem solid #eee;
+          border-top: 1px solid #f0f0f0;
 
-          .icon {
-            font-size: 14rem;
+          .setting-text {
+            font-size: 16rem;
+            color: #333;
+          }
+
+          .forward-icon {
+            font-size: 16rem;
             color: #999;
           }
         }
       }
     }
+  }
+
+  .bottom-area {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 15rem;
+    padding: 15rem 20rem;
+    padding-bottom: calc(15rem + env(safe-area-inset-bottom)); // 适配底部安全区域
+    background: white;
+    box-shadow: 0 -2rem 10rem rgba(0, 0, 0, 0.05);
+    z-index: 100; // 确保底部按钮始终在顶层
+
+    .draft-btn {
+      padding: 8rem 20rem;
+      border-radius: 20rem;
+      background: #f0f0f0;
+      color: #666;
+      font-size: 14rem;
+      cursor: pointer;
+    }
 
     .publish-btn {
-      position: fixed;
-      right: 30rem;
-      bottom: 30rem;
-      padding: 6rem 30rem;
+      padding: 8rem 25rem;
       border: none;
-      border-radius: 25rem;
-      background: #ff0000;
+      border-radius: 20rem;
+      background: var(--primary-color, #ff2c54);
       color: white;
-      font-size: 16rem;
-      box-shadow: 0 4rem 12rem rgba(0, 0, 0, 0.15);
-      z-index: 10;
+      font-size: 14rem;
+      cursor: pointer;
     }
   }
 }
@@ -531,24 +612,11 @@ const handlePublish = async () => {
 @media (max-width: 768rem) {
   .publish-confirm {
     .content {
-      padding: 0 15rem 70rem;
-
-      &.input-focused {
-        .preview-area {
-          height: 30vh !important;
-        }
-      }
+      padding: 10rem 10rem calc(70rem + env(safe-area-inset-bottom));
 
       .preview-area {
-        height: 50vh;
         width: 90%;
-      }
-
-      .publish-btn {
-        right: 15rem;
-        bottom: 15rem;
-        padding: 10rem 25rem;
-        font-size: 14rem;
+        max-height: 60vh; // 在移动端稍微降低预览区域高度
       }
     }
   }
