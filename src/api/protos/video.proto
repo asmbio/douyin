@@ -244,7 +244,10 @@ message Comment {
   bool user_digged = 10;      // 用户是否点赞
   int64 digg_count = 11;      // 点赞数量
   UserInfo user =12;
-  int64 sub_comment_count = 19; // 子评论数量
+  repeated Comment SubComments = 13; // 子评论
+  int64 sub_comment_count = 14; // 子评论数量
+  bool showChildren= 15;
+  bool isLoved =16;
   int64 last_modify_ts = 20;    // 最后修改时间戳
 }
 

@@ -10,54 +10,53 @@
     tag="comment"
     mode="white"
   >
-    <template v-slot:header>
+    <template #header>
       <div class="title">
         <dy-back mode="dark" img="close" direction="right" style="opacity: 0" />
         <div class="num">{{ _formatNumber(comments.length) }}条评论</div>
         <div class="right">
           <Icon icon="prime:arrow-up-right-and-arrow-down-left-from-center" @click.stop="_no" />
-          <Icon icon="ic:round-close" v-click="cancel" />
+          <Icon icon="ic:round-close" @click="cancel" />
         </div>
       </div>
     </template>
     <div class="comment">
       <div class="wrapper" v-if="comments.length">
-        <div class="items">
+        <div class="items" ref="commentListRef" @scroll="handleScroll">
           <div class="item" :key="i" v-for="(item, i) in comments">
             <!--            v-longpress="(e) => showOptions(item)"-->
             <div class="main">
               <div class="content">
-                <img :src="_checkImgUrl(item.avatar)" alt="" class="head-image" />
+                <img :src="_getavater(item.user)" alt="" class="head-image" />
                 <div class="comment-container">
-                  <div class="name">{{ item.displayname }}</div>
-                  <div class="detail" :class="item.user_buried && 'gray'">
-                    {{ item.user_buried ? '该评论已折叠' : item.content }}
+                  <div class="name">{{ item.user?.nickname }}</div>
+                  <div class="detail" :class="item.userBuried && 'gray'">
+                    {{ item.userBuried ? '该评论已折叠' : item.content }}
                   </div>
                   <div class="time-wrapper">
                     <div class="left">
                       <div class="time">
-                        {{ _time(item.create_time)
-                        }}{{ item.ip_location && ` · ${item.ip_location}` }}
+                        {{ _time(item.createTime) }}{{ item.ipLocation && ` · ${item.ipLocation}` }}
                       </div>
                       <div class="reply-text">回复</div>
                     </div>
                     <div class="right d-flex" style="gap: 10rem">
-                      <div class="love" :class="item.user_digged && 'loved'" @click="loved(item)">
+                      <div class="love" :class="item.userDigged && 'loved'" @click="loved(item)">
                         <Icon
                           icon="icon-park-solid:like"
-                          v-show="item.user_digged"
+                          v-show="item.userDigged"
                           class="love-image"
                         />
                         <Icon
                           icon="icon-park-outline:like"
-                          v-show="!item.user_digged"
+                          v-show="!item.userDigged"
                           class="love-image"
                         />
-                        <span v-if="item.digg_count">{{ _formatNumber(item.digg_count) }}</span>
+                        <span v-if="item.diggCount">{{ _formatNumber(item.diggCount) }}</span>
                       </div>
-                      <div class="love" @click="item.user_buried = !item.user_buried">
+                      <div class="love" @click="item.userBuried = !item.userBuried">
                         <Icon
-                          v-if="item.user_buried"
+                          v-if="item.userBuried"
                           icon="icon-park-solid:dislike-two"
                           class="love-image"
                         />
@@ -68,43 +67,39 @@
                 </div>
               </div>
             </div>
-            <div class="replies" v-if="Number(item.sub_comment_count)">
+            <div class="replies" v-if="Number(item.subCommentCount)">
               <template v-if="item.showChildren">
-                <div class="reply" :key="i" v-for="(child, i) in item.children">
+                <div class="reply" :key="i" v-for="(child, i) in item.SubComments">
                   <!--                 v-longpress="e => showOptions(child)"-->
                   <div class="content">
-                    <img :src="_checkImgUrl(child.avatar)" alt="" class="head-image" />
+                    <img :src="_getavater(child.user)" alt="" class="head-image" />
                     <div class="comment-container">
                       <div class="name">
-                        {{ child.nickname }}
-                        <div class="reply-user" v-if="child.replay"></div>
-                        {{ child.replay }}
+                        {{ child.user?.nickname }}
+                        <div class="reply-user" v-if="(child as any).reply"></div>
+                        {{ (child as any).reply }}
                       </div>
                       <div class="detail">{{ child.content }}</div>
                       <div class="time-wrapper">
                         <div class="left">
                           <div class="time">
-                            {{ _time(child.create_time)
-                            }}{{ child.ip_location && ` · ${item.ip_location}` }}
+                            {{ _time(child.createTime)
+                            }}{{ child.ipLocation && ` · ${item.ipLocation}` }}
                           </div>
                           <div class="reply-text">回复</div>
                         </div>
-                        <div
-                          class="love"
-                          :class="child.user_digged && 'loved'"
-                          @click="loved(item)"
-                        >
+                        <div class="love" :class="child.userDigged && 'loved'" @click="loved(item)">
                           <Icon
                             icon="icon-park-solid:like"
-                            v-show="child.user_digged"
+                            v-show="child.userDigged"
                             class="love-image"
                           />
                           <Icon
                             icon="icon-park-outline:like"
-                            v-show="!child.user_digged"
+                            v-show="!child.userDigged"
                             class="love-image"
                           />
-                          <span>{{ _formatNumber(child.digg_count) }}</span>
+                          <span>{{ _formatNumber(child.diggCount) }}</span>
                         </div>
                       </div>
                     </div>
@@ -112,21 +107,22 @@
                 </div>
               </template>
               <Loading
-                v-if="loadChildren && loadChildrenItemCId === item.comment_id"
+                v-if="loadChildren && loadChildrenItemCId === item.commentId"
                 :type="'small'"
                 :is-full-screen="false"
               />
               <div class="more" v-else @click="handShowChildren(item)">
                 <div class="gang"></div>
-                <span
-                  >展开{{ item.showChildren ? '更多' : `${item.sub_comment_count}条` }}回复</span
-                >
+                <span>展开{{ item.showChildren ? '更多' : `${item.subCommentCount}条` }}回复</span>
                 <Icon icon="ep:arrow-down-bold" />
               </div>
             </div>
           </div>
         </div>
-        <no-more />
+        <no-more v-if="noMoreComments" />
+        <div v-if="isLoading && !noMoreComments" class="loading-more">
+          <Loading :type="'small'" :is-full-screen="false" />
+        </div>
       </div>
       <Loading v-else style="position: absolute" />
       <transition name="fade">
@@ -135,16 +131,16 @@
       <div class="input-toolbar">
         <transition name="fade">
           <div class="call-friend" v-if="isCall">
-            <div class="friend" :key="i" v-for="(item, i) in friends.all" @click="toggleCall(item)">
+            <div class="friend" :key="i" v-for="(item, i) in friendsList" @click="toggleCall(item)">
               <img
-                :style="item.select ? 'opacity: .5;' : ''"
+                :style="(item as any).select ? 'opacity: .5;' : ''"
                 class="avatar"
-                :src="_checkImgUrl(item.avatar)"
+                :src="_getavater(item)"
                 alt=""
               />
-              <span>{{ item.name }}</span>
+              <span>{{ item.nickname }}</span>
               <img
-                v-if="item.select"
+                v-if="(item as any).select"
                 class="checked"
                 src="../assets/img/icon/components/check/check-red-share.png"
               />
@@ -170,16 +166,21 @@
   </from-bottom-dialog>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { ref, watch, computed, onMounted } from 'vue'
 import AutoInput from './AutoInput.vue'
 import ConfirmDialog from './dialog/ConfirmDialog.vue'
-import { mapState } from 'pinia'
 import FromBottomDialog from './dialog/FromBottomDialog.vue'
 import Loading from './Loading.vue'
 import Search from './Search.vue'
+import BaseMask from './BaseMask.vue'
+import NoMore from './NoMore.vue'
+import { Icon } from '@iconify/vue'
+import { storeToRefs } from 'pinia'
 import {
   _checkImgUrl,
   _formatNumber,
+  _getavater,
   _no,
   _showSelectDialog,
   _sleep,
@@ -187,158 +188,219 @@ import {
   sampleSize
 } from '@/utils'
 import { useBaseStore } from '@/store/pinia'
-import { videoComments } from '@/api/videos'
 
-export default {
-  name: 'Comment',
-  components: {
-    AutoInput,
-    ConfirmDialog,
-    FromBottomDialog,
-    Loading,
-    Search
+import type { Comment as CommentItem } from '@/api/gen/video_pb'
+import type { UserInfo } from '@/api/gen/userinfo_pb'
+import { getVideoComments } from '@/api/moguservice'
+
+interface Option {
+  id: number
+  name: string
+}
+
+const props = defineProps({
+  modelValue: {
+    type: Boolean,
+    default: false
   },
-  props: {
-    modelValue: {
-      type: Boolean,
-      default() {
-        return false
-      }
-    },
-    videoId: {
-      type: String,
-      default: null
-    },
-    pageId: {
-      type: String,
-      default: 'home-index'
-    },
-    height: {
-      type: String,
-      default: 'calc(var(--vh, 1vh) * 70)'
-    }
+  addr: {
+    type: String,
+    default: ''
   },
-  computed: {
-    ...mapState(useBaseStore, ['friends'])
+  videoId: {
+    type: String,
+    default: null
   },
-  watch: {
-    modelValue(newVale) {
-      if (newVale) {
-        this.getData()
-      } else {
-        this.comments = []
-      }
-    }
+  pageId: {
+    type: String,
+    default: 'home-index'
   },
-  data() {
-    return {
-      comment: '',
-      test: '',
-      comments: [],
-      options: [
-        { id: 1, name: '私信回复' },
-        { id: 2, name: '复制' },
-        { id: 3, name: '搜一搜' },
-        { id: 4, name: '举报' }
-      ],
-      selectRow: {},
-      showPrivateChat: false,
-      isInput: false,
-      isCall: false,
-      loadChildren: false,
-      loadChildrenItemCId: -1
-    }
-  },
-  mounted() {},
-  methods: {
-    _no,
-    _time,
-    _formatNumber,
-    _checkImgUrl,
-    // 评论发送成功后调用此方法
-    resetSelectStatus() {
-      this.friends.all.forEach((item) => {
-        item.select = false // 重置选中状态
-      })
-    },
-    async handShowChildren(item) {
-      this.loadChildrenItemCId = item.comment_id
-      this.loadChildren = true
-      await _sleep(500)
-      this.loadChildren = false
-      if (item.showChildren) {
-        item.children = item.children.concat(sampleSize(this.comments, 10))
-      } else {
-        item.children = sampleSize(this.comments, 3)
-        item.showChildren = true
-      }
-    },
-    send() {
-      if (!this.comment.trim()) {
-        return // 如果评论内容为空，直接返回
-      }
-      const baseStore = useBaseStore()
-      const commentData = {
-        ip_location: baseStore.userinfo.ip_location,
-        awemeId: this.videoId,
-        content: this.comment,
-        create_time: Date.now(),
-        uid: String(baseStore.userinfo.uid),
-        short_id: String(baseStore.userinfo.short_id),
-        unique_id: baseStore.userinfo.unique_id,
-        signature: baseStore.userinfo.signature,
-        nickname: baseStore.userinfo.nickname,
-        avatar: baseStore.userinfo.avatar_168x168['url_list'][0]
-        // 其他必要的字段可以根据你的需求添加
-      }
-      // this.$props.item.statistics.comment_count++
-      // _updateItem(this.$props, 'isLoved', !props.item.isLoved)
-      this.comments.unshift(commentData)
-      this.comment = ''
-      this.isCall = false
-      this.resetSelectStatus()
-    },
-    async getData() {
-      let res: any = await videoComments({ id: this.videoId })
-      if (res.success) {
-        res.data.map((v) => {
-          v.showChildren = false
-          v.digg_count = Number(v.digg_count)
-        })
-        this.comments = res.data
-      }
-    },
-    cancel() {
-      this.$emit('update:modelValue', false)
-      this.$emit('close')
-    },
-    toggleCall(item) {
-      item.select = !item.select
-      let name = item.name
-      if (this.comment.includes('@' + name)) {
-        this.comment = this.comment.replace(`@${name} `, '')
-      } else {
-        this.comment += `@${name} `
-      }
-    },
-    loved(row) {
-      if (row.isLoved) {
-        row.digg_count--
-      } else {
-        row.digg_count++
-      }
-      row.user_digged = !row.user_digged
-    },
-    showOptions(row) {
-      _showSelectDialog(this.options, (e) => {
-        if (e.id === 1) {
-          this.selectRow = row
-          this.showPrivateChat = true
-        }
-      })
-    }
+  height: {
+    type: String,
+    default: 'calc(var(--vh, 1vh) * 70)'
+  }
+})
+
+const emit = defineEmits(['update:modelValue', 'close'])
+
+const baseStore = useBaseStore()
+const { friends } = storeToRefs(baseStore)
+
+const comment = ref('')
+const test = ref('')
+const comments = ref<CommentItem[]>([])
+const options = ref<Option[]>([
+  { id: 1, name: '私信回复' },
+  { id: 2, name: '复制' },
+  { id: 3, name: '搜一搜' },
+  { id: 4, name: '举报' }
+])
+const selectRow = ref<CommentItem | {}>({})
+const showPrivateChat = ref(false)
+const isInput = ref(false)
+const isCall = ref(false)
+const loadChildren = ref(false)
+const loadChildrenItemCId = ref('')
+const isLoading = ref(false)
+const noMoreComments = ref(false)
+const commentListRef = ref<HTMLElement | null>(null)
+const currentCursor = ref('')
+
+const friendsList = computed<UserInfo[]>(() => {
+  if (!friends.value || !friends.value.all) return []
+
+  const sourceItems = friends.value.all as any[]
+
+  return sourceItems.map((item) => {
+    const user = item as UserInfo
+    ;(user as any).select = item.select || false
+    return user
+  })
+})
+
+const resetSelectStatus = () => {
+  if (friendsList.value) {
+    friendsList.value.forEach((item: UserInfo) => {
+      item.select = false // 重置选中状态
+    })
   }
 }
+
+const handShowChildren = async (item: CommentItem) => {
+  loadChildrenItemCId.value = item.commentId
+  loadChildren.value = true
+  await _sleep(500)
+  loadChildren.value = false
+  if (item.showChildren) {
+    item.SubComments = [...(item.SubComments || []), ...sampleSize(comments.value, 10)]
+  } else {
+    item.SubComments = sampleSize(comments.value, 3)
+    item.showChildren = true
+  }
+}
+
+const send = () => {
+  if (!comment.value.trim()) {
+    return // 如果评论内容为空，直接返回
+  }
+
+  const userinfo = baseStore.userinfo
+  const commentData: CommentItem = {
+    //commentId: Date.now(),
+    user: userinfo,
+    content: comment.value,
+    // createTime: Date.now(),
+    //  diggCount: 0,
+
+    userBuried: false,
+    userDigged: false
+  } as CommentItem
+
+  comments.value.unshift(commentData)
+  comment.value = ''
+  isCall.value = false
+  resetSelectStatus()
+}
+
+const getData = async (isInitial = true) => {
+  try {
+    isLoading.value = true
+
+    const cursor = isInitial ? '' : currentCursor.value
+    const res = await getVideoComments(props.addr, props.videoId, '', cursor, 10)
+
+    if (res.comments && res.comments.length > 0) {
+      res.comments.forEach((v: CommentItem) => {
+        v.showChildren = false
+      })
+
+      if (res.comments.length > 0) {
+        currentCursor.value = res.comments[res.comments.length - 1].commentId
+      }
+
+      if (isInitial) {
+        comments.value = res.comments
+      } else {
+        res.comments.forEach((newComment: CommentItem) => {
+          const existingComment = comments.value.find(
+            (comment) => comment.commentId === newComment.commentId
+          )
+
+          if (existingComment) {
+            existingComment.SubComments.push(...newComment.SubComments)
+          } else {
+            comments.value.push(newComment)
+          }
+        })
+      }
+    } else {
+      if (!isInitial) {
+        noMoreComments.value = true
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch comments:', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const handleScroll = async (event: Event) => {
+  const target = event.target as HTMLElement
+  if (
+    target.scrollHeight - target.scrollTop - target.clientHeight < 50 &&
+    !isLoading.value &&
+    !noMoreComments.value
+  ) {
+    await getData(false)
+  }
+}
+
+const cancel = () => {
+  emit('update:modelValue', false)
+  emit('close')
+}
+
+const toggleCall = (item: UserInfo) => {
+  ;(item as any).select = !(item as any).select
+  let name = (item as any).name || item.nickname || ''
+  if (comment.value.includes('@' + name)) {
+    comment.value = comment.value.replace(`@${name} `, '')
+  } else {
+    comment.value += `@${name} `
+  }
+}
+
+const loved = (row: CommentItem) => {
+  if (row.isLoved) {
+    row.diggCount--
+  } else {
+    row.diggCount++
+  }
+  row.userDigged = !row.userDigged
+}
+
+const showOptions = (row: CommentItem) => {
+  _showSelectDialog(options.value, (e: Option) => {
+    if (e.id === 1) {
+      selectRow.value = row
+      showPrivateChat.value = true
+    }
+  })
+}
+
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue) {
+      currentCursor.value = ''
+      noMoreComments.value = false
+      getData(true)
+    } else {
+      comments.value = []
+    }
+  }
+)
 </script>
 
 <style lang="less" scoped>
@@ -397,6 +459,8 @@ export default {
 
   .items {
     width: 100%;
+    max-height: calc(var(--vh, 1vh) * 60);
+    overflow-y: auto;
 
     .item {
       width: 100%;
@@ -624,6 +688,12 @@ export default {
         margin-left: 15rem;
       }
     }
+  }
+
+  .loading-more {
+    display: flex;
+    justify-content: center;
+    padding: 10rem 0;
   }
 }
 

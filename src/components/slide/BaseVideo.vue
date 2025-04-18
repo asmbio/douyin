@@ -91,6 +91,7 @@ import { SlideItemPlayStatus } from '@/utils/const_var'
 import { computed, onBeforeUnmount, onMounted, onUnmounted, provide, reactive } from 'vue'
 import { Icon } from '@iconify/vue'
 import { _css } from '@/utils/dom'
+import { updateVideoViewStatus } from '@/api/moguservice'
 
 import type { Video } from '@/api/gen/video_pb'
 
@@ -297,16 +298,11 @@ onMounted(() => {
   bus.on(EVENT_KEY.CLOSE_SUB_TYPE, onCloseSubType)
 
   bus.on(EVENT_KEY.REMOVE_MUTED, removeMuted)
+  bus.on(EVENT_KEY.UPDATE_VIDEO_VIEW_STATUS, onUpdateVideoViewStatus)
 })
 onBeforeUnmount(() => {
-  // 更新观看时间
-  // 发送播放数据
-  console.log('awemeId: %s,%s,%s ', props.item.awemeId, state.hasEnded, state.currentTime)
-  // bus.emit(EVENT_KEY.VIDEO_PLAYBACK_DATA, {
-  //   hasEnded: state.hasEnded,
-  //   currentTime: state.currentTime,
-  //   awemeId: props.item.awemeId // 可选：传递视频ID用于关联
-  // })
+  // 更新观看时间并发送播放数据
+  sendVideoViewStats()
 })
 onUnmounted(() => {
   // console.log('unmounted')
@@ -318,6 +314,7 @@ onUnmounted(() => {
   bus.off(EVENT_KEY.OPEN_SUB_TYPE, onOpenSubType)
   bus.off(EVENT_KEY.CLOSE_SUB_TYPE, onCloseSubType)
   bus.off(EVENT_KEY.REMOVE_MUTED, removeMuted)
+  bus.off(EVENT_KEY.UPDATE_VIDEO_VIEW_STATUS, onUpdateVideoViewStatus)
 })
 function videoEnded() {
   console.log('视频播放完毕')
@@ -371,6 +368,34 @@ function onCloseComments() {
   }
 }
 
+// Handle the update video view status event
+function onUpdateVideoViewStatus({ uniqueId, index }) {
+  // Only update stats for the current video when it's about to be switched away from
+  if (props.position.uniqueId === uniqueId && props.position.index === index) {
+    sendVideoViewStats()
+  }
+}
+
+// Add a function to send video view statistics
+function sendVideoViewStats() {
+  console.log(
+    'Sending view stats - awemeId: %s, hasEnded: %s, currentTime: %s',
+    props.item.awemeId,
+    state.hasEnded,
+    state.currentTime
+  )
+
+  // Call the API to update view status
+  updateVideoViewStatus(
+    props.item.awemeId,
+    state.currentTime,
+    state.hasEnded,
+    state.currentTime.toString()
+  ).catch((error) => {
+    console.error('Failed to update video view status:', error)
+  })
+}
+
 function click({ uniqueId, index, type }) {
   if (props.position.uniqueId === uniqueId && props.position.index === index) {
     if (type === EVENT_KEY.ITEM_TOGGLE) {
@@ -392,6 +417,10 @@ function click({ uniqueId, index, type }) {
       videoEl.currentTime = 0
       state.ignoreWaiting = true
       pause()
+
+      // When video is stopped (user slides to next video), send view stats immediately
+      sendVideoViewStats()
+
       setTimeout(() => (state.ignoreWaiting = false), 300)
     }
     if (type === EVENT_KEY.ITEM_PLAY) {

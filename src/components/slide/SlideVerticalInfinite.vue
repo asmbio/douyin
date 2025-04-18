@@ -308,7 +308,20 @@ function touchEnd(e) {
     emit('refresh')
     console.log('touchEnd')
   }
+
+  // Before potentially changing slides, emit event to update view stats for current video
+  const oldIndex = state.localIndex
+
   slideTouchEnd(e, state, canNext, (isNext) => {
+    // After slideTouchEnd determines we're actually changing slides (state.localIndex has changed),
+    // emit the event for the video that's about to be switched away from
+    if (oldIndex !== state.localIndex) {
+      bus.emit(EVENT_KEY.UPDATE_VIDEO_VIEW_STATUS, {
+        uniqueId: props.uniqueId,
+        index: oldIndex
+      })
+    }
+
     let half = parseInt((props.virtualTotal / 2).toString()) //虚拟列表的一半
     if (props.list.length > props.virtualTotal) {
       //手指往上滑(即列表展示下一条内容)

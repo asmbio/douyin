@@ -8,7 +8,8 @@ import {
   GetMsgListRequestSchema,
   CONTACT_TAG,
   MyVideoRequestSchema,
-  VideoRequestSchema
+  VideoRequestSchema,
+  VideoCommentsRequestSchema
 } from './gen/moguervice_pb' // 请根据实际路径调整导入
 
 import { type UserInfo } from './gen/userinfo_pb'
@@ -23,6 +24,7 @@ import {
   type MetaFollowMsg,
   type MetaInfoMsg
 } from './gen/trans_pb'
+import { UpdateVideoViewRequestSchema } from './gen/video_pb'
 
 // 创建全局的 transport 和 client 实例（单例模式）
 const transport = createGrpcWebTransport({
@@ -170,6 +172,37 @@ export async function getRecommendedVideos(start: number, size: number) {
     pageSize: size
   })
   return client.getRecommendedVideos(request)
+}
+//
+export async function getVideoComments(
+  addr: string,
+  videoId: string,
+  subCommentId: string,
+  fromkey: string,
+  size: number
+) {
+  const request = create(VideoCommentsRequestSchema, {
+    addr: '',
+    videoId,
+    subCommentId: '',
+    fromkey: '',
+    size
+  })
+  return client.getVideoComments(request)
+}
+export async function updateVideoViewStatus(
+  videoId: string,
+  watchDuration: number,
+  completed: boolean,
+  position: string
+) {
+  const request = create(UpdateVideoViewRequestSchema, {
+    videoId,
+    watchDuration: BigInt(watchDuration),
+    completed,
+    position
+  })
+  return client.updateVideoViewStatus(request)
 }
 
 export async function signAndPubMsg(msgbs: MessageBS) {
