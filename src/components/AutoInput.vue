@@ -5,9 +5,8 @@
     class="auto-input"
     contenteditable
     @input="changeText"
-  >
-    {{ modelValue }}
-  </div>
+    @blur="onBlur"
+  ></div>
 </template>
 
 <script lang="ts">
@@ -21,14 +20,24 @@ export default {
     }
   },
   mounted() {
-    // this.$refs.input.setAttribute("placeholder", "改变")
+    if (this.modelValue) {
+      this.$el.innerText = this.modelValue
+    }
   },
-  computed: {},
-  data: function () {
-    return {}
+  watch: {
+    modelValue(newVal) {
+      // 只有当内容不同时才更新，避免光标跳动
+      if (newVal !== this.$el.innerText) {
+        this.$el.innerText = newVal
+      }
+    }
   },
   methods: {
     changeText() {
+      this.$emit('update:modelValue', this.$el.innerText)
+    },
+    onBlur() {
+      // 确保 blur 时也同步数据
       this.$emit('update:modelValue', this.$el.innerText)
     }
   }

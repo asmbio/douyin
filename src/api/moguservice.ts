@@ -15,7 +15,7 @@ import {
 import { type UserInfo } from './gen/userinfo_pb'
 import { StringSchema } from './gen/string_pb'
 import { EmptySchema } from '@bufbuild/protobuf/wkt'
-import type { Worksmsg } from './gen/trans_worksmsg_pb'
+import type { WorksCommentMsg, Worksmsg } from './gen/trans_worksmsg_pb'
 import type { ChatMessage } from './gen/message_pb'
 import {
   MetaFollowMsg_FollowAction,
@@ -159,6 +159,10 @@ export async function publishVideo(work: Worksmsg) {
   return client.pushVideo(work)
 }
 
+export async function pushVideoComment(comment: WorksCommentMsg) {
+  return client.pushVideoComment(comment)
+}
+
 export async function myVideo(time: bigint, size: number) {
   const request = create(MyVideoRequestSchema)
   request.formtime = time
@@ -182,10 +186,10 @@ export async function getVideoComments(
   size: number
 ) {
   const request = create(VideoCommentsRequestSchema, {
-    addr: '',
+    addr: addr,
     videoId,
-    subCommentId: '',
-    fromkey: '',
+    subCommentId: subCommentId,
+    fromkey: fromkey,
     size
   })
   return client.getVideoComments(request)

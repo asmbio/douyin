@@ -36,8 +36,8 @@ service MoguService {
   //   // 视频获取
    rpc MyVideo(MyVideoRequest)returns (VideoList){}
    rpc GetRecommendedVideos(VideoRequest) returns (VideoList) {}
-   rpc PushVideo(Worksmsg) returns (google.protobuf.Empty){}
-   rpc PushVideoComment(WorksCommentMsg) returns (google.protobuf.Empty){}
+   rpc PushVideo(Worksmsg) returns (protos.String){}
+   rpc PushVideoComment(WorksCommentMsg) returns (protos.String){}
    rpc GetVideoComments(VideoCommentsRequest) returns (CommentList){}   
    rpc UpdateVideoViewStatus(UpdateVideoViewRequest) returns (UpdateVideoViewResponse){}
 

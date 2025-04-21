@@ -37,7 +37,8 @@ message WorksCommentMsg {
   
   string From = 2;
   string To = 3;
-  bytes Key = 4;
+  string wKey = 4;
+ 
   uint64 Feesrate = 5;
   MEDIA_TYPE Tag = 6;
   uint64 Time = 7;
@@ -48,6 +49,8 @@ message WorksCommentMsg {
     Media_Text Media_Text = 11;
     
   }
+  string plKey = 15;
+  string ReplyAddr= 16;
   
 }
 enum MEDIA_TYPE {  

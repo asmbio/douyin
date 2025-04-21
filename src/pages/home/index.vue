@@ -136,6 +136,7 @@
     <Comment
       page-id="home-index"
       :video-id="state.currentItem.awemeId"
+      :addr="state.currentItem?.author?.uid"
       v-model="state.commentVisible"
       @close="closeComments"
     />

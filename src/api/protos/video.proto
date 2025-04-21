@@ -248,6 +248,7 @@ message Comment {
   int64 sub_comment_count = 14; // 子评论数量
   bool showChildren= 15;
   bool isLoved =16;
+  string ReplyAddr =17;       // 子评论的评论指向的用户id
   int64 last_modify_ts = 20;    // 最后修改时间戳
 }
 

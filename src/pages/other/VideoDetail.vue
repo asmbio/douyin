@@ -44,6 +44,7 @@
     <Comment
       page-id="video-detail"
       :video-id="state.currentItem.awemeId"
+      :addr="state.currentItem.author.uid"
       v-model="state.commentVisible"
       @close="closeComments"
     />
@@ -182,7 +183,7 @@ function setCurrentItem(item) {
       aweme_list: []
     }
   }
-  // console.log('item', item)
+  console.log('setCurrentItem', item)
 }
 
 onMounted(() => {

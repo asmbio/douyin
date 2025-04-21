@@ -13,7 +13,7 @@
     <template #header>
       <div class="title">
         <dy-back mode="dark" img="close" direction="right" style="opacity: 0" />
-        <div class="num">{{ _formatNumber(comments.length) }}条评论</div>
+        <div class="num">{{ _formatNumber(data.comments.length) }}条评论</div>
         <div class="right">
           <Icon icon="prime:arrow-up-right-and-arrow-down-left-from-center" @click.stop="_no" />
           <Icon icon="ic:round-close" @click="cancel" />
@@ -21,14 +21,14 @@
       </div>
     </template>
     <div class="comment">
-      <div class="wrapper" v-if="comments.length">
+      <div class="wrapper" v-if="data.comments.length">
         <div class="items" ref="commentListRef" @scroll="handleScroll">
-          <div class="item" :key="i" v-for="(item, i) in comments">
+          <div class="item" :key="i" v-for="(item, i) in data.comments">
             <!--            v-longpress="(e) => showOptions(item)"-->
             <div class="main">
               <div class="content">
                 <img :src="_getavater(item.user)" alt="" class="head-image" />
-                <div class="comment-container">
+                <div class="comment-container" @click="startReply(item)">
                   <div class="name">{{ item.user?.nickname }}</div>
                   <div class="detail" :class="item.userBuried && 'gray'">
                     {{ item.userBuried ? '该评论已折叠' : item.content }}
@@ -36,7 +36,8 @@
                   <div class="time-wrapper">
                     <div class="left">
                       <div class="time">
-                        {{ _time(item.createTime) }}{{ item.ipLocation && ` · ${item.ipLocation}` }}
+                        {{ _time(item.createTime / 1_000_000n)
+                        }}{{ item.ipLocation && ` · ${item.ipLocation}` }}
                       </div>
                       <div class="reply-text">回复</div>
                     </div>
@@ -73,17 +74,19 @@
                   <!--                 v-longpress="e => showOptions(child)"-->
                   <div class="content">
                     <img :src="_getavater(child.user)" alt="" class="head-image" />
-                    <div class="comment-container">
+                    <div class="comment-container" @click="startReply(item, child)">
                       <div class="name">
-                        {{ child.user?.nickname }}
-                        <div class="reply-user" v-if="(child as any).reply"></div>
-                        {{ (child as any).reply }}
+                        {{ child.user?.displayname }}
+                        <div class="reply-user" v-if="child.ReplyAddr"></div>
+                        <span v-if="child.ReplyAddr" class="reply-to-username">
+                          {{ child.ReplyAddr }}
+                        </span>
                       </div>
                       <div class="detail">{{ child.content }}</div>
                       <div class="time-wrapper">
                         <div class="left">
                           <div class="time">
-                            {{ _time(child.createTime)
+                            {{ _time(child.createTime / 1_000_000n)
                             }}{{ child.ipLocation && ` · ${item.ipLocation}` }}
                           </div>
                           <div class="reply-text">回复</div>
@@ -113,8 +116,16 @@
               />
               <div class="more" v-else @click="handShowChildren(item)">
                 <div class="gang"></div>
-                <span>展开{{ item.showChildren ? '更多' : `${item.subCommentCount}条` }}回复</span>
-                <Icon icon="ep:arrow-down-bold" />
+                <span v-if="item.showChildren && item.isAllLoaded">收起回复</span>
+                <span v-else-if="item.showChildren">展开更多回复</span>
+                <span v-else>展开{{ item.subCommentCount }}条回复</span>
+                <Icon
+                  :icon="
+                    item.showChildren && item.isAllLoaded
+                      ? 'ep:arrow-up-bold'
+                      : 'ep:arrow-down-bold'
+                  "
+                />
               </div>
             </div>
           </div>
@@ -124,7 +135,7 @@
           <Loading :type="'small'" :is-full-screen="false" />
         </div>
       </div>
-      <Loading v-else style="position: absolute" />
+      <no-more v-else />
       <transition name="fade">
         <BaseMask v-if="isCall" mode="lightgray" @click="isCall = false" />
       </transition>
@@ -133,14 +144,14 @@
           <div class="call-friend" v-if="isCall">
             <div class="friend" :key="i" v-for="(item, i) in friendsList" @click="toggleCall(item)">
               <img
-                :style="(item as any).select ? 'opacity: .5;' : ''"
+                :style="item.select ? 'opacity: .5;' : ''"
                 class="avatar"
                 :src="_getavater(item)"
                 alt=""
               />
               <span>{{ item.nickname }}</span>
               <img
-                v-if="(item as any).select"
+                v-if="item.select"
                 class="checked"
                 src="../assets/img/icon/components/check/check-red-share.png"
               />
@@ -150,6 +161,10 @@
 
         <div class="toolbar">
           <div class="input-wrapper">
+            <div v-if="data.replyTo" class="reply-indicator">
+              回复 {{ data.replyTo.user?.displayname }}
+              <Icon icon="mdi:close" @click="cancelReply" class="cancel-reply" />
+            </div>
             <AutoInput v-model="comment" placeholder="善语结善缘，恶言伤人心"></AutoInput>
             <div class="right">
               <img src="../assets/img/icon/message/call.png" @click="isCall = !isCall" />
@@ -167,7 +182,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, onMounted } from 'vue'
+import { ref, watch, computed, onMounted, reactive } from 'vue'
 import AutoInput from './AutoInput.vue'
 import ConfirmDialog from './dialog/ConfirmDialog.vue'
 import FromBottomDialog from './dialog/FromBottomDialog.vue'
@@ -177,21 +192,13 @@ import BaseMask from './BaseMask.vue'
 import NoMore from './NoMore.vue'
 import { Icon } from '@iconify/vue'
 import { storeToRefs } from 'pinia'
-import {
-  _checkImgUrl,
-  _formatNumber,
-  _getavater,
-  _no,
-  _showSelectDialog,
-  _sleep,
-  _time,
-  sampleSize
-} from '@/utils'
+import { _formatNumber, _getavater, _no, _showSelectDialog, _time } from '@/utils'
 import { useBaseStore } from '@/store/pinia'
-
 import type { Comment as CommentItem } from '@/api/gen/video_pb'
 import type { UserInfo } from '@/api/gen/userinfo_pb'
-import { getVideoComments } from '@/api/moguservice'
+import { getVideoComments, pushVideoComment } from '@/api/moguservice'
+import { MEDIA_TYPE, Media_TextSchema, WorksCommentMsgSchema } from '@/api/gen/trans_worksmsg_pb'
+import { create } from '@bufbuild/protobuf'
 
 interface Option {
   id: number
@@ -205,7 +212,7 @@ const props = defineProps({
   },
   addr: {
     type: String,
-    default: ''
+    default: null
   },
   videoId: {
     type: String,
@@ -228,7 +235,6 @@ const { friends } = storeToRefs(baseStore)
 
 const comment = ref('')
 const test = ref('')
-const comments = ref<CommentItem[]>([])
 const options = ref<Option[]>([
   { id: 1, name: '私信回复' },
   { id: 2, name: '复制' },
@@ -245,6 +251,13 @@ const isLoading = ref(false)
 const noMoreComments = ref(false)
 const commentListRef = ref<HTMLElement | null>(null)
 const currentCursor = ref('')
+
+// Use reactive for these three data points
+const data = reactive({
+  comments: [] as ExtendedComment[],
+  replyTo: null as CommentItem | null,
+  parentComment: null as CommentItem | null
+})
 
 const friendsList = computed<UserInfo[]>(() => {
   if (!friends.value || !friends.value.all) return []
@@ -265,41 +278,186 @@ const resetSelectStatus = () => {
     })
   }
 }
-
-const handShowChildren = async (item: CommentItem) => {
-  loadChildrenItemCId.value = item.commentId
-  loadChildren.value = true
-  await _sleep(500)
-  loadChildren.value = false
-  if (item.showChildren) {
-    item.SubComments = [...(item.SubComments || []), ...sampleSize(comments.value, 10)]
-  } else {
-    item.SubComments = sampleSize(comments.value, 3)
-    item.showChildren = true
+type ExtendedComment = CommentItem & {
+  showChildren?: boolean
+  isAllLoaded?: boolean
+  lastSubCommentCursor?: string
+}
+// Helper function to safely check properties
+const asExtendedComment = (item: CommentItem) => {
+  return item as CommentItem & {
+    showChildren?: boolean
+    isAllLoaded?: boolean
+    lastSubCommentCursor?: string
   }
 }
 
-const send = () => {
+// 加载更多评论，调用接口getVideoComments subCommentId=item.commentId ,每次加载10个
+const handShowChildren = async (item: CommentItem) => {
+  // Use type assertion for TypeScript compatibility
+  const commentItem = item as CommentItem & {
+    showChildren?: boolean
+    isAllLoaded?: boolean
+    lastSubCommentCursor?: string
+  }
+
+  if (commentItem.showChildren && commentItem.isAllLoaded) {
+    // If already showing all comments and user clicks, collapse the comments
+    commentItem.showChildren = false
+    return
+  }
+
+  loadChildrenItemCId.value = commentItem.commentId
+  loadChildren.value = true
+
+  try {
+    if (!commentItem.showChildren) {
+      // First time loading comments or collapsed state
+      commentItem.showChildren = true
+    }
+    const cursor = ''
+    if (!commentItem.SubComments || commentItem.SubComments.length === 0) {
+      // Load initial comments if none exist
+      //const cursor = '';
+    } else {
+      // Load more comments
+      const cursor = commentItem.lastSubCommentCursor || ''
+    }
+    const res = await getVideoComments(props.addr, props.videoId, commentItem.commentId, cursor, 10)
+
+    if (res.comments && res.comments.length > 0) {
+      commentItem.SubComments = res.comments
+      commentItem.lastSubCommentCursor = res.comments[res.comments.length - 1].commentId
+      commentItem.isAllLoaded = res.comments.length < 10
+    } else {
+      commentItem.isAllLoaded = true
+    }
+  } catch (error) {
+    console.error('Failed to load subcomments:', error)
+  } finally {
+    loadChildren.value = false
+  }
+}
+
+// 开始回复某条评论
+const startReply = (parent: CommentItem, replycomment?: CommentItem) => {
+  data.parentComment = parent
+  if (replycomment) {
+    data.replyTo = replycomment
+  } else {
+    data.replyTo = parent
+  }
+  // 自动聚焦输入框
+  // 可以在这里添加滚动到输入框的逻辑
+}
+
+// 取消回复
+const cancelReply = () => {
+  data.replyTo = null
+  data.parentComment = null
+}
+
+const send = async () => {
   if (!comment.value.trim()) {
     return // 如果评论内容为空，直接返回
   }
 
-  const userinfo = baseStore.userinfo
-  const commentData: CommentItem = {
-    //commentId: Date.now(),
-    user: userinfo,
-    content: comment.value,
-    // createTime: Date.now(),
-    //  diggCount: 0,
+  try {
+    isLoading.value = true
+    const userinfo = baseStore.userinfo
 
-    userBuried: false,
-    userDigged: false
-  } as CommentItem
+    // 创建一个Media_Text对象
+    const mediaText = create(Media_TextSchema, {
+      Text: comment.value
+    })
 
-  comments.value.unshift(commentData)
-  comment.value = ''
-  isCall.value = false
-  resetSelectStatus()
+    // 确定是否是回复评论
+    const isReplylv2 = data.replyTo?.commentId !== data.parentComment?.commentId
+    const commentId = data.parentComment?.commentId || ''
+    const replyAddr = data.replyTo?.user?.nickname || ''
+
+    // 创建评论消息对象
+    const commentMsg = create(WorksCommentMsgSchema, {
+      From: userinfo.uid || '',
+      To: props.addr,
+      wKey: props.videoId || '',
+      plKey: commentId,
+      ReplyAddr: isReplylv2 ? data.replyTo?.user?.uid : '',
+      Tag: MEDIA_TYPE._TEXT,
+      Content: {
+        case: 'MediaText',
+        value: mediaText
+      },
+      Time: BigInt(Date.now()) * 1_000_000n,
+      Feesrate: BigInt(0)
+    })
+
+    // 发送评论
+    var cid = await pushVideoComment(commentMsg)
+
+    // 创建本地评论对象用于UI显示
+    const commentData: CommentItem = {
+      commentId: cid.Value,
+      user: userinfo,
+      content: comment.value,
+      createTime: commentMsg.Time,
+      diggCount: 0,
+      SubComments: [],
+      ReplyAddr: replyAddr, // 子评论的评论的回复，在名称显示的地方加一个三角箭头符号
+      userBuried: false,
+      userDigged: false
+    } as unknown as CommentItem
+
+    // 根据是否是回复，添加到对应位置
+    if (data.parentComment) {
+      // 如果回复的是子评论，添加到父评论的子评论里
+      const pc = data.comments.find((v) => v.commentId == data.parentComment!.commentId)
+      if (pc) {
+        // 确保SubComments是数组
+        if (!pc.SubComments) {
+          pc.SubComments = []
+        }
+
+        // 更新子评论数量
+        if (pc.subCommentCount) {
+          pc.subCommentCount = BigInt(Number(pc.subCommentCount) + 1)
+        } else {
+          pc.subCommentCount = BigInt(1)
+        }
+
+        // 添加到子评论数组
+        pc.SubComments.unshift(commentData)
+
+        // 确保显示子评论
+        pc.showChildren = true
+
+        // 强制UI更新
+        // const commentIndex = data.comments.findIndex((v) => v.commentId == data.parentComment!.commentId)
+        // if (commentIndex !== -1) {
+        //   // 创建新数组触发响应式更新
+        //   const updatedComments = [...data.comments]
+        //   data.comments = updatedComments
+        // }
+      } else {
+        // 父评论未找到，添加到顶层
+        console.warn('Parent comment not found, adding to top level')
+        data.comments.unshift(commentData)
+      }
+    } else {
+      // 普通评论，添加到列表顶部
+      data.comments.unshift(commentData)
+    }
+
+    // 重置状态
+    comment.value = ''
+    isCall.value = false
+    resetSelectStatus()
+    cancelReply() // 重置回复状态
+  } catch (error) {
+    console.error('Failed to send comment:', error)
+  } finally {
+    isLoading.value = false
+  }
 }
 
 const getData = async (isInitial = true) => {
@@ -308,10 +466,17 @@ const getData = async (isInitial = true) => {
 
     const cursor = isInitial ? '' : currentCursor.value
     const res = await getVideoComments(props.addr, props.videoId, '', cursor, 10)
+    console.log('getVideoComments', res)
 
     if (res.comments && res.comments.length > 0) {
+      if (res.comments.length < 10) {
+        noMoreComments.value = true
+      }
+
       res.comments.forEach((v: CommentItem) => {
-        v.showChildren = false
+        const extendedComment = asExtendedComment(v)
+        extendedComment.showChildren = false
+        extendedComment.isAllLoaded = false
       })
 
       if (res.comments.length > 0) {
@@ -319,29 +484,28 @@ const getData = async (isInitial = true) => {
       }
 
       if (isInitial) {
-        comments.value = res.comments
+        data.comments = res.comments
       } else {
         res.comments.forEach((newComment: CommentItem) => {
-          const existingComment = comments.value.find(
+          const existingComment = data.comments.find(
             (comment) => comment.commentId === newComment.commentId
           )
 
           if (existingComment) {
             existingComment.SubComments.push(...newComment.SubComments)
           } else {
-            comments.value.push(newComment)
+            data.comments.push(newComment)
           }
         })
       }
     } else {
-      if (!isInitial) {
-        noMoreComments.value = true
-      }
+      noMoreComments.value = true
     }
   } catch (error) {
     console.error('Failed to fetch comments:', error)
   } finally {
     isLoading.value = false
+    console.log('isLoading', isLoading.value)
   }
 }
 
@@ -362,7 +526,7 @@ const cancel = () => {
 }
 
 const toggleCall = (item: UserInfo) => {
-  ;(item as any).select = !(item as any).select
+  item.select = !item.select
   let name = (item as any).name || item.nickname || ''
   if (comment.value.includes('@' + name)) {
     comment.value = comment.value.replace(`@${name} `, '')
@@ -393,11 +557,12 @@ watch(
   () => props.modelValue,
   (newValue) => {
     if (newValue) {
+      console.log('comment', props.addr, props.videoId)
       currentCursor.value = ''
       noMoreComments.value = false
       getData(true)
     } else {
-      comments.value = []
+      data.comments = []
     }
   }
 )
@@ -544,10 +709,11 @@ watch(
 
             .reply-user {
               margin-left: 5rem;
+              margin-right: 3rem;
               width: 0;
               height: 0;
               border: 5rem solid transparent;
-              border-left: 6rem solid gray;
+              border-left: 6rem solid var(--second-text-color);
             }
           }
 
@@ -670,6 +836,24 @@ watch(
         padding: 5rem 10rem;
         background: #eee;
         border-radius: 20rem;
+        position: relative;
+
+        .reply-indicator {
+          position: absolute;
+          top: -25rem;
+          left: 10rem;
+          background: rgba(0, 0, 0, 0.05);
+          padding: 2rem 10rem;
+          border-radius: 10rem;
+          font-size: 12rem;
+          display: flex;
+          align-items: center;
+
+          .cancel-reply {
+            margin-left: 5rem;
+            font-size: 14rem;
+          }
+        }
 
         .right {
           display: flex;
@@ -705,5 +889,11 @@ watch(
 .comment-enter-from,
 .comment-leave-to {
   transform: translateY(60vh);
+}
+
+.reply-to-username {
+  color: var(--primary-color);
+  margin-right: 5rem;
+  font-size: 13rem;
 }
 </style>
