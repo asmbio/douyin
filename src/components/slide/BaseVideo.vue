@@ -318,7 +318,9 @@ onUnmounted(() => {
 })
 function videoEnded() {
   console.log('视频播放完毕')
+  state.hasEnded = true
   // 执行其他操作...
+  sendVideoViewStats()
 }
 function removeMuted() {
   state.isMuted = false
@@ -390,7 +392,7 @@ function sendVideoViewStats() {
     props.item.awemeId,
     state.currentTime,
     state.hasEnded,
-    state.currentTime.toString()
+    state.currentTime
   ).catch((error) => {
     console.error('Failed to update video view status:', error)
   })

@@ -17,7 +17,7 @@ https://github.com/asmbio/Release/tree/main/p2psosial_v0.0.1-dev
 ### 本地开发
 **注意：必须 git 命令 clone 下来才能运行，下载 zip 包是无法运行的。如果 clone 速度太慢，推荐使用 gitee 地址** 
 
-**注意：项目依赖本地后台服务mogu文件太大需要单独下载,Android(android/app/libs) Windows(electron\bin\win) 分别放在不同的文件夹内**
+**注意：项目依赖本地后台服务mogu文件太大Android aar需要单独下载,Android(android/app/libs) Windows(electron\bin\win) 分别放在不同的文件夹内**
 
 ```bash
 

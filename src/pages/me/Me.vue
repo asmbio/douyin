@@ -131,6 +131,10 @@
                   <Icon icon="iconamoon:music-2-light" />
                   <span>我的音乐</span>
                 </div>
+                <div class="item" @click="$nav('/me/right-menu/look-history')">
+                  <Icon icon="tabler:history" />
+                  <span>观看历史</span>
+                </div>
                 <div class="item" @click="$nav('/me/my-group-chat')">
                   <Icon icon="streamline:chat-two-bubbles-oval" />
                   <span>我的群聊</span>

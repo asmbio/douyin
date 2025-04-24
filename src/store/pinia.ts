@@ -28,7 +28,7 @@ import { h } from 'vue'
 
 export const idMappings = new Map([
   [
-    '2KXH9n6tG2g1D8VbYc7qLZ',
+    'vW1NNYW1Xm6WHzN1nxjKzvWAeVi',
     {
       route: '/message/fans',
       img: new URL('../assets/img/icon/msg-icon1.png', import.meta.url).href,
@@ -37,7 +37,7 @@ export const idMappings = new Map([
     }
   ],
   [
-    '3VnYJ8cQmRq9sLpWfT4hBx',
+    'of2BqPA8hkWeQHavWKbjza3cCg2',
     {
       route: '/message/all',
       img: new URL('../assets/img/icon/msg-icon2.png', import.meta.url).href,
@@ -46,7 +46,7 @@ export const idMappings = new Map([
     }
   ],
   [
-    '5qMv7dFgHjK3nRtPwS4zL9',
+    'HVkydXTEfnwSuVuJhhyXpiQ9ZDv',
     {
       route: '/message/chat',
       img: new URL('../assets/img/icon/avatar/2.png', import.meta.url).href,
@@ -55,7 +55,7 @@ export const idMappings = new Map([
     }
   ],
   [
-    '8rTbYcNqXm6JkLpV9sFwG2',
+    'mUCYBWPVug5YTbTqiJFC4RfaNCA',
     {
       route: '/message/douyin-helper',
       img: new URL('../assets/img/icon/msg-icon5.webp', import.meta.url).href,
@@ -64,7 +64,7 @@ export const idMappings = new Map([
     }
   ],
   [
-    '7sZq4dFvT9jK3mRnPwXhL6',
+    'SVP4jWisrKh16L2JJy9NCVVbwJy',
     {
       route: '/message/system-notice',
       img: new URL('../assets/img/icon/msg-icon4.png', import.meta.url).href,
@@ -73,7 +73,7 @@ export const idMappings = new Map([
     }
   ],
   [
-    '9LpWfT4hBx3VnYJ8cQmRqS',
+    'mJk7HWJh1zmcbtdwEdbx73k3jx3',
     {
       route: '/me/request-update',
       img: new URL('../assets/img/icon/msg-icon7.webp', import.meta.url).href,
@@ -82,7 +82,7 @@ export const idMappings = new Map([
     }
   ],
   [
-    'HjK3nRtPwS4zL95qMv7dFg',
+    'ESexJ9gfosxcVnmPxooA9MxgpTW',
     {
       route: '/message/task-notice',
       img: new URL('../assets/img/icon/msg-icon6.webp', import.meta.url).href,
@@ -91,7 +91,7 @@ export const idMappings = new Map([
     }
   ],
   [
-    'D8VbYc7qLZ2KXH9n6tG2g1',
+    '6kzL4vkswEcXjmtvK6mL8r59b2o',
     {
       route: '/message/live-notice',
       img: new URL('../assets/img/icon/msg-icon8.webp', import.meta.url).href,
@@ -100,7 +100,7 @@ export const idMappings = new Map([
     }
   ],
   [
-    'cQmRq9sLpWfT4hBx3VnYJ8',
+    'owyUi3vw9nY5kvLSeatDtP61LNW',
     {
       route: '/message/money-notice',
       img: new URL('../assets/img/icon/msg-icon9.webp', import.meta.url).href,

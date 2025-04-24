@@ -40,6 +40,7 @@ service MoguService {
    rpc PushVideoComment(WorksCommentMsg) returns (protos.String){}
    rpc GetVideoComments(VideoCommentsRequest) returns (CommentList){}   
    rpc UpdateVideoViewStatus(UpdateVideoViewRequest) returns (UpdateVideoViewResponse){}
+   rpc GetWatchHistory(WatchHistoryRequest) returns (VideoList){}
 
    // blocks
     rpc SignAndPubMsg(MessageBS) returns (google.protobuf.Empty) {}
@@ -132,4 +133,11 @@ message VideoRequest {
 message MyVideoRequest {
   uint64 formtime = 1; // 从新到旧
   int32 page_size = 2;  
+}
+
+message WatchHistoryRequest {
+  int32 page_size = 1;
+  bool include_completed = 2; // 是否包含已完成的观看
+  bool include_incomplete = 3; // 是否包含未完成的观看
+  string fromkey = 4; // 用于分页，从此key之后开始获取数据
 }

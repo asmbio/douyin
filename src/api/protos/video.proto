@@ -74,6 +74,10 @@ message Video {
   // 其他信息
   bool isLoved = 14;
   bool isCollect = 15;
+  
+  // 观看历史相关字段
+  uint32 watch_position = 16; // 视频已观看的位置（秒）
+  bool is_watched = 17;      // 视频是否已完整观看
 }
 
 // ========== 嵌套结构 ==========
@@ -263,7 +267,7 @@ message UpdateVideoViewRequest {
   string video_id = 1;        // The ID of the video (aweme_id)
   int64 watch_duration = 2;   // Duration watched in seconds
   bool completed = 3;         // Whether the video was watched completely
-  string position = 4;        // Position in video (in seconds) where user stopped watching
+  uint32 position = 4;        // Position in video (in seconds) where user stopped watching
 }
 
 message UpdateVideoViewResponse {

@@ -9,7 +9,8 @@ import {
   CONTACT_TAG,
   MyVideoRequestSchema,
   VideoRequestSchema,
-  VideoCommentsRequestSchema
+  VideoCommentsRequestSchema,
+  WatchHistoryRequestSchema
 } from './gen/moguervice_pb' // 请根据实际路径调整导入
 
 import { type UserInfo } from './gen/userinfo_pb'
@@ -177,6 +178,16 @@ export async function getRecommendedVideos(start: number, size: number) {
   })
   return client.getRecommendedVideos(request)
 }
+
+export async function getWatchHistory(fromkey: string, size: number) {
+  const request = create(WatchHistoryRequestSchema, {
+    pageSize: size,
+    includeCompleted: true,
+    includeIncomplete: true,
+    fromkey: fromkey
+  })
+  return client.getWatchHistory(request)
+}
 //
 export async function getVideoComments(
   addr: string,
@@ -198,7 +209,7 @@ export async function updateVideoViewStatus(
   videoId: string,
   watchDuration: number,
   completed: boolean,
-  position: string
+  position: number
 ) {
   const request = create(UpdateVideoViewRequestSchema, {
     videoId,

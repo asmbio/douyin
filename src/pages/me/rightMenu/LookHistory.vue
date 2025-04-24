@@ -10,7 +10,6 @@
     </BaseHeader>
     <div class="content">
       <Indicator
-        style="width: calc(100vw - 2rem); margin-left: 1rem"
         tabStyleWidth="50%"
         :tabTexts="['视频', '影视综']"
         v-model:active-index="data.currentSlideItemIndex"
@@ -18,7 +17,7 @@
       </Indicator>
       <SlideHorizontal v-model:index="data.currentSlideItemIndex" class="SlideHorizontal">
         <SlideItem class="tab1" style="overflow: auto">
-          <Scroll class="Scroll" @pulldown="getHistoryVideo">
+          <Scroll class="Scroll" @pulldown="getWatchHistoryVideos">
             <Posters :list="data.historyVideo.list" v-if="data.historyVideo.total"></Posters>
             <Loading :is-full-screen="false" v-if="data.loadingVideo" />
             <template v-else>
@@ -44,7 +43,8 @@
 import Posters from '@/components/Posters.vue'
 import Scroll from '@/components/Scroll.vue'
 import NoMore from '@/components/NoMore.vue'
-import { historyOther, historyVideo } from '@/api/videos'
+import { historyOther } from '@/api/videos'
+import { getWatchHistory } from '@/api/moguservice'
 
 import { computed, onMounted, reactive } from 'vue'
 import { _showConfirmDialog } from '@/utils'
@@ -62,7 +62,7 @@ const data = reactive({
   pageSize: 15,
   historyVideo: {
     total: 0,
-    pageNo: 0,
+    fromkey: '',
     list: []
   },
   historyOther: {
@@ -79,27 +79,37 @@ const isClear = computed(() => {
   return data.historyOther.list.length
 })
 onMounted(() => {
-  getHistoryVideo(true)
+  getWatchHistoryVideos(true)
   getHistoryOther(true)
 })
 
-async function getHistoryVideo(init = false) {
+async function getWatchHistoryVideos(init = false) {
   if (data.loadingVideo) return
   if (data.isClearHistoryVideo) return
-  if (!init) {
-    if (data.historyVideo.total <= data.historyVideo.list.length) return
-    data.historyVideo.pageNo++
-  }
+
   data.loadingVideo = true
-  let res: any = await historyVideo({
-    pageNo: data.historyVideo.pageNo,
-    pageSize: data.pageSize
-  })
-  console.log(res)
-  data.loadingVideo = false
-  if (res.success) {
-    data.historyVideo.list = data.historyVideo.list.concat(res.data.list)
-    data.historyVideo.total = res.data.total
+
+  try {
+    const res = await getWatchHistory(init ? '' : data.historyVideo.fromkey, data.pageSize)
+    console.log('getWatchHistory', res.all)
+    if (res && res.all) {
+      if (init) {
+        data.historyVideo.list = res.all
+      } else {
+        data.historyVideo.list = [...data.historyVideo.list, ...res.all]
+      }
+
+      data.historyVideo.total = data.historyVideo.list.length
+
+      // Save the last item's key for pagination
+      if (res.all.length > 0) {
+        data.historyVideo.fromkey = res.all[res.all.length - 1].awemeId || ''
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch watch history:', error)
+  } finally {
+    data.loadingVideo = false
   }
 }
 
@@ -122,15 +132,23 @@ async function getHistoryOther(init = false) {
 }
 
 function clear() {
-  _showConfirmDialog('确定清空？', '清空后，以往观看记录不再展示', 'gray', () => {
-    if (data.currentSlideItemIndex === 0) {
-      data.historyVideo.list = []
+  _showConfirmDialog(
+    '确定清空？',
+    '清空后，以往观看记录不再展示',
+    'gray',
+    () => {
+      if (data.currentSlideItemIndex === 0) {
+        data.historyVideo.list = []
+        data.isClearHistoryVideo = true
+        return
+      }
+      data.historyOther.list = []
       data.isClearHistoryVideo = true
-      return
-    }
-    data.historyOther.list = []
-    data.isClearHistoryVideo = true
-  })
+    },
+    null,
+    '取消',
+    '确定'
+  )
 }
 </script>
 
