@@ -10,21 +10,15 @@
       />
       <div class="tab-ctn">
         <div class="tabs" ref="tabs">
-          <div class="tab" :class="{ active: index === 0 }" @click.stop="change(0)">
-            <span>热点</span>
-          </div>
-          <div class="tab" :class="{ active: index === 1 }" @click.stop="change(1)">
-            <span>长视频</span>
-          </div>
-          <div class="tab" :class="{ active: index === 2 }" @click.stop="change(2)">
-            <span>关注</span>
-            <img src="../../../assets/img/icon/live.webp" class="tab2-img" />
-          </div>
-          <div class="tab" :class="{ active: index === 3 }" @click.stop="change(3)">
-            <span>发现</span>
-          </div>
-          <div class="tab" :class="{ active: index === 4 }" @click.stop="change(4)">
-            <span>推荐</span>
+          <div
+            v-for="(tab, i) in tabItems"
+            :key="i"
+            class="tab"
+            :class="{ active: index === i }"
+            @click.stop="change(i)"
+          >
+            <span>{{ tab.title }}</span>
+            <img v-if="tab.icon" :src="tab.icon" class="tab-icon" />
           </div>
         </div>
         <div class="indicator" ref="indicator"></div>
@@ -45,6 +39,7 @@ import bus from '../../../utils/bus'
 import { mapState } from 'pinia'
 import { useBaseStore } from '@/store/pinia'
 import { _css } from '@/utils/dom'
+import liveIcon from '../../../assets/img/icon/live.webp'
 
 export default {
   name: 'IndicatorHome',
@@ -70,6 +65,17 @@ export default {
     isLight: {
       type: Boolean,
       default: () => false
+    },
+    // 配置的tabs，允许自定义tab项
+    tabs: {
+      type: Array,
+      default: () => [
+        // { title: '热点' },
+        // { title: '长视频' },
+        { title: '关注', icon: liveIcon },
+        { title: '发现' },
+        { title: '推荐' }
+      ]
     }
   },
   setup() {
@@ -82,7 +88,8 @@ export default {
       lefts: [],
       indicatorSpace: 0,
       type: 1,
-      moveY: 0
+      moveY: 0,
+      tabItems: []
     }
   },
   computed: {
@@ -135,7 +142,9 @@ export default {
       return {}
     }
   },
-  created() {},
+  created() {
+    this.tabItems = this.tabs
+  },
   mounted() {
     this.initTabs()
     bus.on(this.name + '-moveX', this.move)
@@ -149,7 +158,17 @@ export default {
     bus.off(this.name + '-moveY')
     bus.off(this.name + '-end', this.end)
   },
-
+  watch: {
+    tabs: {
+      handler(newVal) {
+        this.tabItems = newVal
+        this.$nextTick(() => {
+          this.initTabs()
+        })
+      },
+      deep: true
+    }
+  },
   methods: {
     change(index) {
       this.$emit('update:index', index)
@@ -157,6 +176,7 @@ export default {
       _css(this.indicatorRef, 'left', this.lefts[index] + 'px')
     },
     initTabs() {
+      this.lefts = []
       let tabs = this.$refs.tabs
       this.indicatorRef = this.$refs.indicator
       let indicatorWidth = _css(this.indicatorRef, 'width')
@@ -250,21 +270,15 @@ export default {
           position: relative;
           font-size: 17rem;
           cursor: pointer;
+          padding: 0 5rem;
+          white-space: nowrap;
+          flex: 1;
+          text-align: center;
 
-          .tab1-img {
-            position: absolute;
-            @width: 12rem;
-            width: @width;
-            height: @width;
-            margin-left: 4rem;
-            transition: all 0.3s;
-            // margin-top: 7rem;
-          }
-
-          .tab2-img {
+          .tab-icon {
             position: absolute;
             height: 15rem;
-            left: 24rem;
+            margin-left: 4rem;
             top: -5rem;
           }
 
