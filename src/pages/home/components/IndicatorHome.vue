@@ -70,11 +70,11 @@ export default {
     tabs: {
       type: Array,
       default: () => [
-        // { title: '热点' },
-        // { title: '长视频' },
-        { title: '关注', icon: liveIcon },
-        { title: '发现' },
-        { title: '推荐' }
+        // { title: '热点',index:0 },
+        // { title: '长视频',index:1 },
+        { title: '关注', index: 2, icon: liveIcon },
+        { title: '发现', index: 3 },
+        { title: '推荐', index: 4 }
       ]
     }
   },
@@ -171,7 +171,7 @@ export default {
   },
   methods: {
     change(index) {
-      this.$emit('update:index', index)
+      this.$emit('update:index', this.tabItems[index].index)
       _css(this.indicatorRef, 'transition-duration', `300ms`)
       _css(this.indicatorRef, 'left', this.lefts[index] + 'px')
     },
