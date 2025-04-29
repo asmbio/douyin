@@ -1,7 +1,7 @@
 import { getDftAddr, getNoticeList, getNoticeStream } from '@/api/moguservice'
 import { useBaseStore } from './pinia'
 import { onUnmounted } from 'vue'
-import { PlatformAdapter } from '@/utils/platform'
+import { platformAdapter } from '@/utils/platform'
 import { _sleep } from '@/utils'
 
 // 使用Composition API实现
@@ -13,7 +13,7 @@ export function useNoticeStream() {
   const init = async () => {
     try {
       store.loading = true
-      const platformAdapter = new PlatformAdapter()
+
       // 获取当前平台
       console.log('Current platform:', platformAdapter.platform)
       const start = await platformAdapter.executePlatformAction('')

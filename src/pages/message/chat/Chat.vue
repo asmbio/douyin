@@ -1,7 +1,7 @@
 <template>
   <div class="Chat">
     <div class="chat-content" @touchstart="data.tooltipTop = -1">
-      <div class="header">
+      <div class="header" :style="{ paddingTop: store.statusbarHeight + 'rem' }">
         <div class="left">
           <dy-back @click="back()"></dy-back>
           <img

@@ -27,7 +27,7 @@
         </div>
       </div>
       <div class="row" @click="_notice('不可修改')">
-        <div class="left">抖音号</div>
+        <div class="left">用户ID</div>
         <div class="right">
           <span>{{ isEmpty(_getUserDouyinId({ author: store.userinfo })) }}</span>
           <dy-back scale=".8" direction="right"></dy-back>

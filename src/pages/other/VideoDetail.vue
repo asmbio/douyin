@@ -1,6 +1,6 @@
 <template>
   <div id="video-detail">
-    <div class="search-wrapper">
+    <div class="search-wrapper" :style="{ paddingTop: baseStore.statusbarHeight + 'px' }">
       <Icon class="back" icon="icon-park-outline:left" @click="router.back" />
       <div class="search" @click="nav('/home/search')">
         <div class="left">

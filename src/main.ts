@@ -54,6 +54,7 @@ app.use(VueLazyload, {
 app.use(pinia)
 app.use(router)
 const store = useBaseStore()
+store.initplatform()
 
 app.mount('#app')
 console.log("app.mount('#app')")

@@ -1,4 +1,5 @@
 import Mogu from '@/definitions'
+import StatusBarHeight from '@/plugins/StatusBarHeightPlugin'
 
 declare global {
   interface Window {
@@ -98,7 +99,7 @@ export class PlatformActionHandler {
 // platform-adapter.ts
 type PlatformChangeCallback = (platform: Platform) => void
 
-export class PlatformAdapter {
+class PlatformAdapter {
   private currentPlatform: Platform
   private readonly resizeHandler: () => void
   private readonly callbacks: PlatformChangeCallback[] = []
@@ -122,6 +123,24 @@ export class PlatformAdapter {
 
   public async executePlatformAction(pwd: string): Promise<{ value: string }> {
     return PlatformActionHandler.execute(this.currentPlatform, pwd)
+  }
+
+  public async getStatusBarHeight(): Promise<number> {
+    let statusBarHeight = 0
+    if (this.isMobile) {
+      try {
+        const result = await StatusBarHeight.getHeight()
+        statusBarHeight = result.height
+        console.log('Capacitor StatusBarHeight plugin result:', statusBarHeight)
+      } catch (error) {
+        console.error('Error getting status bar height:', error)
+        // Fallback to default value
+        statusBarHeight = 44
+      }
+    }
+
+    console.log('statusBarHeight', statusBarHeight)
+    return statusBarHeight
   }
 
   public subscribe(callback: PlatformChangeCallback): void {
@@ -158,6 +177,8 @@ export class PlatformAdapter {
     this.updatePlatform()
   }
 }
+
+export const platformAdapter = new PlatformAdapter()
 
 //   // 使用示例
 //   const platformAdapter = new PlatformAdapter();

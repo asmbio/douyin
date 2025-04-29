@@ -8,7 +8,7 @@
     <div class="content">
       <div class="recommend">
         <div class="title">
-          <div class="left">已有20+位朋友加入抖音</div>
+          <div class="left">已有20+位朋友加入蘑菇</div>
         </div>
         <div class="list">
           <People :key="i" v-for="(item, i) in data.list" :people="item"></People>

@@ -178,7 +178,7 @@ let state = reactive({
   status: props.isPlay ? SlideItemPlayStatus.Play : SlideItemPlayStatus.Pause,
   duration: 0,
   step: 0,
-  currentTime: -1,
+  currentTime: 0,
   playX: 0,
   start: { x: 0 },
   last: { x: 0, time: 0 },

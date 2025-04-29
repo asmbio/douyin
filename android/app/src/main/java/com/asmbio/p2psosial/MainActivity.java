@@ -25,6 +25,8 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
 
         registerPlugin(MoguPlugin.class);
+        registerPlugin(StatusBarHeightPlugin.class);
+
         super.onCreate(savedInstanceState);
         var  filesDir= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         File appDataDir = new File(filesDir, "mogu");

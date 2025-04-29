@@ -176,7 +176,7 @@
               </div>
             </div>
           </div>
-          <span class="bottom">抖音红包</span>
+          <span class="bottom">蘑菇红包</span>
         </div>
 
         <div class="cart" v-if="message.type === MESSAGE_TYPE.BUSINESS_CARD">

@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import { _no } from '@/utils'
 import bus, { EVENT_KEY } from '../utils/bus'
 
 export default {
@@ -56,7 +57,8 @@ export default {
           this.$nav('/home')
           break
         case 2:
-          this.$nav('/shop')
+          //this.$nav('/shop')
+          _no()
           break
         case 3:
           this.$nav('/publish')

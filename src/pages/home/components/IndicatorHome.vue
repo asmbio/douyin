@@ -72,9 +72,9 @@ export default {
       default: () => [
         // { title: '热点',index:0 },
         // { title: '长视频',index:1 },
-        { title: '关注', index: 2, icon: liveIcon },
-        { title: '发现', index: 3 },
-        { title: '推荐', index: 4 }
+        { title: '关注', icon: liveIcon },
+        { title: '发现' },
+        { title: '推荐' }
       ]
     }
   },
@@ -93,28 +93,41 @@ export default {
     }
   },
   computed: {
-    ...mapState(useBaseStore, ['judgeValue', 'homeRefresh']),
+    ...mapState(useBaseStore, ['judgeValue', 'homeRefresh', 'statusbarHeight']),
+
     transform() {
       return `translate3d(0, ${this.moveY - this.judgeValue > this.homeRefresh ? this.homeRefresh : this.moveY - this.judgeValue}px, 0)`
     },
     toolbarStyle() {
+      console.log('this.statusbarHeight', this.statusbarHeight)
       if (this.loading) {
         return {
           opacity: 1,
           'transition-duration': '300ms',
-          transform: `translate3d(0, 0, 0)`
+          transform: `translate3d(0, 0, 0)`,
+          paddingTop: this.statusbarHeight + 'px'
         }
       }
       if (this.moveY) {
         return {
           opacity: 1 - (this.moveY - this.judgeValue) / (this.homeRefresh / 2),
-          transform: this.transform
+          transform: this.transform,
+          paddingTop: this.statusbarHeight + 'px'
+        }
+      }
+      if (this.statusbarHeight) {
+        return {
+          opacity: 1,
+          'transition-duration': '300ms',
+          transform: `translate3d(0, 0, 0)`,
+          paddingTop: this.statusbarHeight + 'px'
         }
       }
       return {
         opacity: 1,
         'transition-duration': '300ms',
-        transform: `translate3d(0, 0, 0)`
+        transform: `translate3d(0, 0, 0)`,
+        paddingTop: this.statusbarHeight + 'px'
       }
     },
     noticeStyle() {
@@ -147,6 +160,7 @@ export default {
   },
   mounted() {
     this.initTabs()
+
     bus.on(this.name + '-moveX', this.move)
     bus.on(this.name + '-moveY', (e) => {
       this.moveY = e
@@ -171,7 +185,7 @@ export default {
   },
   methods: {
     change(index) {
-      this.$emit('update:index', this.tabItems[index].index)
+      this.$emit('update:index', index)
       _css(this.indicatorRef, 'transition-duration', `300ms`)
       _css(this.indicatorRef, 'left', this.lefts[index] + 'px')
     },
@@ -255,7 +269,9 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-
+    //padding-top: var(--status-bar-height);
+    // padding-top: env(safe-area-inset-top, 0px);    /* 新标准 */
+    // padding-top: constant(safe-area-inset-top, 0px); /* 兼容旧版 iOS */
     .tab-ctn {
       width: 80%;
       position: relative;

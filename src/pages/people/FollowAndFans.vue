@@ -207,7 +207,7 @@ watch(
       if (data.slideIndex === 1) {
         friends = data.fans
       }
-      //TODO 搜索时仅仅判断是否包含了对应字符串，抖音做了拼音判断的
+      //TODO 搜索时仅仅判断是否包含了对应字符串，蘑菇做了拼音判断的
       data.searchFriends = friends.filter((v) => {
         if (v.displayname.includes(newVal)) return true
         return v.nickname.includes(newVal)

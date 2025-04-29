@@ -142,7 +142,7 @@ onMounted(async () => {
   font-size: 14rem;
 }
 
-@media screen and (min-width: 500px) {
+@media screen and (min-width: 5000px) {
   #app {
     width: 500px !important;
     position: relative;

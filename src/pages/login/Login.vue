@@ -39,11 +39,11 @@
         </div>
         <div class="right">
           我已阅读并同意
-          <span class="link" @click="nav('/service-protocol', { type: '“抖音”用户服务协议' })"
+          <span class="link" @click="nav('/service-protocol', { type: '“蘑菇”用户服务协议' })"
             >个人数据不可侵犯</span
           >
           <!-- 和
-          <span class="link" @click="nav('/service-protocol', { type: '“抖音”隐私政策' })"
+          <span class="link" @click="nav('/service-protocol', { type: '“蘑菇”隐私政策' })"
             >个人数据不可侵犯隐私政策</span
           >
           <div>
@@ -51,7 +51,7 @@
             <span class="link" @click="nav('/service-protocol', { type: '中国移动认证服务协议' })"
               >《中国移动认证服务条款》</span
             >
-            ，同时登录并使用抖音火山版（原“火山小视频”）和抖音
+            ，同时登录并使用蘑菇火山版（原“火山小视频”）和蘑菇
           </div> -->
         </div>
       </div>
@@ -67,10 +67,7 @@
         </transition>
       </div>
       <transition name="fade">
-        <span
-          v-if="!data.isOtherLogin"
-          class="other-login-text link"
-          @click="data.isOtherLogin = !data.isOtherLogin"
+        <span v-if="!data.isOtherLogin" class="other-login-text link" @click="_no"
           >其他方式登录</span
         >
       </transition>
@@ -85,7 +82,7 @@ import { useNav } from '@/utils/hooks/useNav'
 import { _no } from '@/utils'
 import { useBaseStore } from '@/store/pinia'
 import LoginInput from './components/LoginInput.vue'
-import { getDftAddr, startCore } from '@/api/moguservice'
+import { startCore } from '@/api/moguservice'
 import Check from '@/components/Check.vue'
 
 defineOptions({

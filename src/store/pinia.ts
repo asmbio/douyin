@@ -19,6 +19,8 @@ import {
 } from '@/api/gen/message_pb'
 import { create } from '@bufbuild/protobuf'
 import { h } from 'vue'
+import { platformAdapter } from '@/utils/platform'
+
 //let user: UserInfo
 
 // type Conversion = {
@@ -59,7 +61,7 @@ export const idMappings = new Map([
     {
       route: '/message/douyin-helper',
       img: new URL('../assets/img/icon/msg-icon5.webp', import.meta.url).href,
-      name: '抖音小助手',
+      name: '蘑菇小助手',
       tag: '官方'
     }
   ],
@@ -115,6 +117,7 @@ export const useBaseStore = defineStore('base', {
     return {
       bodyHeight: document.body.clientHeight,
       bodyWidth: document.body.clientWidth,
+      statusbarHeight: 0,
       maskDialog: false,
       maskDialogMode: 'dark',
       version: '17.1.0',
@@ -215,7 +218,18 @@ export const useBaseStore = defineStore('base', {
     }
   },
   actions: {
+    async initplatform() {
+      this.statusbarHeight = await platformAdapter.getStatusBarHeight()
+    },
     async init() {
+      console.log(
+        'init ,window.innerWidth,window.innerHeight,screen.width,screen.height',
+        window.innerWidth,
+        window.innerHeight,
+        screen.width,
+        screen.height
+      )
+
       let success = false
       while (!success) {
         try {

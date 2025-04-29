@@ -2,7 +2,12 @@
   <div class="Me">
     <SlideRowList name="baseSlide" style="width: 100%" v-model:active-index="baseActiveIndex">
       <SlideItem>
-        <div ref="float" class="float" :class="floatFixed ? 'fixed' : ''">
+        <div
+          ref="float"
+          class="float"
+          :class="floatFixed ? 'fixed' : ''"
+          :style="{ paddingTop: statusbarHeight + 'rem' }"
+        >
           <div
             :style="floatFixed ? 'opacity: 0;' : ''"
             class="left"
@@ -64,7 +69,7 @@
                   <p class="name">{{ userinfo?.displayname }}</p>
                   <div class="number mb1r">
                     <span class="mr1r" v-if="userinfo?.is_private">私密账号</span>
-                    <span>抖音号：{{ userinfo?.uid }}</span>
+                    <span>用户ID：{{ userinfo?.uid }}</span>
                     <img
                       src="../../assets/img/icon/me/qrcode-gray.png"
                       alt=""
@@ -125,7 +130,7 @@
               <div class="other">
                 <div class="item" @click="_no">
                   <Icon icon="iconamoon:shopping-card-light" />
-                  <span>抖音商城</span>
+                  <span>我的商城</span>
                 </div>
                 <div class="item" @click="$nav('/me/my-music')">
                   <Icon icon="iconamoon:music-2-light" />
@@ -281,7 +286,7 @@
             </div>
             <div class="li" @click="_no">
               <img src="../../assets/img/icon/newicon/left_menu/gongyi.png" alt="" />
-              <span>抖音公益</span>
+              <span>蘑菇公益</span>
             </div>
             <div class="li" @click="$nav('/me/right-menu/minor-protection/index')">
               <img src="../../assets/img/icon/newicon/left_menu/umbrella.png" alt="" />
@@ -397,6 +402,7 @@ import { useBaseStore } from '@/store/pinia'
 
 import { userCollect } from '@/api/user'
 import SlideRowList from '@/components/slide/SlideRowList.vue'
+
 // const store =useBaseStore()
 // console.log(store.userinfo)
 //const { userinfo, bodyHeight,bodyWidth } = storeToRefs(store)
@@ -458,7 +464,7 @@ export default {
       if (this.tempScroll || this.isScroll) return { overflow: 'auto' }
       return { overflow: 'hidden' }
     },
-    ...mapState(useBaseStore, ['userinfo', 'bodyHeight', 'bodyWidth', 'videos'])
+    ...mapState(useBaseStore, ['userinfo', 'bodyHeight', 'bodyWidth', 'statusbarHeight', 'videos'])
   },
   watch: {
     contentIndex(newVal, oldVal) {

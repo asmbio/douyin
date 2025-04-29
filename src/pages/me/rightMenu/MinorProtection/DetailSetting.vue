@@ -59,9 +59,9 @@
           <span>我已阅读并接受</span>
           <span
             style="color: yellow"
-            @click="nav('/service-protocol', { type: '抖音亲子平台服务协议' })"
+            @click="nav('/service-protocol', { type: '蘑菇亲子平台服务协议' })"
           >
-            《抖音亲子平台服务协议》
+            《蘑菇亲子平台服务协议》
           </span>
         </div>
         <BaseButton type="primary">立即绑定</BaseButton>

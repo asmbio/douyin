@@ -1,6 +1,13 @@
 <template>
   <div class="posters">
-    <div class="poster-item" :key="index" v-for="(i, index) in list" @click="goDetail(index)">
+    <div
+      class="poster-item"
+      :key="index"
+      v-for="(i, index) in list"
+      @click="goDetail(index)"
+      :style="{ order: index }"
+    >
+      <!-- 添加order样式保持原始顺序 -->>
       <video
         class="poster"
         @loadedmetadata="handleMetadata($event, index)"
@@ -125,19 +132,24 @@ function handleMetadata(event, index) {
 <style scoped lang="less">
 .posters {
   display: grid;
-  grid-template-columns: 33.33% 33.33% 33.33%;
+  grid-template-columns: repeat(auto-fill, 120rem);
+  gap: 2rem;
+  grid-auto-flow: dense; /* 允许密集填充 */
+  align-items: start; /* 列对齐到顶部 */
+  justify-content: center; /* 行对齐到左侧 */
 }
 
 .poster-item {
-  height: 200rem;
-  max-height: calc(33.33vw * 1.3);
+  width: 120rem;
   border: 0.5px solid black;
   overflow: hidden;
   position: relative;
+  break-inside: avoid; /* 防止元素被拆分到不同列 */
 
   .poster {
     width: 100%;
-    height: 100%;
+    height: auto;
+    object-fit: contain;
   }
 
   .top,

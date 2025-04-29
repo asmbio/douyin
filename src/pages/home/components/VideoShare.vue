@@ -136,7 +136,7 @@ export default {
             totoutiao: '今日头条',
             dislike: '不感兴趣',
             bizhi: '动态壁纸',
-            code: '抖音码'
+            code: '二维码'
           }
         }
       },

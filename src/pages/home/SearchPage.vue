@@ -2,7 +2,7 @@
   <div class="Search">
     <div class="header">
       <dy-back mode="light" @click="router.back" class="mr1r"></dy-back>
-      <Search placeholder="搜索用户名字/抖音号" :isShowRightText="true" @notice="_no"></Search>
+      <Search placeholder="搜索用户名字/用户ID" :isShowRightText="true" @notice="_no"></Search>
     </div>
     <div class="content">
       <div class="history">
@@ -45,7 +45,7 @@
       <div class="rank-list">
         <div class="indicator">
           <div class="tab" :class="{ active: data.slideIndex === 0 }" @click="data.slideIndex = 0">
-            抖音热榜
+            蘑菇热榜
           </div>
           <div class="tab" :class="{ active: data.slideIndex === 1 }" @click="data.slideIndex = 1">
             直播榜

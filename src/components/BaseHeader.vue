@@ -1,6 +1,6 @@
 <template>
   <div id="BaseHeader" :class="[props.isFixed ? 'fixed' : '']">
-    <div class="header">
+    <div class="header" :style="{ paddingTop: statusBarHeight + 'rem' }">
       <dy-back
         :mode="props.backMode"
         :img="props.backImg"
@@ -15,7 +15,8 @@
   </div>
 </template>
 <script setup lang="ts">
-import { useAttrs } from 'vue'
+import { useBaseStore } from '@/store/pinia'
+import { computed, useAttrs } from 'vue'
 import { useRouter } from 'vue-router'
 
 defineOptions({
@@ -42,6 +43,7 @@ const props = defineProps({
 })
 const router = useRouter()
 const attrs: any = useAttrs()
+const baseStore = useBaseStore()
 
 function back() {
   if (attrs.onBack) {
@@ -50,6 +52,7 @@ function back() {
     router.back()
   }
 }
+const statusBarHeight = computed(() => baseStore.statusbarHeight)
 </script>
 
 <style scoped lang="less">
@@ -73,6 +76,8 @@ function back() {
     box-sizing: border-box;
     border-bottom: 1px solid #cccccc11;
     position: relative;
+    padding-top: env(safe-area-inset-top, 0px); /* 新标准 */
+    padding-top: constant(safe-area-inset-top, 0px); /* 兼容旧版 iOS */
 
     .left {
       position: absolute;

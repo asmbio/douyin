@@ -103,6 +103,7 @@
           name="second"
           @showSlidebar="state.baseIndex = 0"
           v-model:index="state.navIndex"
+          :tabs="homeindex"
         />
         <SlideHorizontal
           class="first-horizontal-item"
@@ -110,17 +111,16 @@
           :change-active-index-use-anim="false"
           v-model:index="state.navIndex"
         >
-          <!--          <SlideItem></SlideItem>-->
-          <Slide0 :active="state.navIndex === 0 && state.baseIndex === 1" />
-          <SlideItem>
+          <!-- <Slide0 :active="state.navIndex === 0 && state.baseIndex === 1" /> -->
+          <!-- <SlideItem>
             <LongVideo :active="state.navIndex === 1 && state.baseIndex === 1" />
-          </SlideItem>
-          <!--          <SlideItem></SlideItem>-->
-          <Slide2 :active="state.navIndex === 2 && state.baseIndex === 1" />
+          </SlideItem> -->
+
+          <Slide2 :active="state.navIndex === 0 && state.baseIndex === 1" />
           <SlideItem>
-            <Community :active="state.navIndex === 3 && state.baseIndex === 1" />
+            <Community :active="state.navIndex === 1 && state.baseIndex === 1" />
           </SlideItem>
-          <Slide4 :active="state.navIndex === 4 && state.baseIndex === 1" />
+          <Slide4 :active="state.navIndex === 2 && state.baseIndex === 1" />
         </SlideHorizontal>
 
         <BaseFooter v-bind:init-tab="1" />
@@ -193,19 +193,26 @@ import { useBaseStore } from '@/store/pinia'
 import BaseMask from '@/components/BaseMask.vue'
 import type { UserInfo } from '@/api/gen/userinfo_pb'
 import type { VideoInfo, VideoList, Video as pVideo } from '@/api/gen/video_pb'
+import liveIcon from '../../assets/img/icon/live.webp'
 
 defineOptions({
   name: 'Home'
 })
 const nav = useNav()
 const baseStore = useBaseStore()
-
+const homeindex = [
+  // { title: '热点',index:0 },
+  // { title: '长视频',index:1 },
+  { title: '关注', index: 2, icon: liveIcon },
+  { title: '发现', index: 3 },
+  { title: '推荐', index: 4 }
+]
 //const isMobile = ref(/Mobi|Android|iPhone/i.test(navigator.userAgent))
 
 const state = reactive({
   active: true,
   baseIndex: 1,
-  navIndex: 4,
+  navIndex: 2,
   itemIndex: 0,
   test: '',
   recommendList: [],

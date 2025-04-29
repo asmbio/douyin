@@ -65,7 +65,7 @@
               {{ 'wu' }}
             </div>
             <div class="number" v-else>
-              <span>抖音号：{{ _getUserDouyinId(props.currentItem) }}</span>
+              <span>用户ID：{{ _getUserDouyinId(props.currentItem) }}</span>
               <img
                 src="@/assets/img/icon/me/copy.png"
                 alt=""

@@ -10,7 +10,8 @@ import {
   MyVideoRequestSchema,
   VideoRequestSchema,
   VideoCommentsRequestSchema,
-  WatchHistoryRequestSchema
+  WatchHistoryRequestSchema,
+  ChronologicalVideosRequestSchema
 } from './gen/moguervice_pb' // 请根据实际路径调整导入
 
 import { type UserInfo } from './gen/userinfo_pb'
@@ -187,6 +188,22 @@ export async function getWatchHistory(fromkey: string, size: number) {
     fromkey: fromkey
   })
   return client.getWatchHistory(request)
+}
+
+export async function getChronologicalVideos(
+  referenceKey: string,
+  size: number,
+  direction: boolean
+) {
+  const request = create(ChronologicalVideosRequestSchema, {
+    pageSize: size,
+    referenceKey: referenceKey,
+    direction: direction,
+    includeWatched: true,
+    includeNotWatched: true,
+    includeNotFinished: true
+  })
+  return client.getChronologicalVideos(request)
 }
 //
 export async function getVideoComments(

@@ -216,7 +216,7 @@ async function copyLink() {
   await _sleep(500)
   _hideLoading()
   _copy(props.item.shareUrl)
-  //TODO 抖音样式改了
+  //TODO 蘑菇样式改了
   _notice('复制成功')
 }
 function delayShowDialog(cb) {

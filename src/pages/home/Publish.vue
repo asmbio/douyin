@@ -20,12 +20,17 @@
       </SlideHorizontal>
     </div>
     <div class="float">
-      <Icon class="close" icon="mingcute:close-line" @click="router.back()" />
-      <div class="choose-music">
+      <Icon
+        class="close"
+        :style="{ top: baseStore.statusbarHeight + 'rem' }"
+        icon="mingcute:close-line"
+        @click="router.back()"
+      />
+      <div class="choose-music" :style="{ top: baseStore.statusbarHeight + 'rem' }">
         <Icon icon="vaadin:music" />
         <span>选择音乐</span>
       </div>
-      <div class="toolbar">
+      <div class="toolbar" :style="{ top: baseStore.statusbarHeight + 'rem' }">
         <div class="tool" @click.stop="$emit('showComments')">
           <Icon icon="tabler:refresh" />
         </div>
@@ -53,6 +58,7 @@ import { IpfsFileSchema, Media_Video_MixedSchema } from '@/api/gen/trans_worksms
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { create } from '@bufbuild/protobuf'
+import { useBaseStore } from '@/store/pinia'
 
 defineOptions({
   name: 'Publish'
@@ -60,7 +66,7 @@ defineOptions({
 const router = useRouter()
 const videoEl = ref(null)
 const activeIndex = ref(1)
-
+const baseStore = useBaseStore()
 //访问用户媒体设备的兼容方法
 function getUserMedia(constrains, success, error) {
   if (navigator.mediaDevices.getUserMedia) {
@@ -197,7 +203,7 @@ onMounted(() => {
     left: 0;
     right: 0;
     top: 0;
-    height: calc(100% - 60px);
+    height: calc(100% - 60rem);
 
     .close {
       font-size: 28rem;

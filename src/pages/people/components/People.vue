@@ -50,7 +50,7 @@
             <span v-else>{{ people.displayname }}</span>
           </div>
           <div class="name f12">
-            抖音id:
+            用户ID:
 
             <span v-if="people.uid.indexOf(searchKey) > -1"
               >{{ people.uid.substr(0, people.uid.indexOf(searchKey))

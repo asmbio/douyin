@@ -41,6 +41,7 @@ service MoguService {
    rpc GetVideoComments(VideoCommentsRequest) returns (CommentList){}   
    rpc UpdateVideoViewStatus(UpdateVideoViewRequest) returns (UpdateVideoViewResponse){}
    rpc GetWatchHistory(WatchHistoryRequest) returns (VideoList){}
+   rpc GetChronologicalVideos(ChronologicalVideosRequest) returns (VideoList){}
 
    // blocks
     rpc SignAndPubMsg(MessageBS) returns (google.protobuf.Empty) {}
@@ -140,4 +141,13 @@ message WatchHistoryRequest {
   bool include_completed = 2; // 是否包含已完成的观看
   bool include_incomplete = 3; // 是否包含未完成的观看
   string fromkey = 4; // 用于分页，从此key之后开始获取数据
+}
+
+message ChronologicalVideosRequest {
+  int32 page_size = 1; // 每次请求视频数量
+  string reference_key = 2; // 参考键，用于分页
+  bool direction = 3; // 分页方向: true表示向下获取较旧视频，false表示向上获取较新视频
+  bool include_watched = 4; // 是否包含已观看视频
+  bool include_not_finished = 5; // 是否包含未看完视频
+  bool include_not_watched = 6; // 是否包含未观看视频
 }

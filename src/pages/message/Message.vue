@@ -1,7 +1,7 @@
 <template>
   <div id="Message" ref="app" :class="data.createChatDialog ? 'disable-scroll' : ''">
     <div class="no-search" v-show="!data.searching">
-      <header>
+      <header :style="{ paddingTop: store.statusbarHeight + 'rem' }">
         <Icon @click="data.createChatDialog = true" icon="formkit:add" />
         <Icon icon="tabler:camera-selfie" />
         <Icon @click="data.searching = true" icon="tabler:search" />
@@ -80,7 +80,7 @@
                 <div class="right">
                   <div class="info">
                     <span class="name">{{ item.name }}</span>
-                    <span class="account">{{ item.account ? '抖音号:' + item.account : '' }}</span>
+                    <span class="account">{{ item.account ? '用户ID:' + item.account : '' }}</span>
                   </div>
                   <img v-if="item.select" src="../../assets/img/icon/message/checked.png" alt="" />
                   <img
@@ -380,7 +380,7 @@ watch(
   () => data.createChatSearchKey,
   (newVal) => {
     if (newVal) {
-      //TODO 搜索时仅仅判断是否包含了对应字符串，抖音做了拼音判断的
+      //TODO 搜索时仅仅判断是否包含了对应字符串，蘑菇做了拼音判断的
       data.searchFriends = store.friends.all.filter((v) => {
         if (v.displayname.includes(newVal)) return true
         return v.nickname.includes(newVal)
