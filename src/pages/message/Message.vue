@@ -1,7 +1,7 @@
 <template>
   <div id="Message" ref="app" :class="data.createChatDialog ? 'disable-scroll' : ''">
     <div class="no-search" v-show="!data.searching">
-      <header :style="{ paddingTop: store.statusbarHeight + 'rem' }">
+      <header :style="{ paddingTop: store.statusbarHeight + 'px' }">
         <Icon @click="data.createChatDialog = true" icon="formkit:add" />
         <Icon icon="tabler:camera-selfie" />
         <Icon @click="data.searching = true" icon="tabler:search" />

@@ -130,7 +130,9 @@ class PlatformAdapter {
     if (this.isMobile) {
       try {
         const result = await StatusBarHeight.getHeight()
-        statusBarHeight = result.height
+        const cssPixels = result.height / window.devicePixelRatio
+
+        statusBarHeight = cssPixels
         console.log('Capacitor StatusBarHeight plugin result:', statusBarHeight)
       } catch (error) {
         console.error('Error getting status bar height:', error)

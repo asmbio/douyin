@@ -6,7 +6,7 @@
           ref="float"
           class="float"
           :class="floatFixed ? 'fixed' : ''"
-          :style="{ paddingTop: statusbarHeight + 'rem' }"
+          :style="{ paddingTop: statusbarHeight + 'px' }"
         >
           <div
             :style="floatFixed ? 'opacity: 0;' : ''"

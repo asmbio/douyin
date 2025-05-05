@@ -1,5 +1,9 @@
 <template>
-  <div class="indicator-home" :class="{ isLight }">
+  <div
+    class="indicator-home"
+    :class="{ isLight }"
+    :style="{ paddingTop: statusbarHeight - 10 + 'px' }"
+  >
     <div class="notice" :style="noticeStyle"><span>下拉刷新内容</span></div>
     <div class="toolbar" ref="toolbar" :style="toolbarStyle">
       <Icon
@@ -104,30 +108,30 @@ export default {
         return {
           opacity: 1,
           'transition-duration': '300ms',
-          transform: `translate3d(0, 0, 0)`,
-          paddingTop: this.statusbarHeight + 'px'
+          transform: `translate3d(0, 0, 0)`
+          //paddingTop: this.statusbarHeight + 'px'
         }
       }
       if (this.moveY) {
         return {
           opacity: 1 - (this.moveY - this.judgeValue) / (this.homeRefresh / 2),
-          transform: this.transform,
-          paddingTop: this.statusbarHeight + 'px'
+          transform: this.transform
+          //paddingTop: this.statusbarHeight + 'px'
         }
       }
       if (this.statusbarHeight) {
         return {
           opacity: 1,
           'transition-duration': '300ms',
-          transform: `translate3d(0, 0, 0)`,
-          paddingTop: this.statusbarHeight + 'px'
+          transform: `translate3d(0, 0, 0)`
+          //paddingTop: this.statusbarHeight + 'px'
         }
       }
       return {
         opacity: 1,
         'transition-duration': '300ms',
-        transform: `translate3d(0, 0, 0)`,
-        paddingTop: this.statusbarHeight + 'px'
+        transform: `translate3d(0, 0, 0)`
+        //paddingTop: this.statusbarHeight + 'px'
       }
     },
     noticeStyle() {

@@ -132,19 +132,38 @@ function handleMetadata(event, index) {
 <style scoped lang="less">
 .posters {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 120rem);
+  grid-template-columns: repeat(auto-fit, minmax(120rem, 1fr));
   gap: 2rem;
-  grid-auto-flow: dense; /* 允许密集填充 */
-  align-items: start; /* 列对齐到顶部 */
-  justify-content: center; /* 行对齐到左侧 */
+  grid-auto-flow: dense;
+  align-items: start;
+  justify-content: center;
+
+  /* 计算列数并设置每列宽度的媒体查询 */
+  /* 2列 */
+  @media screen and (min-width: 250rem) and (max-width: 370rem) {
+    grid-template-columns: repeat(2, calc(50% - 1rem));
+  }
+  /* 3列 */
+  @media screen and (min-width: 371rem) and (max-width: 490rem) {
+    grid-template-columns: repeat(3, calc(33.33% - 1.33rem));
+  }
+  /* 4列 */
+  @media screen and (min-width: 491rem) and (max-width: 610rem) {
+    grid-template-columns: repeat(4, calc(25% - 1.5rem));
+  }
+  /* 5列及以上 */
+  @media screen and (min-width: 611rem) {
+    grid-template-columns: repeat(auto-fill, minmax(120rem, 1fr));
+  }
 }
 
 .poster-item {
-  width: 120rem;
+  min-width: 120rem;
+  width: 100%;
   border: 0.5px solid black;
   overflow: hidden;
   position: relative;
-  break-inside: avoid; /* 防止元素被拆分到不同列 */
+  break-inside: avoid;
 
   .poster {
     width: 100%;

@@ -324,13 +324,24 @@ export default {
 
     .poster-wrapper {
       display: grid;
-      grid-template-columns: repeat(3, 31%);
+      grid-template-columns: repeat(auto-fit, minmax(120rem, 1fr));
+      gap: 2rem;
+      width: 100%;
 
-      grid-column-gap: 3.5%;
-      grid-row-gap: 2%;
+      /* 计算列数并设置每列宽度的媒体查询 */
+      /* 2列 */
+      @media screen and (min-width: 250rem) and (max-width: 370rem) {
+        grid-template-columns: repeat(2, calc(50% - 1rem));
+      }
+      /* 3列 */
+      @media screen and (min-width: 371rem) {
+        grid-template-columns: repeat(3, calc(33.33% - 1.33rem));
+      }
     }
 
     .poster-item {
+      min-width: 120rem;
+      width: 100%;
       border-radius: 8rem;
       overflow: hidden;
       position: relative;

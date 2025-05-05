@@ -22,15 +22,15 @@
     <div class="float">
       <Icon
         class="close"
-        :style="{ top: baseStore.statusbarHeight + 'rem' }"
+        :style="{ top: baseStore.statusbarHeight + 'px' }"
         icon="mingcute:close-line"
         @click="router.back()"
       />
-      <div class="choose-music" :style="{ top: baseStore.statusbarHeight + 'rem' }">
+      <div class="choose-music" :style="{ top: baseStore.statusbarHeight + 'px' }">
         <Icon icon="vaadin:music" />
         <span>选择音乐</span>
       </div>
-      <div class="toolbar" :style="{ top: baseStore.statusbarHeight + 'rem' }">
+      <div class="toolbar" :style="{ top: baseStore.statusbarHeight + 'px' }">
         <div class="tool" @click.stop="$emit('showComments')">
           <Icon icon="tabler:refresh" />
         </div>

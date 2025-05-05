@@ -1,6 +1,10 @@
 <template>
-  <div id="BaseHeader" :class="[props.isFixed ? 'fixed' : '']">
-    <div class="header" :style="{ paddingTop: statusBarHeight + 'rem' }">
+  <div
+    id="BaseHeader"
+    :class="[props.isFixed ? 'fixed' : '']"
+    :style="{ paddingTop: statusBarHeight + 'px' }"
+  >
+    <div class="header">
       <dy-back
         :mode="props.backMode"
         :img="props.backImg"
@@ -52,7 +56,7 @@ function back() {
     router.back()
   }
 }
-const statusBarHeight = computed(() => baseStore.statusbarHeight)
+const statusBarHeight = computed(() => baseStore.statusbarHeight - 10)
 </script>
 
 <style scoped lang="less">
@@ -76,8 +80,6 @@ const statusBarHeight = computed(() => baseStore.statusbarHeight)
     box-sizing: border-box;
     border-bottom: 1px solid #cccccc11;
     position: relative;
-    padding-top: env(safe-area-inset-top, 0px); /* 新标准 */
-    padding-top: constant(safe-area-inset-top, 0px); /* 兼容旧版 iOS */
 
     .left {
       position: absolute;
