@@ -155,7 +155,8 @@ async function login() {
   color: black;
   font-size: 14rem;
   background: white;
-
+  max-width: 500rem;
+  margin: auto;
   .content {
     padding: 60rem 30rem;
 

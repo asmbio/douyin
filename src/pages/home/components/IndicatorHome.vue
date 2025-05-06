@@ -170,11 +170,17 @@ export default {
       this.moveY = e
     })
     bus.on(this.name + '-end', this.end)
+
+    // 添加窗口大小变化监听
+    window.addEventListener('resize', this.handleResize)
   },
   unmounted() {
     bus.off(this.name + '-moveX', this.move)
     bus.off(this.name + '-moveY')
     bus.off(this.name + '-end', this.end)
+
+    // 移除窗口大小变化监听
+    window.removeEventListener('resize', this.handleResize)
   },
   watch: {
     tabs: {
@@ -188,6 +194,9 @@ export default {
     }
   },
   methods: {
+    handleResize() {
+      this.initTabs()
+    },
     change(index) {
       this.$emit('update:index', index)
       _css(this.indicatorRef, 'transition-duration', `300ms`)
