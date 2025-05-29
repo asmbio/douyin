@@ -23,6 +23,7 @@ https://github.com/asmbio/Release/tree/main/p2psosial_v0.0.1-dev
 
 cd douyin
 npm install
+npx buf generate
 npm run dev
 ```
 
